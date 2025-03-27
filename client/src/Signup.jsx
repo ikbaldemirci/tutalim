@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "./api";
 
 function Signup() {
@@ -90,10 +90,13 @@ function Signup() {
           >
             <option value="emlakçı">Emlakçı</option>
             <option value="ev sahibi">Ev Sahibi</option>
+            <option value="kullanıcı">Kullanıcı</option>
           </select>
         </div>
         <button type="submit">SignUp</button>
       </form>
+      <p>Already Have an Account</p>
+      <Link to="/login">Login</Link>
     </div>
   );
 }

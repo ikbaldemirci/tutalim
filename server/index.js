@@ -39,6 +39,9 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = "tutalim-secret";
+
 app.post("/api/login", async (req, res) => {
   const { mail, password } = req.body;
   const user = await collection.findOne({ mail });
@@ -48,7 +51,14 @@ app.post("/api/login", async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.json({ status: "fail", message: "Wrong password" });
 
-  res.json({ status: "success", message: "Login successful" });
+  const token = jwt.sign(
+    { id: user._id, role: user.role, name: user.name },
+    SECRET_KEY,
+    { expiresIn: "1h" }
+  );
+
+  // res.json({ status: "success", message: "Login successful" });
+  res.json({ status: "success", token });
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));
