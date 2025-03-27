@@ -13,8 +13,15 @@ function Login() {
     try {
       const res = await api.post("/login", { mail, password });
       if (res.data.status === "success") {
-        navigate("/home");
+        localStorage.setItem("token", res.data.token);
+        const decoded = JSON.parse(atob(res.data.token.split(".")[1]));
+
+        if (decoded.role === "emlakçı") navigate("/realtor");
+        else if (decoded.role === "ev sahibi") navigate("/owner");
+        else if (decoded.role === "kullanıcı") navigate("/");
+        // else if(decoded.role === "kullanıcı") navigate("/home");
       } else {
+        78;
         alert(res.data.message || "Login failed");
       }
     } catch (err) {
