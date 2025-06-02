@@ -1,7 +1,8 @@
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "./api";
+import api from "../api";
+import "./Login.css";
 
 function Login() {
   const [mail, setMail] = useState("");
@@ -31,10 +32,11 @@ function Login() {
   };
 
   return (
-    <div>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label htmlFor="mail">Mail:</label>
+    <div className="login-container">
+      <div className="login-box">
+        <h2>Giriş Yap</h2>
+        <form onSubmit={handleLogin}>
+          <label htmlFor="mail">E-posta</label>
           <input
             type="email"
             id="mail"
@@ -43,9 +45,8 @@ function Login() {
             onChange={(e) => setMail(e.target.value)}
             required
           />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
+
+          <label htmlFor="password">Parola</label>
           <input
             type="password"
             id="password"
@@ -54,12 +55,13 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      <p>
-        Hesabım yok <Link to="/signup">Signup</Link>
-      </p>
+
+          <button type="submit">Giriş Yap</button>
+        </form>
+        <p className="signup-link">
+          Hesabın yok mu? <Link to="/signup">Kayıt Ol</Link>
+        </p>
+      </div>
     </div>
   );
 }
