@@ -4,8 +4,13 @@ function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-transparent shadow-sm">
       <div className="container">
-        <NavLink className="navbar-brand fw-bold" to="/">
-          Tutalım.com
+        <NavLink to="/">
+          <img
+            src="/images/tutalim.png"
+            alt="Logo"
+            className="navbar-brand"
+            style={{ width: "150px" }}
+          />
         </NavLink>
         <button
           className="navbar-toggler"
