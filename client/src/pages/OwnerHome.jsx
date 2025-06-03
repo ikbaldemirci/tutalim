@@ -1,5 +1,5 @@
 import jwtDecode from "jwt-decode";
-import Navbar from "./components/Navbar";
+import Navbar from "../components/Navbar";
 
 function OwnerHome() {
   const token = localStorage.getItem("token");

@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
-import "./Login.css";
+import "../styles/Login.css";
 
 function Login() {
   const [mail, setMail] = useState("");
