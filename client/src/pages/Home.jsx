@@ -8,9 +8,8 @@ function Home() {
     <div
       className="container-fluid min-vh-100 d-flex flex-column justify-content-center  text-center"
       style={{
-        backgroundImage: 'url("/images/bg.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        background:
+          "linear-gradient(to bottom, rgba(150, 216, 230, 1), rgba(255, 255, 0, 0))",
       }}
     >
       <Navbar />
