@@ -9,7 +9,7 @@ function Signup() {
     surname: "",
     mail: "",
     password: "",
-    role: "emlakçı",
+    role: "realtor",
   });
 
   const navigate = useNavigate();
@@ -97,9 +97,9 @@ function Signup() {
               onChange={handleChange}
               required
             >
-              <option value="emlakçı">Emlakçı</option>
-              <option value="ev sahibi">Ev Sahibi</option>
-              <option value="kullanıcı">Kullanıcı</option>
+              <option value="realtor">Emlakçı</option>
+              <option value="owner">Ev Sahibi</option>
+              <option value="user">Kullanıcı</option>
             </select>
           </div>
 
