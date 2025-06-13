@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
 import { Typography, Button } from "@mui/material";
-// import LogoutIcon from "@mui/icons-material/Logout";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 function OwnerHome() {
   const token = localStorage.getItem("token");
@@ -18,7 +18,7 @@ function OwnerHome() {
       <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
       <Button
         variant="contained"
-        // endIcon={<LogoutIcon />}
+        endIcon={<LogoutIcon />}
         onClick={handleLogout}
       >
         Logout
