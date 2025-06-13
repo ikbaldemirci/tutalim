@@ -15,6 +15,7 @@ function Login() {
       const res = await api.post("/login", { mail, password });
       if (res.data.status === "success") {
         localStorage.setItem("token", res.data.token);
+        console.log("kaydedilen token:", res.data.token);
         const decoded = JSON.parse(atob(res.data.token.split(".")[1]));
 
         if (decoded.role === "emlakçı") navigate("/realtor");

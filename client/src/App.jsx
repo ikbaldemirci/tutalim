@@ -52,6 +52,8 @@ import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import OwnerHome from "./pages/OwnerHome";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   return (
@@ -63,6 +65,14 @@ function App() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/owner"
+          element={
+            <ProtectedRoute role="ev sahibi">
+              <OwnerHome />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
