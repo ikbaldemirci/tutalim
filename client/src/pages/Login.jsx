@@ -18,9 +18,9 @@ function Login() {
         console.log("kaydedilen token:", res.data.token);
         const decoded = JSON.parse(atob(res.data.token.split(".")[1]));
 
-        if (decoded.role === "emlakçı") navigate("/realtor");
-        else if (decoded.role === "ev sahibi") navigate("/owner");
-        else if (decoded.role === "kullanıcı") navigate("/");
+        if (decoded.role === "realtor") navigate("/realtor");
+        else if (decoded.role === "owner") navigate("/owner");
+        // else if (decoded.role === "user") navigate("/");
         // else if(decoded.role === "kullanıcı") navigate("/home");
       } else {
         78;

@@ -10,7 +10,7 @@ const LoginSchema = new mongoose.Schema({
   surname: { type: String, required: true },
   mail: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, required: true, enum: ["emlakçı", "ev sahibi"] },
+  role: { type: String, required: true, enum: ["realtor", "owner"] },
 });
 
 module.exports = mongoose.model("users", LoginSchema);
