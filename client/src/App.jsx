@@ -53,6 +53,7 @@ import Portfolio from "./pages/Portfolio";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import OwnerHome from "./pages/OwnerHome";
+import RealtorHome from "./pages/RealtorHome";
 import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
@@ -68,8 +69,16 @@ function App() {
         <Route
           path="/owner"
           element={
-            <ProtectedRoute role="ev sahibi">
+            <ProtectedRoute role="owner">
               <OwnerHome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/realtor"
+          element={
+            <ProtectedRoute role="realtor">
+              <RealtorHome />
             </ProtectedRoute>
           }
         />

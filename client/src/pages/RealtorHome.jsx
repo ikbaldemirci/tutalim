@@ -1,6 +1,7 @@
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
-// import { Typography, Button, LogoutIcon } from "@mui/material";
+import { Typography, Button } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 function RealtorHome() {
   const token = localStorage.getItem("token");
