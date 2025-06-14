@@ -3,6 +3,7 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const collection = require("./config");
 const app = express();
+const Property = require("./propertyModel");
 
 app.use(
   cors({
@@ -56,9 +57,60 @@ app.post("/api/login", async (req, res) => {
     SECRET_KEY,
     { expiresIn: "1h" }
   );
-
-  // res.json({ status: "success", message: "Login successful" });
   res.json({ status: "success", token });
+});
+
+// Create a new property
+app.post("/api/properties", async (req, res) => {
+  try {
+    const { rentPrice, rentDate, endDate, location, realtorId, ownerId } =
+      req.body;
+    const property = await Property.create({
+      rentPrice,
+      rentDate,
+      endDate,
+      location,
+      realtor: realtorId,
+      owner: ownerId || null,
+      details,
+    });
+    res.json({ status: "success", property });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Server error" });
+  }
+});
+
+// Get properties filtered by realtor and owner
+app.get("/api/properties", async (req, res) => {
+  try {
+    const { realtorId, ownerId } = req.query;
+    const filter = {};
+    if (realtorId) filter.realtor = realtorId;
+    if (ownerId) filter.owner = ownerId;
+
+    const properties = await Property.find(filter);
+    res.json({ status: "success", properties });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Server error" });
+  }
+});
+
+// Assign a property to an owner
+app.put("/api/properties/:id/assign", async (req, res) => {
+  try {
+    const { ownerId } = req.body;
+    const property = await Property.findByIdAndUpdate(
+      req.params.id,
+      { owner: ownerId },
+      { new: true }
+    );
+    res.json({ status: "success", property });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Server error" });
+  }
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));

@@ -42,10 +42,20 @@ Tutalim is a simple MERN stack project that demonstrates a small property portal
 
 The API currently defines the MongoDB connection URI and JWT secret directly in the code. You can change them by editing `server/config.js` and `server/index.js` or by introducing environment variables:
 
-| Variable | Purpose | Default value |
-|----------|---------|---------------|
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/tutalim` |
-| `JWT_SECRET` | Secret used for signing JWT tokens | `tutalim-secret` |
+| Variable      | Purpose                            | Default value                       |
+| ------------- | ---------------------------------- | ----------------------------------- |
+| `MONGODB_URI` | MongoDB connection string          | `mongodb://localhost:27017/tutalim` |
+| `JWT_SECRET`  | Secret used for signing JWT tokens | `tutalim-secret`                    |
+
+## Property API
+
+The server exposes simple endpoints for managing properties:
+
+| Method & Path                                   | Description                                                                                       |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `POST /api/properties`                          | Create a property. Requires `address`, `rentPrice` and `realtorId`. Optionally include `ownerId`. |
+| `GET /api/properties?ownerId=...&realtorId=...` | Fetch properties filtered by owner or realtor.                                                    |
+| `PUT /api/properties/:id/assign`                | Attach an existing property to an owner by providing `ownerId` in the body.                       |
 
 ## License
 
