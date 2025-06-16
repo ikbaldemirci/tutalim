@@ -2,6 +2,7 @@ import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
 import { Typography, Button } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
+import BasicTable from "../components/BasicTable";
 
 function RealtorHome() {
   const token = localStorage.getItem("token");
@@ -16,6 +17,7 @@ function RealtorHome() {
     <div>
       <Navbar />
       <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
+      <BasicTable />
       <Button
         variant="contained"
         endIcon={<LogoutIcon />}
