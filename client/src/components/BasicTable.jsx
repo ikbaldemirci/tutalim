@@ -1,4 +1,5 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableBody,
@@ -30,6 +31,37 @@ const mockData = [
 ];
 
 export default function BasicTable() {
+  const [properties, setProperties] = useState([]);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const decoded = JSON.parse(atob(token.split(".")[1]));
+        const id = decoded.id;
+        const role = decoded.role;
+
+        const queryParam =
+          role === "realtor"
+            ? `realtorId=${id}`
+            : role === "owner"
+            ? `ownerId=${id}`
+            : "";
+
+        const res = await axios.get(
+          `http://localhost:5000/api/properties?${queryParam}`
+        );
+        if (res.data.status === "success") {
+          setProperties(res.data.properties);
+        }
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
   return (
     <TableContainer
       component={Paper}
@@ -38,7 +70,7 @@ export default function BasicTable() {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>ID</TableCell>
+            {/* <TableCell>ID</TableCell> */}
             <TableCell>Fiyat (₺)</TableCell>
             <TableCell>Başlangıç</TableCell>
             <TableCell>Bitiş</TableCell>
@@ -47,14 +79,19 @@ export default function BasicTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {mockData.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.id}</TableCell>
+          {properties.map((row) => (
+            <TableRow key={row._id}>
               <TableCell>{row.rentPrice}</TableCell>
-              <TableCell>{row.rentDate}</TableCell>
-              <TableCell>{row.endDate}</TableCell>
+              <TableCell>
+                {new Date(row.rentDate).toLocaleDateString()}
+              </TableCell>
+              <TableCell>
+                {new Date(row.endDate).toLocaleDateString()}
+              </TableCell>
               <TableCell>{row.location}</TableCell>
-              <TableCell>{row.owner}</TableCell>
+              <TableCell>
+                {row.owner ? row.owner.name || row.owner : "Henüz atanmadı"}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
