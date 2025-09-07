@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const collection = require("./config");
 const app = express();
 const Property = require("./propertyModel");
@@ -113,4 +114,4 @@ app.put("/api/properties/:id/assign", async (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+app.listen(5001, () => console.log("Server running on port 5001"));

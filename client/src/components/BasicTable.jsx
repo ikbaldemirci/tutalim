@@ -49,7 +49,7 @@ export default function BasicTable() {
             : "";
 
         const res = await axios.get(
-          `http://localhost:5000/api/properties?${queryParam}`
+          `http://localhost:5001/api/properties?${queryParam}`
         );
         if (res.data.status === "success") {
           setProperties(res.data.properties);

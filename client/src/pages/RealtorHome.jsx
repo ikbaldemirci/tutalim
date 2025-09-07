@@ -18,7 +18,7 @@ function RealtorHome() {
       const realtorId = decoded.id;
 
       axios
-        .get(`http://localhost:5000/api/properties?realtorId=${realtorId}`)
+        .get(`http://localhost:5001/api/properties?realtorId=${realtorId}`)
         .then((res) => {
           if (res.data.status === "success") {
             setProperties(res.data.properties);

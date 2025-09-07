@@ -18,7 +18,7 @@ function OwnerHome() {
       const ownerId = decoded.id;
 
       axios
-        .get(`http://localhost:5000/api/properties?ownerId=${ownerId}`)
+        .get(`http://localhost:5001/api/properties?ownerId=${ownerId}`)
         .then((res) => {
           if (res.data.status === "success") {
             setProperties(res.data.properties);
