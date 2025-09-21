@@ -8,15 +8,15 @@ const Property = require("./propertyModel");
 app.use(
   cors({
     origin: "http://localhost:5173",
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "OPTIONS"],
     credentials: true,
   })
 );
 
 app.use(express.json());
-
 app.options("*", cors());
 
+// Signup endpoint
 app.post("/api/signup", async (req, res) => {
   try {
     const { name, surname, mail, password, role } = req.body;
@@ -43,6 +43,7 @@ app.post("/api/signup", async (req, res) => {
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = "tutalim-secret";
 
+// Login endpoint
 app.post("/api/login", async (req, res) => {
   const { mail, password } = req.body;
   const user = await collection.findOne({ mail });
@@ -63,20 +64,39 @@ app.post("/api/login", async (req, res) => {
 // Create a new property
 app.post("/api/properties", async (req, res) => {
   try {
-    const { rentPrice, rentDate, endDate, location, realtorId, ownerId } =
-      req.body;
-    const property = await Property.create({
+    const {
       rentPrice,
       rentDate,
       endDate,
       location,
+      realtorId,
+      ownerId,
+      tenantName,
+    } = req.body;
+
+    if (!rentPrice || !rentDate || !endDate || !location || !realtorId) {
+      return res
+        .status(400)
+        .json({ status: "fail", message: "Eksik alanlar var" });
+    }
+
+    const property = await Property.create({
+      rentPrice,
+      rentDate: new Date(rentDate),
+      endDate: new Date(endDate),
+      location,
       realtor: realtorId,
       owner: ownerId || null,
-      details,
+      tenantName: tenantName || "",
     });
-    res.json({ status: "success", property });
+
+    const populatedProperty = await Property.findById(property._id)
+      .populate("realtor", "name mail")
+      .populate("owner", "name mail");
+
+    res.json({ status: "success", property: populatedProperty });
   } catch (err) {
-    console.error(err);
+    console.error("Property ekleme hatası:", err);
     res.status(500).json({ status: "error", message: "Server error" });
   }
 });
@@ -89,10 +109,43 @@ app.get("/api/properties", async (req, res) => {
     if (realtorId) filter.realtor = realtorId;
     if (ownerId) filter.owner = ownerId;
 
-    const properties = await Property.find(filter);
+    const properties = await Property.find(filter)
+
+      .populate("realtor", "name mail")
+      .populate("owner", "name mail");
+
     res.json({ status: "success", properties });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ status: "error", message: "Server error" });
+  }
+});
+
+// Update a property
+app.put("/api/properties/:id", async (req, res) => {
+  try {
+    const { rentPrice, rentDate, endDate, location, tenantName, ownerId } =
+      req.body;
+
+    const property = await Property.findByIdAndUpdate(
+      req.params.id,
+      {
+        rentPrice,
+        rentDate: new Date(rentDate),
+        endDate: new Date(endDate),
+        location,
+        tenantName,
+        ...(ownerId && { owner: ownerId }),
+      },
+      { new: true }
+    )
+
+      .populate("realtor", "name mail")
+      .populate("owner", "name mail");
+
+    res.json({ status: "success", property });
+  } catch (err) {
+    console.error("Property update error:", err);
     res.status(500).json({ status: "error", message: "Server error" });
   }
 });
@@ -105,7 +158,10 @@ app.put("/api/properties/:id/assign", async (req, res) => {
       req.params.id,
       { owner: ownerId },
       { new: true }
-    );
+    )
+      .populate("realtor", "name mail")
+      .populate("owner", "name mail");
+
     res.json({ status: "success", property });
   } catch (err) {
     console.error(err);

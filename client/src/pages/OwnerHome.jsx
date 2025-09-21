@@ -11,6 +11,12 @@ function OwnerHome() {
   const decoded = token ? jwtDecode(token) : null;
 
   const [properties, setProperties] = useState([]);
+  const [form, setForm] = useState({
+    rentPrice: "",
+    rentDate: "",
+    endDate: "",
+    location: "",
+  });
 
   useEffect(() => {
     if (token) {
@@ -39,7 +45,15 @@ function OwnerHome() {
     <div>
       <Navbar />
       <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
-      <BasicTable data={properties} />
+      <BasicTable
+        data={properties}
+        onUpdate={(updated) => {
+          setProperties((prev) =>
+            prev.map((p) => (p._id === updated._id ? updated : p))
+          );
+        }}
+      />
+
       <Button
         variant="contained"
         endIcon={<LogoutIcon />}
