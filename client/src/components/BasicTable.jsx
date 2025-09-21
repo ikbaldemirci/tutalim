@@ -10,12 +10,22 @@ import {
   Paper,
   Button,
   TextField,
+  Toolbar,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  //Typography,
 } from "@mui/material";
 
 export default function BasicTable({ data = [], onUpdate }) {
   const [editingRow, setEditingRow] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [ownerInput, setOwnerInput] = useState({}); // propertyId -> ownerId
+
+  // search & filter state
+  const [search, setSearch] = useState("");
+  const [filterLocation, setFilterLocation] = useState("");
 
   // Düzenle moduna geç
   const handleEditClick = (row) => {
@@ -68,11 +78,52 @@ export default function BasicTable({ data = [], onUpdate }) {
     }
   };
 
+  // search + filter uygulanmış data
+  const filteredData = data.filter((row) => {
+    const matchSearch =
+      row.tenantName?.toLowerCase().includes(search.toLowerCase()) ||
+      row.location?.toLowerCase().includes(search.toLowerCase()) ||
+      row.rentPrice?.toString().includes(search) ||
+      // row.rentDate?.toLowerCase().includes(search.toLowerCase()) ||
+      // row.endDate?.toLowerCase().includes(search.toLowerCase()) ||
+      (row.owner?.name &&
+        row.owner.name.toLowerCase().includes(search.toLowerCase()));
+
+    const matchFilter = filterLocation
+      ? row.location?.toLowerCase().includes(filterLocation.toLowerCase())
+      : true;
+    return matchSearch && matchFilter;
+  });
+
   return (
     <TableContainer
       component={Paper}
-      sx={{ maxWidth: 900, margin: "2rem auto" }}
+      sx={{ maxWidth: 1000, margin: "2rem auto" }}
     >
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <TextField
+          size="small"
+          placeholder="Ara"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{ width: 250 }}
+        />
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Konuma göre filtrele</InputLabel>
+          <Select
+            value={filterLocation}
+            label="Konuma göre filtrele"
+            onChange={(e) => setFilterLocation(e.target.value)}
+          >
+            <MenuItem value="">Hepsi</MenuItem>
+            {[...new Set(data.map((d) => d.location))].map((loc) => (
+              <MenuItem key={loc} value={loc}>
+                {loc}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Toolbar>
       <Table>
         <TableHead>
           <TableRow>
@@ -97,7 +148,7 @@ export default function BasicTable({ data = [], onUpdate }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row) => (
+          {filteredData.map((row) => (
             <TableRow key={row._id}>
               <TableCell>
                 {editingRow === row._id ? (
