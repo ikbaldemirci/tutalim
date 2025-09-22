@@ -44,7 +44,25 @@ function OwnerHome() {
   return (
     <div>
       <Navbar />
-      <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          margin: "1rem auto",
+          padding: "0 1rem",
+        }}
+      >
+        <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
+        <Button
+          variant="contained"
+          endIcon={<LogoutIcon />}
+          onClick={handleLogout}
+          sx={{ m: 2 }}
+        >
+          Logout
+        </Button>
+      </div>
       <BasicTable
         data={properties}
         onUpdate={(updated) => {
@@ -53,14 +71,6 @@ function OwnerHome() {
           );
         }}
       />
-
-      <Button
-        variant="contained"
-        endIcon={<LogoutIcon />}
-        onClick={handleLogout}
-      >
-        Logout
-      </Button>
     </div>
   );
 }
