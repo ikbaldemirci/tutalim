@@ -11,10 +11,10 @@ import {
   Button,
   TextField,
   Toolbar,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
+  // MenuItem,
+  // Select,
+  // FormControl,
+  // InputLabel,
   //Typography,
 } from "@mui/material";
 
@@ -23,9 +23,12 @@ export default function BasicTable({ data = [], onUpdate }) {
   const [editForm, setEditForm] = useState({});
   const [ownerInput, setOwnerInput] = useState({}); // propertyId -> ownerId
 
-  // search & filter state
+  // search
   const [search, setSearch] = useState("");
-  const [filterLocation, setFilterLocation] = useState("");
+
+  //  filter state
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   // Düzenle moduna geç
   const handleEditClick = (row) => {
@@ -84,15 +87,18 @@ export default function BasicTable({ data = [], onUpdate }) {
       row.tenantName?.toLowerCase().includes(search.toLowerCase()) ||
       row.location?.toLowerCase().includes(search.toLowerCase()) ||
       row.rentPrice?.toString().includes(search) ||
-      // row.rentDate?.toLowerCase().includes(search.toLowerCase()) ||
-      // row.endDate?.toLowerCase().includes(search.toLowerCase()) ||
       (row.owner?.name &&
         row.owner.name.toLowerCase().includes(search.toLowerCase()));
 
-    const matchFilter = filterLocation
-      ? row.location?.toLowerCase().includes(filterLocation.toLowerCase())
-      : true;
-    return matchSearch && matchFilter;
+    const matchDate =
+      // (!startDate ||
+      //   (row.rentDate && new Date(row.rentDate) >= new Date(startDate))) &&
+      // (!endDate || (row.endDate && new Date(row.endDate) <= new Date(endDate)));
+
+      (!startDate || new Date(row.rentDate) >= new Date(startDate)) &&
+      (!endDate || new Date(row.endDate) <= new Date(endDate));
+
+    return matchSearch && matchDate;
   });
 
   return (
@@ -101,28 +107,30 @@ export default function BasicTable({ data = [], onUpdate }) {
       sx={{ maxWidth: 1000, margin: "2rem auto" }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        {/* <Toolbar sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}></Toolbar> */}
         <TextField
           size="small"
           placeholder="Ara"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          sx={{ width: 250 }}
+          sx={{ width: 220 }}
         />
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Konuma göre filtrele</InputLabel>
-          <Select
-            value={filterLocation}
-            label="Konuma göre filtrele"
-            onChange={(e) => setFilterLocation(e.target.value)}
-          >
-            <MenuItem value="">Hepsi</MenuItem>
-            {[...new Set(data.map((d) => d.location))].map((loc) => (
-              <MenuItem key={loc} value={loc}>
-                {loc}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <TextField
+          size="small"
+          type="date"
+          label="Başlangıç"
+          InputLabelProps={{ shrink: true }}
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <TextField
+          size="small"
+          type="date"
+          label="Bitiş"
+          InputLabelProps={{ shrink: true }}
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
       </Toolbar>
       <Table>
         <TableHead>
