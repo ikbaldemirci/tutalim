@@ -122,7 +122,26 @@ function RealtorHome() {
   return (
     <div>
       <Navbar />
-      <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          margin: "1rem auto",
+          padding: "0 1rem",
+        }}
+      >
+        <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
+        <Button
+          variant="contained"
+          endIcon={<LogoutIcon />}
+          onClick={handleLogout}
+          sx={{ m: 2 }}
+        >
+          Logout
+        </Button>
+      </div>
+
       <Paper sx={{ maxWidth: 900, margin: "1rem auto", p: 2 }}>
         <Typography variant="subtitle1" sx={{ mb: 2 }}>
           Yeni İlan Ekle
@@ -181,14 +200,7 @@ function RealtorHome() {
           );
         }}
       />
-      <Button
-        variant="contained"
-        endIcon={<LogoutIcon />}
-        onClick={handleLogout}
-        sx={{ m: 2 }}
-      >
-        Logout
-      </Button>
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
