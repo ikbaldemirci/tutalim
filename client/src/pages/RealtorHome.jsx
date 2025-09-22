@@ -195,9 +195,15 @@ function RealtorHome() {
       <BasicTable
         data={properties}
         onUpdate={(updated) => {
-          setProperties((prev) =>
-            prev.map((p) => (p._id === updated._id ? updated : p))
-          );
+          if (updated.deleted) {
+            // silineni listeden çıkar
+            setProperties((prev) => prev.filter((p) => p._id !== updated._id));
+          } else {
+            // güncelleneni listede değiştir
+            setProperties((prev) =>
+              prev.map((p) => (p._id === updated._id ? updated : p))
+            );
+          }
         }}
       />
 
