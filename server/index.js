@@ -8,7 +8,7 @@ const Property = require("./propertyModel");
 app.use(
   cors({
     origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
     credentials: true,
   })
 );
@@ -165,6 +165,17 @@ app.put("/api/properties/:id/assign", async (req, res) => {
     res.json({ status: "success", property });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ status: "error", message: "Server error" });
+  }
+});
+
+// Delete a property
+app.delete("/api/properties/:id", async (req, res) => {
+  try {
+    await Property.findByIdAndDelete(req.params.id);
+    res.json({ status: "success", message: "Property deleted" });
+  } catch (err) {
+    console.error("Property delete error:", err);
     res.status(500).json({ status: "error", message: "Server error" });
   }
 });

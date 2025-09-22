@@ -11,12 +11,9 @@ import {
   Button,
   TextField,
   Toolbar,
-  // MenuItem,
-  // Select,
-  // FormControl,
-  // InputLabel,
-  //Typography,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 export default function BasicTable({ data = [], onUpdate }) {
   const [editingRow, setEditingRow] = useState(null);
@@ -66,6 +63,24 @@ export default function BasicTable({ data = [], onUpdate }) {
     }
   };
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Bu mülkü silmek istediğinize emin misiniz?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/api/properties/${id}`
+      );
+      if (res.data.status === "success") {
+        onUpdate({ _id: id, deleted: true }); // parent state güncelle
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
   const handleAssignOwner = async (id) => {
     try {
       const res = await axios.put(
@@ -101,6 +116,12 @@ export default function BasicTable({ data = [], onUpdate }) {
     return matchSearch && matchDate;
   });
 
+  const handleClearFilters = () => {
+    setStartDate("");
+    setEndDate("");
+    setSearch("");
+  };
+
   return (
     <TableContainer
       component={Paper}
@@ -131,6 +152,7 @@ export default function BasicTable({ data = [], onUpdate }) {
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
         />
+        <Button onClick={handleClearFilters}>Filtreleri Temizle</Button>
       </Toolbar>
       <Table>
         <TableHead>
@@ -268,13 +290,24 @@ export default function BasicTable({ data = [], onUpdate }) {
                     Kaydet
                   </Button>
                 ) : (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => handleEditClick(row)}
-                  >
-                    Düzenle
-                  </Button>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleEditClick(row)}
+                    >
+                      <EditIcon />
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => handleDelete(row._id)}
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  </div>
                 )}
               </TableCell>
             </TableRow>
