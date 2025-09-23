@@ -20,14 +20,10 @@ export default function BasicTable({ data = [], onUpdate }) {
   const [editForm, setEditForm] = useState({});
   const [ownerInput, setOwnerInput] = useState({}); // propertyId -> ownerId
 
-  // search
   const [search, setSearch] = useState("");
-
-  //  filter state
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Düzenle moduna geç
   const handleEditClick = (row) => {
     setEditingRow(row._id);
     setEditForm({
@@ -49,8 +45,10 @@ export default function BasicTable({ data = [], onUpdate }) {
         `http://localhost:5000/api/properties/${id}`,
         {
           ...editForm,
-          rentDate: new Date(editForm.rentDate),
-          endDate: new Date(editForm.endDate),
+          // rentDate: new Date(editForm.rentDate),
+          // endDate: new Date(editForm.endDate),
+          rentDate: editForm.rentDate ? new Date(editForm.rentDate) : undefined,
+          endDate: editForm.endDate ? new Date(editForm.endDate) : undefined,
         }
       );
 
@@ -60,6 +58,7 @@ export default function BasicTable({ data = [], onUpdate }) {
       }
     } catch (err) {
       console.error("Update error:", err);
+      alert("Güncelleme sırasında hata oluştu.");
     }
   };
 
@@ -78,41 +77,86 @@ export default function BasicTable({ data = [], onUpdate }) {
       }
     } catch (err) {
       console.error("Delete error:", err);
+      alert("Silme sırasında hata oluştu.");
     }
   };
 
   const handleAssignOwner = async (id) => {
+    const mail = ownerInput[id]?.trim();
+    if (!mail) {
+      alert("Lütfen kayıtlı e-posta adresi girin.");
+      return;
+    }
+
     try {
       const res = await axios.put(
         `http://localhost:5000/api/properties/${id}/assign`,
         // { ownerId: ownerInput[id] }
-        { ownerMail: ownerInput[id] }
+        { ownerMail: mail }
       );
       if (res.data.status === "success") {
         onUpdate(res.data.property);
-        setOwnerInput({ ...ownerInput, [id]: "" });
-      }
+        // setOwnerInput({ ...ownerInput, [id]: "" });
+        setOwnerInput((prev) => ({ ...prev, [id]: "" }));
+        alert("Atama başarılı");
+      } else alert("Atama başarısız");
     } catch (err) {
       console.error("Assign error:", err);
+      alert("Atama sırasında hata oluştu. Mail adresini kontrol edin.");
     }
   };
 
-  // search + filter uygulanmış data
+  const getUserDisplay = (user) => {
+    if (!user) return null;
+    // Eğer populate edilmiş obje ise object, değilse string id olabilir
+    if (typeof user === "object") {
+      // name varsa name + (opsiyonel) surname yoksa mail göster
+      return (
+        user.name || user.mail || (user._id && user._id.toString()) || null
+      );
+    }
+    // user string ise (objectId string) => gösterilecek okunabilir bilgi yok, döndür id
+    return String(user);
+  };
+
+  // hangi sütunda ne gösterilecek: eğer kullanıcının rolü realtor ise Owner gösterilsin,
+  // eğer owner ise Realtor gösterilsin
+  const renderOwnerOrRealtorCell = (row) => {
+    const token = localStorage.getItem("token");
+    const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
+    if (!decoded) return "Henüz atanmadı";
+
+    if (decoded.role === "realtor") {
+      // Emlakçı görüyorsa -> ev sahibinin bilgisini göster (owner)
+      const ownerName = getUserDisplay(row.owner);
+      return ownerName || "Henüz atanmadı";
+    } else {
+      // Ev sahibi görüyorsa -> emlakçının bilgisini göster (realtor)
+      const realtorName = getUserDisplay(row.realtor);
+      return realtorName || "Henüz atanmadı";
+    }
+  };
+
   const filteredData = data.filter((row) => {
+    const searchLower = search?.toString().toLowerCase() || "";
+
     const matchSearch =
-      row.tenantName?.toLowerCase().includes(search.toLowerCase()) ||
-      row.location?.toLowerCase().includes(search.toLowerCase()) ||
-      row.rentPrice?.toString().includes(search) ||
-      (row.owner?.name &&
-        row.owner.name.toLowerCase().includes(search.toLowerCase()));
+      (row.tenantName && row.tenantName.toLowerCase().includes(searchLower)) ||
+      (row.location && row.location.toLowerCase().includes(searchLower)) ||
+      (row.rentPrice && row.rentPrice.toString().includes(search)) ||
+      (row.owner &&
+        typeof row.owner === "object" &&
+        row.owner.name &&
+        row.owner.name.toLowerCase().includes(searchLower)) ||
+      (row.realtor &&
+        typeof row.realtor === "object" &&
+        row.realtor.name &&
+        row.realtor.name.toLowerCase().includes(searchLower));
 
     const matchDate =
-      // (!startDate ||
-      //   (row.rentDate && new Date(row.rentDate) >= new Date(startDate))) &&
-      // (!endDate || (row.endDate && new Date(row.endDate) <= new Date(endDate)));
-
-      (!startDate || new Date(row.rentDate) >= new Date(startDate)) &&
-      (!endDate || new Date(row.endDate) <= new Date(endDate));
+      (!startDate ||
+        (row.rentDate && new Date(row.rentDate) >= new Date(startDate))) &&
+      (!endDate || (row.endDate && new Date(row.endDate) <= new Date(endDate)));
 
     return matchSearch && matchDate;
   });
@@ -137,24 +181,27 @@ export default function BasicTable({ data = [], onUpdate }) {
           onChange={(e) => setSearch(e.target.value)}
           sx={{ width: 220 }}
         />
-        <TextField
-          size="small"
-          type="date"
-          label="Başlangıç"
-          InputLabelProps={{ shrink: true }}
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <TextField
-          size="small"
-          type="date"
-          label="Bitiş"
-          InputLabelProps={{ shrink: true }}
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-        <Button onClick={handleClearFilters}>Filtreleri Temizle</Button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <TextField
+            size="small"
+            type="date"
+            label="Başlangıç"
+            InputLabelProps={{ shrink: true }}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <TextField
+            size="small"
+            type="date"
+            label="Bitiş"
+            InputLabelProps={{ shrink: true }}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+          <Button onClick={handleClearFilters}>Filtreleri Temizle</Button>
+        </div>
       </Toolbar>
+
       <Table>
         <TableHead>
           <TableRow>
@@ -178,6 +225,7 @@ export default function BasicTable({ data = [], onUpdate }) {
             <TableCell>İşlemler</TableCell>
           </TableRow>
         </TableHead>
+
         <TableBody>
           {filteredData.map((row) => (
             <TableRow key={row._id}>
@@ -255,10 +303,10 @@ export default function BasicTable({ data = [], onUpdate }) {
                 )}
               </TableCell>
 
-              {/* Owner */}
+              {/* Owner / Realtor display + assign by mail */}
               <TableCell>
-                {row.owner ? row.owner.name || row.owner : "Henüz atanmadı"}
-                <div style={{ display: "flex", gap: "0.5rem", marginTop: 4 }}>
+                {renderOwnerOrRealtorCell(row)}
+                <div style={{ display: "flex", gap: "0.5rem", marginTop: 8 }}>
                   <TextField
                     size="small"
                     placeholder="Owner Mail"
