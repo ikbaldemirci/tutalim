@@ -85,7 +85,8 @@ export default function BasicTable({ data = [], onUpdate }) {
     try {
       const res = await axios.put(
         `http://localhost:5000/api/properties/${id}/assign`,
-        { ownerId: ownerInput[id] }
+        // { ownerId: ownerInput[id] }
+        { ownerMail: ownerInput[id] }
       );
       if (res.data.status === "success") {
         onUpdate(res.data.property);
@@ -260,7 +261,7 @@ export default function BasicTable({ data = [], onUpdate }) {
                 <div style={{ display: "flex", gap: "0.5rem", marginTop: 4 }}>
                   <TextField
                     size="small"
-                    placeholder="Owner ID"
+                    placeholder="Owner Mail"
                     value={ownerInput[row._id] || ""}
                     onChange={(e) =>
                       setOwnerInput({

@@ -153,10 +153,18 @@ app.put("/api/properties/:id", async (req, res) => {
 // Assign a property to an owner
 app.put("/api/properties/:id/assign", async (req, res) => {
   try {
-    const { ownerId } = req.body;
+    const { ownerMail } = req.body;
+
+    const owner = await collection.findOne({ mail: ownerMail });
+    if (!owner) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Owner not found" });
+    }
+
     const property = await Property.findByIdAndUpdate(
       req.params.id,
-      { owner: ownerId },
+      { owner: owner._id },
       { new: true }
     )
       .populate("realtor", "name mail")
@@ -164,7 +172,7 @@ app.put("/api/properties/:id/assign", async (req, res) => {
 
     res.json({ status: "success", property });
   } catch (err) {
-    console.error(err);
+    console.error("Assign error:", err);
     res.status(500).json({ status: "error", message: "Server error" });
   }
 });
