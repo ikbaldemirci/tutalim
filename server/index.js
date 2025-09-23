@@ -127,19 +127,30 @@ app.put("/api/properties/:id", async (req, res) => {
     const { rentPrice, rentDate, endDate, location, tenantName, ownerId } =
       req.body;
 
+    let updateData = {
+      rentPrice,
+      rentDate: new Date(rentDate),
+      endDate: new Date(endDate),
+      location,
+      tenantName,
+    };
+
+    // Eğer ownerMail gönderildiyse ev sahibini mail üzerinden bul ve ata
+    if (ownerMail) {
+      const owner = await collection.findOne({ mail: ownerMail });
+      if (!owner) {
+        return res
+          .status(404)
+          .json({ status: "fail", message: "Owner not found" });
+      }
+      updateData.owner = owner._id;
+    }
+
     const property = await Property.findByIdAndUpdate(
       req.params.id,
-      {
-        rentPrice,
-        rentDate: new Date(rentDate),
-        endDate: new Date(endDate),
-        location,
-        tenantName,
-        ...(ownerId && { owner: ownerId }),
-      },
+      updateData,
       { new: true }
     )
-
       .populate("realtor", "name mail")
       .populate("owner", "name mail");
 
