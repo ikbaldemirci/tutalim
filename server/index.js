@@ -124,8 +124,15 @@ app.get("/api/properties", async (req, res) => {
 // Update a property
 app.put("/api/properties/:id", async (req, res) => {
   try {
-    const { rentPrice, rentDate, endDate, location, tenantName, ownerId } =
-      req.body;
+    const {
+      rentPrice,
+      rentDate,
+      endDate,
+      location,
+      tenantName,
+      ownerId,
+      ownerMail,
+    } = req.body;
 
     let updateData = {
       rentPrice,
@@ -164,18 +171,39 @@ app.put("/api/properties/:id", async (req, res) => {
 // Assign a property to an owner
 app.put("/api/properties/:id/assign", async (req, res) => {
   try {
-    const { ownerMail } = req.body;
+    const { ownerMail, realtorMail } = req.body;
+    let updateData = {};
 
-    const owner = await collection.findOne({ mail: ownerMail });
-    if (!owner) {
+    if (ownerMail) {
+      const owner = await collection.findOne({ mail: ownerMail });
+      if (!owner) {
+        return res
+          .status(404)
+          .json({ status: "fail", message: "Owner not found" });
+      }
+      updateData.owner = owner._id;
+    }
+
+    if (realtorMail) {
+      const realtor = await collection.findOne({ mail: realtorMail });
+      if (!realtor) {
+        return res
+          .status(404)
+          .json({ status: "fail", message: "Realtor not found" });
+      }
+      updateData.realtor = realtor._id;
+    }
+
+    // Eğer hiç mail gelmediyse
+    if (Object.keys(updateData).length === 0) {
       return res
-        .status(404)
-        .json({ status: "fail", message: "Owner not found" });
+        .status(400)
+        .json({ status: "fail", message: "No mail provided" });
     }
 
     const property = await Property.findByIdAndUpdate(
       req.params.id,
-      { owner: owner._id },
+      updateData,
       { new: true }
     )
       .populate("realtor", "name mail")

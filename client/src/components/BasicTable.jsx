@@ -19,10 +19,15 @@ export default function BasicTable({ data = [], onUpdate }) {
   const [editingRow, setEditingRow] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [ownerInput, setOwnerInput] = useState({}); // propertyId -> ownerId
+  const [realtorInput, setRealtorInput] = useState({}); // propertyId -> realtorId
 
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  const token = localStorage.getItem("token");
+  const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
+  const userRole = decoded?.role;
 
   const handleEditClick = (row) => {
     setEditingRow(row._id);
@@ -57,7 +62,6 @@ export default function BasicTable({ data = [], onUpdate }) {
         setEditingRow(null);
       }
     } catch (err) {
-      console.error("Update error:", err);
       alert("Güncelleme sırasında hata oluştu.");
     }
   };
@@ -76,33 +80,24 @@ export default function BasicTable({ data = [], onUpdate }) {
         onUpdate({ _id: id, deleted: true }); // parent state güncelle
       }
     } catch (err) {
-      console.error("Delete error:", err);
       alert("Silme sırasında hata oluştu.");
     }
   };
 
-  const handleAssignOwner = async (id) => {
-    const mail = ownerInput[id]?.trim();
-    if (!mail) {
-      alert("Lütfen kayıtlı e-posta adresi girin.");
-      return;
-    }
-
+  const handleAssign = async (id, payload) => {
     try {
       const res = await axios.put(
         `http://localhost:5000/api/properties/${id}/assign`,
-        // { ownerId: ownerInput[id] }
-        { ownerMail: mail }
+        payload // { ownerMail: "..."} veya { realtorMail: "..." }
       );
+
       if (res.data.status === "success") {
         onUpdate(res.data.property);
-        // setOwnerInput({ ...ownerInput, [id]: "" });
-        setOwnerInput((prev) => ({ ...prev, [id]: "" }));
-        alert("Atama başarılı");
-      } else alert("Atama başarısız");
+        setOwnerInput({ ...ownerInput, [id]: "" });
+        setRealtorInput({ ...realtorInput, [id]: "" });
+      }
     } catch (err) {
       console.error("Assign error:", err);
-      alert("Atama sırasında hata oluştu. Mail adresini kontrol edin.");
     }
   };
 
@@ -303,41 +298,149 @@ export default function BasicTable({ data = [], onUpdate }) {
                 )}
               </TableCell>
 
-              {/* Owner / Realtor display + assign by mail */}
+              {/* Owner/Realtor bilgisi */}
               <TableCell>
-                {renderOwnerOrRealtorCell(row)}
-                <div style={{ display: "flex", gap: "0.5rem", marginTop: 8 }}>
-                  <TextField
-                    size="small"
-                    placeholder="Owner Mail"
-                    value={ownerInput[row._id] || ""}
-                    onChange={(e) =>
-                      setOwnerInput({
-                        ...ownerInput,
-                        [row._id]: e.target.value,
-                      })
-                    }
-                  />
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => handleAssignOwner(row._id)}
-                  >
-                    Ata
-                  </Button>
-                </div>
+                {userRole === "realtor" ? (
+                  <>
+                    {row.owner ? (
+                      editingRow === row._id ? (
+                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                          <TextField
+                            size="small"
+                            placeholder="Yeni Owner Mail"
+                            value={ownerInput[row._id] || ""}
+                            onChange={(e) =>
+                              setOwnerInput({
+                                ...ownerInput,
+                                [row._id]: e.target.value,
+                              })
+                            }
+                          />
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() =>
+                              handleAssign(row._id, {
+                                ownerMail: ownerInput[row._id],
+                              })
+                            }
+                          >
+                            Ata
+                          </Button>
+                        </div>
+                      ) : (
+                        row.owner.name || row.owner.mail
+                      )
+                    ) : (
+                      // hiç atama yapılmamışsa her zaman input gelsin
+                      <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <TextField
+                          size="small"
+                          placeholder="Owner Mail"
+                          value={ownerInput[row._id] || ""}
+                          onChange={(e) =>
+                            setOwnerInput({
+                              ...ownerInput,
+                              [row._id]: e.target.value,
+                            })
+                          }
+                        />
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() =>
+                            handleAssign(row._id, {
+                              ownerMail: ownerInput[row._id],
+                            })
+                          }
+                        >
+                          Ata
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {row.realtor ? (
+                      editingRow === row._id ? (
+                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                          <TextField
+                            size="small"
+                            placeholder="Yeni Realtor Mail"
+                            value={realtorInput[row._id] || ""}
+                            onChange={(e) =>
+                              setRealtorInput({
+                                ...realtorInput,
+                                [row._id]: e.target.value,
+                              })
+                            }
+                          />
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() =>
+                              handleAssign(row._id, {
+                                realtorMail: realtorInput[row._id],
+                              })
+                            }
+                          >
+                            Ata
+                          </Button>
+                        </div>
+                      ) : (
+                        row.realtor.name || row.realtor.mail
+                      )
+                    ) : (
+                      // hiç atama yapılmamışsa her zaman input gelsin
+                      <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <TextField
+                          size="small"
+                          placeholder="Realtor Mail"
+                          value={realtorInput[row._id] || ""}
+                          onChange={(e) =>
+                            setRealtorInput({
+                              ...realtorInput,
+                              [row._id]: e.target.value,
+                            })
+                          }
+                        />
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() =>
+                            handleAssign(row._id, {
+                              realtorMail: realtorInput[row._id],
+                            })
+                          }
+                        >
+                          Ata
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
               </TableCell>
 
               {/* İşlemler */}
               <TableCell>
                 {editingRow === row._id ? (
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => handleSave(row._id)}
-                  >
-                    Kaydet
-                  </Button>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleSave(row._id)}
+                    >
+                      Kaydet
+                    </Button>
+
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => setEditingRow(null)}
+                    >
+                      Vazgeç
+                    </Button>
+                  </div>
                 ) : (
                   <div style={{ display: "flex", gap: "0.5rem" }}>
                     <Button
