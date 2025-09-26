@@ -200,7 +200,7 @@ export default function BasicTable({ data = [], onUpdate }) {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Kıracı</TableCell>
+            <TableCell>Kiracı</TableCell>
             <TableCell>Fiyat (₺)</TableCell>
             <TableCell>Başlangıç</TableCell>
             <TableCell>Bitiş</TableCell>
@@ -210,9 +210,7 @@ export default function BasicTable({ data = [], onUpdate }) {
                 const token = localStorage.getItem("token");
                 if (token) {
                   const decoded = JSON.parse(atob(token.split(".")[1]));
-                  return decoded.role === "realtor"
-                    ? "Ev Sahibi Adı"
-                    : "Emlakçı Adı";
+                  return decoded.role === "realtor" ? "Ev Sahibi" : "Emlakçı";
                 }
                 return "";
               })()}
@@ -241,12 +239,13 @@ export default function BasicTable({ data = [], onUpdate }) {
                 {editingRow === row._id ? (
                   <TextField
                     name="rentPrice"
+                    type="number"
                     value={editForm.rentPrice}
                     onChange={handleEditChange}
                     size="small"
                   />
                 ) : (
-                  row.rentPrice
+                  row.rentPrice?.toLocaleString("tr-TR") + " ₺"
                 )}
               </TableCell>
 
@@ -307,7 +306,7 @@ export default function BasicTable({ data = [], onUpdate }) {
                         <div style={{ display: "flex", gap: "0.5rem" }}>
                           <TextField
                             size="small"
-                            placeholder="Yeni Owner Mail"
+                            placeholder="Yeni Ev Sahibi Mail"
                             value={ownerInput[row._id] || ""}
                             onChange={(e) =>
                               setOwnerInput({
@@ -336,7 +335,7 @@ export default function BasicTable({ data = [], onUpdate }) {
                       <div style={{ display: "flex", gap: "0.5rem" }}>
                         <TextField
                           size="small"
-                          placeholder="Owner Mail"
+                          placeholder="Ev Sahibi Mail"
                           value={ownerInput[row._id] || ""}
                           onChange={(e) =>
                             setOwnerInput({
