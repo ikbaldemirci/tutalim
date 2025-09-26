@@ -174,6 +174,9 @@ app.put("/api/properties/:id/assign", async (req, res) => {
     const { ownerMail, realtorMail } = req.body;
     let updateData = {};
 
+    // if (ownerMail === null) {
+    //   updateData.owner = null;
+    // } else
     if (ownerMail) {
       const owner = await collection.findOne({ mail: ownerMail });
       if (!owner) {
@@ -184,7 +187,9 @@ app.put("/api/properties/:id/assign", async (req, res) => {
       updateData.owner = owner._id;
     }
 
-    if (realtorMail) {
+    if (realtorMail === null) {
+      updateData.realtor = null;
+    } else if (realtorMail) {
       const realtor = await collection.findOne({ mail: realtorMail });
       if (!realtor) {
         return res
