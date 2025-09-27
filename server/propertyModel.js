@@ -13,6 +13,10 @@ const PropertySchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "users", default: null },
   details: { type: mongoose.Schema.Types.Mixed },
   tenantName: { type: String, default: "" },
+
+  contractFile: { type: String, default: "" },
 });
 
-module.exports = mongoose.model("properties", PropertySchema);
+const Property = mongoose.model("properties", PropertySchema);
+
+module.exports = Property;

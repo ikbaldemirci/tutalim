@@ -5,6 +5,25 @@ const collection = require("./config");
 const app = express();
 const Property = require("./propertyModel");
 
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+    // cb(
+    //   null,
+    //   file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
+    // );
+  },
+});
+
+const upload = multer({ storage: storage });
+
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -15,6 +34,7 @@ app.use(
 
 app.use(express.json());
 app.options("*", cors());
+app.use("/uploads", express.static("uploads"));
 
 // Signup endpoint
 app.post("/api/signup", async (req, res) => {
@@ -231,5 +251,39 @@ app.delete("/api/properties/:id", async (req, res) => {
     res.status(500).json({ status: "error", message: "Server error" });
   }
 });
+
+// Sözleşme yükleme endpointi
+app.post(
+  "/api/properties/:id/contract",
+  upload.single("contract"),
+  async (req, res) => {
+    try {
+      const property = await Property.findByIdAndUpdate(
+        req.params.id,
+        { contractFile: req.file.path }, // dosya yolu kaydedilecek
+        { new: true }
+      )
+        .populate("realtor", "name mail")
+        .populate("owner", "name mail");
+
+      if (!property) {
+        return res
+          .status(404)
+          .json({ status: "fail", message: "Property not found" });
+      }
+
+      res.json({
+        status: "success",
+        message: "Sözleşme başarıyla yüklendi",
+        property,
+      });
+    } catch (err) {
+      console.error("Contract upload error:", err);
+      res
+        .status(500)
+        .json({ status: "error", message: "Server error while uploading" });
+    }
+  }
+);
 
 app.listen(5000, () => console.log("Server running on port 5000"));
