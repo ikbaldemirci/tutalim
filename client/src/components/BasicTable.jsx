@@ -162,6 +162,31 @@ export default function BasicTable({ data = [], onUpdate }) {
     setSearch("");
   };
 
+  const handleContractUpload = async (id, file) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("contract", file);
+
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/properties/${id}/contract`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (res.data.status === "success") {
+        onUpdate(res.data.property); // güncellenmiş property'yi parent state'e yolla
+      }
+    } catch (err) {
+      console.error("Contract upload error:", err);
+    }
+  };
+
   return (
     <TableContainer
       component={Paper}
@@ -298,129 +323,6 @@ export default function BasicTable({ data = [], onUpdate }) {
               </TableCell>
 
               {/* Owner/Realtor bilgisi */}
-              {/* <TableCell>
-                {userRole === "realtor" ? (
-                  <>
-                    {row.owner ? (
-                      editingRow === row._id ? (
-                        <div style={{ display: "flex", gap: "0.5rem" }}>
-                          <TextField
-                            size="small"
-                            placeholder="Yeni Ev Sahibi Mail"
-                            value={ownerInput[row._id] || ""}
-                            onChange={(e) =>
-                              setOwnerInput({
-                                ...ownerInput,
-                                [row._id]: e.target.value,
-                              })
-                            }
-                          />
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() =>
-                              handleAssign(row._id, {
-                                ownerMail: ownerInput[row._id],
-                              })
-                            }
-                          >
-                            Ata
-                          </Button>
-                        </div>
-                      ) : (
-                        row.owner.name || row.owner.mail
-                      )
-                    ) : (
-                      // hiç atama yapılmamışsa her zaman input gelsin
-                      <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <TextField
-                          size="small"
-                          placeholder="Ev Sahibi Mail"
-                          value={ownerInput[row._id] || ""}
-                          onChange={(e) =>
-                            setOwnerInput({
-                              ...ownerInput,
-                              [row._id]: e.target.value,
-                            })
-                          }
-                        />
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() =>
-                            handleAssign(row._id, {
-                              ownerMail: ownerInput[row._id],
-                            })
-                          }
-                        >
-                          Ata
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {row.realtor ? (
-                      editingRow === row._id ? (
-                        <div style={{ display: "flex", gap: "0.5rem" }}>
-                          <TextField
-                            size="small"
-                            placeholder="Yeni Realtor Mail"
-                            value={realtorInput[row._id] || ""}
-                            onChange={(e) =>
-                              setRealtorInput({
-                                ...realtorInput,
-                                [row._id]: e.target.value,
-                              })
-                            }
-                          />
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() =>
-                              handleAssign(row._id, {
-                                realtorMail: realtorInput[row._id],
-                              })
-                            }
-                          >
-                            Ata
-                          </Button>
-                        </div>
-                      ) : (
-                        row.realtor.name || row.realtor.mail
-                      )
-                    ) : (
-                      // hiç atama yapılmamışsa her zaman input gelsin
-                      <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <TextField
-                          size="small"
-                          placeholder="Realtor Mail"
-                          value={realtorInput[row._id] || ""}
-                          onChange={(e) =>
-                            setRealtorInput({
-                              ...realtorInput,
-                              [row._id]: e.target.value,
-                            })
-                          }
-                        />
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() =>
-                            handleAssign(row._id, {
-                              realtorMail: realtorInput[row._id],
-                            })
-                          }
-                        >
-                          Ata
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </TableCell> */}
-
-              {/* Owner/Realtor bilgisi */}
               <TableCell>
                 {userRole === "realtor" ? (
                   <>
@@ -483,84 +385,6 @@ export default function BasicTable({ data = [], onUpdate }) {
                     )}
                   </>
                 ) : (
-                  // <>
-                  //   {row.realtor ? (
-                  //     editingRow === row._id ? (
-                  //       // Düzenle modunda: yeni realtor maili girilebilir
-                  //       <div style={{ display: "flex", gap: "0.5rem" }}>
-                  //         <TextField
-                  //           size="small"
-                  //           placeholder="Yeni Realtor Mail"
-                  //           value={realtorInput[row._id] || ""}
-                  //           onChange={(e) =>
-                  //             setRealtorInput({
-                  //               ...realtorInput,
-                  //               [row._id]: e.target.value,
-                  //             })
-                  //           }
-                  //         />
-                  //         <Button
-                  //           variant="outlined"
-                  //           size="small"
-                  //           onClick={() =>
-                  //             handleAssign(row._id, {
-                  //               realtorMail: realtorInput[row._id],
-                  //             })
-                  //           }
-                  //         >
-                  //           Ata
-                  //         </Button>
-                  //       </div>
-                  //     ) : (
-                  //       // Normal görünümde: atanmış realtor bilgisi + "Yetkiyi Kaldır"
-                  //       <div
-                  //         style={{
-                  //           display: "flex",
-                  //           gap: "0.5rem",
-                  //           alignItems: "center",
-                  //         }}
-                  //       >
-                  //         <span>{row.realtor.name || row.realtor.mail}</span>
-                  //         <Button
-                  //           variant="text"
-                  //           color="error"
-                  //           size="small"
-                  //           onClick={() =>
-                  //             handleAssign(row._id, { realtorMail: null })
-                  //           }
-                  //         >
-                  //           Yetkiyi Kaldır
-                  //         </Button>
-                  //       </div>
-                  //     )
-                  //   ) : (
-                  //     // Hiç atama yapılmamışsa her zaman input gelsin
-                  //     <div style={{ display: "flex", gap: "0.5rem" }}>
-                  //       <TextField
-                  //         size="small"
-                  //         placeholder="Realtor Mail"
-                  //         value={realtorInput[row._id] || ""}
-                  //         onChange={(e) =>
-                  //           setRealtorInput({
-                  //             ...realtorInput,
-                  //             [row._id]: e.target.value,
-                  //           })
-                  //         }
-                  //       />
-                  //       <Button
-                  //         variant="outlined"
-                  //         size="small"
-                  //         onClick={() =>
-                  //           handleAssign(row._id, {
-                  //             realtorMail: realtorInput[row._id],
-                  //           })
-                  //         }
-                  //       >
-                  //         Ata
-                  //       </Button>
-                  //     </div>
-                  //   )}
-                  // </>
                   <>
                     {row.realtor ? (
                       <div
@@ -652,6 +476,33 @@ export default function BasicTable({ data = [], onUpdate }) {
                     >
                       <DeleteIcon />
                     </Button>
+
+                    {/* Sözleşme ekleme */}
+                    <Button variant="outlined" size="small" component="label">
+                      Sözleşme Ekle
+                      <input
+                        type="file"
+                        hidden
+                        accept="application/pdf"
+                        onChange={(e) =>
+                          handleContractUpload(row._id, e.target.files[0])
+                        }
+                      />
+                    </Button>
+
+                    {/* Eğer sözleşme eklenmişse link göster */}
+                    {row.contractFile && (
+                      <a
+                        href={`http://localhost:5000/${row.contractFile}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <Button variant="text" size="small" color="primary">
+                          Sözleşmeyi Gör
+                        </Button>
+                      </a>
+                    )}
                   </div>
                 )}
               </TableCell>
