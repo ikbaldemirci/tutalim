@@ -7,6 +7,7 @@ const Property = require("./propertyModel");
 
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -285,5 +286,39 @@ app.post(
     }
   }
 );
+
+// delete contract
+app.delete("/api/properties/:id/contract", async (req, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Property not found" });
+    }
+
+    if (property.contractFile) {
+      const filePath = path.resolve(property.contractFile);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      property.contractFile = "";
+      await property.save();
+    }
+
+    const updatedProperty = await Property.findById(req.params.id)
+      .populate("realtor", "name mail")
+      .populate("owner", "name mail");
+
+    res.json({
+      status: "success",
+      message: "Contract deleted",
+      property: updatedProperty,
+    });
+  } catch (err) {
+    console.error("Delete contract error:", err);
+    res.status(500).json({ status: "error", message: "Server error" });
+  }
+});
 
 app.listen(5000, () => console.log("Server running on port 5000"));
