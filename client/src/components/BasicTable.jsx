@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import SaveIcon from "@mui/icons-material/Save";
 
 export default function BasicTable({ data = [], onUpdate }) {
   const [editingRow, setEditingRow] = useState(null);
@@ -459,8 +461,12 @@ export default function BasicTable({ data = [], onUpdate }) {
               <TableCell>
                 {!row.contractFile ? (
                   // Eğer sözleşme yoksa yükleme butonu
-                  <Button variant="outlined" size="small" component="label">
-                    Sözleşme Ekle
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<CloudUploadIcon />}
+                  >
+                    Sözleşme Yükle
                     <input
                       type="file"
                       hidden
@@ -477,6 +483,7 @@ export default function BasicTable({ data = [], onUpdate }) {
                     color="error"
                     size="small"
                     onClick={() => handleDeleteContract(row._id)}
+                    startIcon={<DeleteIcon />}
                   >
                     Sözleşmeyi Sil
                   </Button>
@@ -491,6 +498,7 @@ export default function BasicTable({ data = [], onUpdate }) {
                         "_blank"
                       )
                     }
+                    startIcon={<SaveIcon />}
                   >
                     Sözleşmeyi Görüntüle
                   </Button>
