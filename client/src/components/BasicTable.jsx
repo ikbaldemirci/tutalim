@@ -13,19 +13,18 @@ import {
   Toolbar,
   Snackbar,
   Alert,
-  // CircularProgress,
+  CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SaveIcon from "@mui/icons-material/Save";
-import CircularProgress from "@mui/material/CircularProgress";
 
 export default function BasicTable({
   data = [],
   onUpdate,
-  loadingState, //sil
-  setLoadingState, // sil
+  loadingState,
+  setLoadingState,
 }) {
   const [editingRow, setEditingRow] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -40,7 +39,6 @@ export default function BasicTable({
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
   const userRole = decoded?.role;
 
-  // const [loadingState, setLoadingState] = useState({});
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -68,8 +66,6 @@ export default function BasicTable({
         `http://localhost:5000/api/properties/${id}`,
         {
           ...editForm,
-          // rentDate: new Date(editForm.rentDate),
-          // endDate: new Date(editForm.endDate),
           rentDate: editForm.rentDate ? new Date(editForm.rentDate) : undefined,
           endDate: editForm.endDate ? new Date(editForm.endDate) : undefined,
         }
@@ -180,89 +176,6 @@ export default function BasicTable({
     setSearch("");
   };
 
-  // // upload
-  // const handleUploadContract = async (id, file) => {
-  //   if (!file) return;
-
-  //   const formData = new FormData();
-  //   formData.append("contract", file);
-
-  //   setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
-  //   const startTime = Date.now();
-
-  //   try {
-  //     const res = await axios.post(
-  //       `http://localhost:5000/api/properties/${id}/contract`,
-  //       formData,
-  //       { headers: { "Content-Type": "multipart/form-data" } }
-  //     );
-
-  //     if (res.data.status === "success") {
-  //       onUpdate(res.data.property);
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Sözleşme başarıyla yüklendi.",
-  //         severity: "success",
-  //       });
-  //     } else {
-  //       throw new Error("Upload failed");
-  //     }
-  //   } catch (err) {
-  //     console.error("Upload error:", err);
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Sözleşme yüklenemedi.",
-  //       severity: "error",
-  //     });
-  //   } finally {
-  //     const elapsed = Date.now() - startTime;
-  //     const delay = Math.max(0, 2000 - elapsed); // min 2sn
-  //     setTimeout(() => {
-  //       setLoadingState((prev) => ({ ...prev, [id]: null }));
-  //     }, delay);
-  //   }
-  // };
-
-  // // delete
-  // const handleDeleteContract = async (id) => {
-  //   const ok = window.confirm(
-  //     "Bu sözleşmeyi silmek istediğinize emin misiniz?"
-  //   );
-  //   if (!ok) return;
-
-  //   setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
-  //   const startTime = Date.now();
-
-  //   try {
-  //     const res = await axios.delete(
-  //       `http://localhost:5000/api/properties/${id}/contract`
-  //     );
-  //     if (res.data.status === "success") {
-  //       onUpdate(res.data.property);
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Sözleşme silindi.",
-  //         severity: "info",
-  //       });
-  //     } else {
-  //       throw new Error("Delete failed");
-  //     }
-  //   } catch (err) {
-  //     console.error("Delete error:", err);
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Sözleşme silinemedi.",
-  //       severity: "error",
-  //     });
-  //   } finally {
-  //     const elapsed = Date.now() - startTime;
-  //     const delay = Math.max(0, 2000 - elapsed); // min 2sn
-  //     setTimeout(() => {
-  //       setLoadingState((prev) => ({ ...prev, [id]: null }));
-  //     }, delay);
-  //   }
-  // };
-
   // upload
   const handleUploadContract = async (id, file) => {
     if (!file) return;
@@ -353,7 +266,6 @@ export default function BasicTable({
         sx={{ maxWidth: 1000, margin: "2rem auto" }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          {/* <Toolbar sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}></Toolbar> */}
           <TextField
             size="small"
             placeholder="Ara"
@@ -600,72 +512,6 @@ export default function BasicTable({
                 </TableCell>
 
                 {/* Sözleşme */}
-                {/* <TableCell>
-                  {!row.contractFile ? (
-                    // Eğer sözleşme yoksa yükleme butonu
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      component="label"
-                      disabled={loadingState[row._id]?.action === "upload"}
-                      startIcon={
-                        loadingState[row._id]?.action === "upload" ? (
-                          <CircularProgress size={16} />
-                        ) : (
-                          <CloudUploadIcon />
-                        )
-                      }
-                    >
-                      {loadingState[row._id]?.action === "upload"
-                        ? "Yükleniyor..."
-                        : "Sözleşme Yükle"}
-                      <input
-                        type="file"
-                        hidden
-                        accept="application/pdf,image/*"
-                        onChange={(e) =>
-                          handleUploadContract(row._id, e.target.files[0])
-                        }
-                      />
-                    </Button>
-                  ) : editingRow === row._id ? (
-                    // Düzenleme modundaysa sil
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      disabled={loadingState[row._id]?.action === "delete"}
-                      startIcon={
-                        loadingState[row._id]?.action === "delete" ? (
-                          <CircularProgress size={16} />
-                        ) : (
-                          <DeleteIcon />
-                        )
-                      }
-                      onClick={() => handleDeleteContract(row._id)}
-                    >
-                      {loadingState[row._id]?.action === "delete"
-                        ? "Siliniyor..."
-                        : "Sözleşmeyi Sil"}
-                    </Button>
-                  ) : (
-                    // Normal modda görüntüle
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() =>
-                        window.open(
-                          `http://localhost:5000/${row.contractFile}`,
-                          "_blank"
-                        )
-                      }
-                      startIcon={<SaveIcon />}
-                    >
-                      Sözleşmeyi Görüntüle
-                    </Button>
-                  )}
-                </TableCell> */}
-
                 <TableCell>
                   {/* 1) Önce global loading durumu */}
                   {loadingState[row._id] === "upload" ? (
