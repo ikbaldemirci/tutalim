@@ -162,7 +162,8 @@ export default function BasicTable({ data = [], onUpdate }) {
     setSearch("");
   };
 
-  const handleContractUpload = async (id, file) => {
+  // upload
+  const handleUploadContract = async (id, file) => {
     if (!file) return;
 
     const formData = new FormData();
@@ -172,18 +173,33 @@ export default function BasicTable({ data = [], onUpdate }) {
       const res = await axios.post(
         `http://localhost:5000/api/properties/${id}/contract`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       if (res.data.status === "success") {
-        onUpdate(res.data.property); // güncellenmiş property'yi parent state'e yolla
+        onUpdate(res.data.property);
       }
     } catch (err) {
-      console.error("Contract upload error:", err);
+      console.error("Upload error:", err);
+    }
+  };
+
+  // delete
+  const handleDeleteContract = async (id) => {
+    const confirmDelete = window.confirm(
+      "Bu sözleşmeyi silmek istediğinize emin misiniz?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/api/properties/${id}/contract`
+      );
+      if (res.data.status === "success") {
+        onUpdate(res.data.property);
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
     }
   };
 
@@ -240,6 +256,7 @@ export default function BasicTable({ data = [], onUpdate }) {
                 return "";
               })()}
             </TableCell>
+            <TableCell>Sözleşme</TableCell>
             <TableCell>İşlemler</TableCell>
           </TableRow>
         </TableHead>
@@ -438,6 +455,48 @@ export default function BasicTable({ data = [], onUpdate }) {
                 )}
               </TableCell>
 
+              {/* Sözleşme */}
+              <TableCell>
+                {!row.contractFile ? (
+                  // Eğer sözleşme yoksa yükleme butonu
+                  <Button variant="outlined" size="small" component="label">
+                    Sözleşme Ekle
+                    <input
+                      type="file"
+                      hidden
+                      accept="application/pdf"
+                      onChange={(e) =>
+                        handleUploadContract(row._id, e.target.files[0])
+                      }
+                    />
+                  </Button>
+                ) : editingRow === row._id ? (
+                  // Düzenleme modundaysa sil
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    onClick={() => handleDeleteContract(row._id)}
+                  >
+                    Sözleşmeyi Sil
+                  </Button>
+                ) : (
+                  // Normal modda görüntüle
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() =>
+                      window.open(
+                        `http://localhost:5000/${row.contractFile}`,
+                        "_blank"
+                      )
+                    }
+                  >
+                    Sözleşmeyi Görüntüle
+                  </Button>
+                )}
+              </TableCell>
+
               {/* İşlemler */}
               <TableCell>
                 {editingRow === row._id ? (
@@ -476,33 +535,6 @@ export default function BasicTable({ data = [], onUpdate }) {
                     >
                       <DeleteIcon />
                     </Button>
-
-                    {/* Sözleşme ekleme */}
-                    <Button variant="outlined" size="small" component="label">
-                      Sözleşme Ekle
-                      <input
-                        type="file"
-                        hidden
-                        accept="application/pdf"
-                        onChange={(e) =>
-                          handleContractUpload(row._id, e.target.files[0])
-                        }
-                      />
-                    </Button>
-
-                    {/* Eğer sözleşme eklenmişse link göster */}
-                    {row.contractFile && (
-                      <a
-                        href={`http://localhost:5000/${row.contractFile}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <Button variant="text" size="small" color="primary">
-                          Sözleşmeyi Gör
-                        </Button>
-                      </a>
-                    )}
                   </div>
                 )}
               </TableCell>
