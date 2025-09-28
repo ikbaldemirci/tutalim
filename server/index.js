@@ -297,11 +297,28 @@ app.delete("/api/properties/:id/contract", async (req, res) => {
         .json({ status: "fail", message: "Property not found" });
     }
 
+    // if (property.contractFile) {
+    //   const filePath = path.resolve(property.contractFile);
+    //   if (fs.existsSync(filePath)) {
+    //     fs.unlinkSync(filePath);
+    //   }
+    //   property.contractFile = "";
+    //   await property.save();
+    // }
+
     if (property.contractFile) {
-      const filePath = path.resolve(property.contractFile);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+      // normalize et: başındaki / veya \ varsa kaldır
+      const safePath = property.contractFile.replace(/^[/\\]+/, "");
+      const filePath = path.join(__dirname, safePath);
+
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      } catch (fileErr) {
+        console.error("Dosya silme hatası:", fileErr);
       }
+
       property.contractFile = "";
       await property.save();
     }

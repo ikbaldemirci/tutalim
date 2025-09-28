@@ -11,6 +11,8 @@ function OwnerHome() {
   const decoded = token ? jwtDecode(token) : null;
 
   const [properties, setProperties] = useState([]);
+  const [loadingState, setLoadingState] = useState({});
+
   const [form, setForm] = useState({
     rentPrice: "",
     rentDate: "",
@@ -70,6 +72,8 @@ function OwnerHome() {
             prev.map((p) => (p._id === updated._id ? updated : p))
           );
         }}
+        loadingState={loadingState}
+        setLoadingState={setLoadingState}
       />
     </div>
   );
