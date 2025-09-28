@@ -19,6 +19,8 @@ function RealtorHome() {
   const decoded = token ? jwtDecode(token) : null;
 
   const [properties, setProperties] = useState([]);
+  const [loadingState, setLoadingState] = useState({});
+
   const [form, setForm] = useState({
     rentPrice: "",
     rentDate: "",
@@ -32,24 +34,6 @@ function RealtorHome() {
     message: "",
     severity: "success",
   });
-
-  // useEffect(() => {
-  //   if (token) {
-  //     const decoded = jwtDecode(token);
-  //     const realtorId = decoded.id;
-
-  //     axios
-  //       .get(`http://localhost:5000/api/properties?realtorId=${realtorId}`)
-  //       .then((res) => {
-  //         if (res.data.status === "success") {
-  //           setProperties(res.data.properties);
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console.error("Veri çekme hatası:", err);
-  //       });
-  //   }
-  // }, [token]);
 
   useEffect(() => {
     if (token && decoded?.id) {
@@ -205,6 +189,8 @@ function RealtorHome() {
             );
           }
         }}
+        loadingState={loadingState}
+        setLoadingState={setLoadingState}
       />
 
       <Snackbar

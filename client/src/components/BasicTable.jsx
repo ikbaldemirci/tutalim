@@ -11,13 +11,22 @@ import {
   Button,
   TextField,
   Toolbar,
+  Snackbar,
+  Alert,
+  // CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SaveIcon from "@mui/icons-material/Save";
+import CircularProgress from "@mui/material/CircularProgress";
 
-export default function BasicTable({ data = [], onUpdate }) {
+export default function BasicTable({
+  data = [],
+  onUpdate,
+  loadingState, //sil
+  setLoadingState, // sil
+}) {
   const [editingRow, setEditingRow] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [ownerInput, setOwnerInput] = useState({}); // propertyId -> ownerId
@@ -30,6 +39,13 @@ export default function BasicTable({ data = [], onUpdate }) {
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
   const userRole = decoded?.role;
+
+  // const [loadingState, setLoadingState] = useState({});
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const handleEditClick = (row) => {
     setEditingRow(row._id);
@@ -164,12 +180,98 @@ export default function BasicTable({ data = [], onUpdate }) {
     setSearch("");
   };
 
+  // // upload
+  // const handleUploadContract = async (id, file) => {
+  //   if (!file) return;
+
+  //   const formData = new FormData();
+  //   formData.append("contract", file);
+
+  //   setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
+  //   const startTime = Date.now();
+
+  //   try {
+  //     const res = await axios.post(
+  //       `http://localhost:5000/api/properties/${id}/contract`,
+  //       formData,
+  //       { headers: { "Content-Type": "multipart/form-data" } }
+  //     );
+
+  //     if (res.data.status === "success") {
+  //       onUpdate(res.data.property);
+  //       setSnackbar({
+  //         open: true,
+  //         message: "Sözleşme başarıyla yüklendi.",
+  //         severity: "success",
+  //       });
+  //     } else {
+  //       throw new Error("Upload failed");
+  //     }
+  //   } catch (err) {
+  //     console.error("Upload error:", err);
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Sözleşme yüklenemedi.",
+  //       severity: "error",
+  //     });
+  //   } finally {
+  //     const elapsed = Date.now() - startTime;
+  //     const delay = Math.max(0, 2000 - elapsed); // min 2sn
+  //     setTimeout(() => {
+  //       setLoadingState((prev) => ({ ...prev, [id]: null }));
+  //     }, delay);
+  //   }
+  // };
+
+  // // delete
+  // const handleDeleteContract = async (id) => {
+  //   const ok = window.confirm(
+  //     "Bu sözleşmeyi silmek istediğinize emin misiniz?"
+  //   );
+  //   if (!ok) return;
+
+  //   setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
+  //   const startTime = Date.now();
+
+  //   try {
+  //     const res = await axios.delete(
+  //       `http://localhost:5000/api/properties/${id}/contract`
+  //     );
+  //     if (res.data.status === "success") {
+  //       onUpdate(res.data.property);
+  //       setSnackbar({
+  //         open: true,
+  //         message: "Sözleşme silindi.",
+  //         severity: "info",
+  //       });
+  //     } else {
+  //       throw new Error("Delete failed");
+  //     }
+  //   } catch (err) {
+  //     console.error("Delete error:", err);
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Sözleşme silinemedi.",
+  //       severity: "error",
+  //     });
+  //   } finally {
+  //     const elapsed = Date.now() - startTime;
+  //     const delay = Math.max(0, 2000 - elapsed); // min 2sn
+  //     setTimeout(() => {
+  //       setLoadingState((prev) => ({ ...prev, [id]: null }));
+  //     }, delay);
+  //   }
+  // };
+
   // upload
   const handleUploadContract = async (id, file) => {
     if (!file) return;
 
     const formData = new FormData();
     formData.append("contract", file);
+
+    setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
+    const startTime = Date.now();
 
     try {
       const res = await axios.post(
@@ -180,9 +282,27 @@ export default function BasicTable({ data = [], onUpdate }) {
 
       if (res.data.status === "success") {
         onUpdate(res.data.property);
+
+        // snackbar'ı spinner bitiminde gösterebilmek için state'e kaydediyoruz
+        const elapsed = Date.now() - startTime;
+        const delay = Math.max(0, 2000 - elapsed);
+        setTimeout(() => {
+          setLoadingState((prev) => ({ ...prev, [id]: null }));
+          setSnackbar({
+            open: true,
+            message: "Sözleşme başarıyla yüklendi.",
+            severity: "success",
+          });
+        }, delay);
       }
     } catch (err) {
       console.error("Upload error:", err);
+      setLoadingState((prev) => ({ ...prev, [id]: null }));
+      setSnackbar({
+        open: true,
+        message: "Sözleşme yüklenemedi.",
+        severity: "error",
+      });
     }
   };
 
@@ -193,165 +313,216 @@ export default function BasicTable({ data = [], onUpdate }) {
     );
     if (!confirmDelete) return;
 
+    setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
+    const startTime = Date.now();
+
     try {
       const res = await axios.delete(
         `http://localhost:5000/api/properties/${id}/contract`
       );
+
       if (res.data.status === "success") {
         onUpdate(res.data.property);
+
+        const elapsed = Date.now() - startTime;
+        const delay = Math.max(0, 2000 - elapsed);
+        setTimeout(() => {
+          setLoadingState((prev) => ({ ...prev, [id]: null }));
+          setSnackbar({
+            open: true,
+            message: "Sözleşme silindi.",
+            severity: "info",
+          });
+        }, delay);
       }
     } catch (err) {
       console.error("Delete error:", err);
+      setLoadingState((prev) => ({ ...prev, [id]: null }));
+      setSnackbar({
+        open: true,
+        message: "Sözleşme silinemedi.",
+        severity: "error",
+      });
     }
   };
 
   return (
-    <TableContainer
-      component={Paper}
-      sx={{ maxWidth: 1000, margin: "2rem auto" }}
-    >
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* <Toolbar sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}></Toolbar> */}
-        <TextField
-          size="small"
-          placeholder="Ara"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{ width: 220 }}
-        />
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+    <>
+      <TableContainer
+        component={Paper}
+        sx={{ maxWidth: 1000, margin: "2rem auto" }}
+      >
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+          {/* <Toolbar sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}></Toolbar> */}
           <TextField
             size="small"
-            type="date"
-            label="Başlangıç"
-            InputLabelProps={{ shrink: true }}
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            placeholder="Ara"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{ width: 220 }}
           />
-          <TextField
-            size="small"
-            type="date"
-            label="Bitiş"
-            InputLabelProps={{ shrink: true }}
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-          <Button onClick={handleClearFilters}>Filtreleri Temizle</Button>
-        </div>
-      </Toolbar>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <TextField
+              size="small"
+              type="date"
+              label="Başlangıç"
+              InputLabelProps={{ shrink: true }}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+            <TextField
+              size="small"
+              type="date"
+              label="Bitiş"
+              InputLabelProps={{ shrink: true }}
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+            <Button onClick={handleClearFilters}>Filtreleri Temizle</Button>
+          </div>
+        </Toolbar>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Kiracı</TableCell>
-            <TableCell>Fiyat (₺)</TableCell>
-            <TableCell>Başlangıç</TableCell>
-            <TableCell>Bitiş</TableCell>
-            <TableCell>Konum</TableCell>
-            <TableCell>
-              {(() => {
-                const token = localStorage.getItem("token");
-                if (token) {
-                  const decoded = JSON.parse(atob(token.split(".")[1]));
-                  return decoded.role === "realtor" ? "Ev Sahibi" : "Emlakçı";
-                }
-                return "";
-              })()}
-            </TableCell>
-            <TableCell>Sözleşme</TableCell>
-            <TableCell>İşlemler</TableCell>
-          </TableRow>
-        </TableHead>
-
-        <TableBody>
-          {filteredData.map((row) => (
-            <TableRow key={row._id}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Kiracı</TableCell>
+              <TableCell>Fiyat (₺)</TableCell>
+              <TableCell>Başlangıç</TableCell>
+              <TableCell>Bitiş</TableCell>
+              <TableCell>Konum</TableCell>
               <TableCell>
-                {editingRow === row._id ? (
-                  <TextField
-                    name="tenantName"
-                    value={editForm.tenantName}
-                    onChange={handleEditChange}
-                    size="small"
-                  />
-                ) : (
-                  row.tenantName || "Henüz atanmadı"
-                )}
+                {(() => {
+                  const token = localStorage.getItem("token");
+                  if (token) {
+                    const decoded = JSON.parse(atob(token.split(".")[1]));
+                    return decoded.role === "realtor" ? "Ev Sahibi" : "Emlakçı";
+                  }
+                  return "";
+                })()}
               </TableCell>
-              {/* Fiyat */}
-              <TableCell>
-                {editingRow === row._id ? (
-                  <TextField
-                    name="rentPrice"
-                    type="number"
-                    value={editForm.rentPrice}
-                    onChange={handleEditChange}
-                    size="small"
-                  />
-                ) : (
-                  row.rentPrice?.toLocaleString("tr-TR") + " ₺"
-                )}
-              </TableCell>
+              <TableCell>Sözleşme</TableCell>
+              <TableCell>İşlemler</TableCell>
+            </TableRow>
+          </TableHead>
 
-              {/* Başlangıç */}
-              <TableCell>
-                {editingRow === row._id ? (
-                  <TextField
-                    name="rentDate"
-                    type="date"
-                    value={editForm.rentDate}
-                    onChange={handleEditChange}
-                    size="small"
-                  />
-                ) : row.rentDate ? (
-                  new Date(row.rentDate).toLocaleDateString()
-                ) : (
-                  "-"
-                )}
-              </TableCell>
+          <TableBody>
+            {filteredData.map((row) => (
+              <TableRow key={row._id}>
+                <TableCell>
+                  {editingRow === row._id ? (
+                    <TextField
+                      name="tenantName"
+                      value={editForm.tenantName}
+                      onChange={handleEditChange}
+                      size="small"
+                    />
+                  ) : (
+                    row.tenantName || "Henüz atanmadı"
+                  )}
+                </TableCell>
+                {/* Fiyat */}
+                <TableCell>
+                  {editingRow === row._id ? (
+                    <TextField
+                      name="rentPrice"
+                      type="number"
+                      value={editForm.rentPrice}
+                      onChange={handleEditChange}
+                      size="small"
+                    />
+                  ) : (
+                    row.rentPrice?.toLocaleString("tr-TR") + " ₺"
+                  )}
+                </TableCell>
 
-              {/* Bitiş */}
-              <TableCell>
-                {editingRow === row._id ? (
-                  <TextField
-                    name="endDate"
-                    type="date"
-                    value={editForm.endDate}
-                    onChange={handleEditChange}
-                    size="small"
-                  />
-                ) : row.endDate ? (
-                  new Date(row.endDate).toLocaleDateString()
-                ) : (
-                  "-"
-                )}
-              </TableCell>
+                {/* Başlangıç */}
+                <TableCell>
+                  {editingRow === row._id ? (
+                    <TextField
+                      name="rentDate"
+                      type="date"
+                      value={editForm.rentDate}
+                      onChange={handleEditChange}
+                      size="small"
+                    />
+                  ) : row.rentDate ? (
+                    new Date(row.rentDate).toLocaleDateString()
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
 
-              {/* Konum */}
-              <TableCell>
-                {editingRow === row._id ? (
-                  <TextField
-                    name="location"
-                    value={editForm.location}
-                    onChange={handleEditChange}
-                    size="small"
-                  />
-                ) : (
-                  row.location
-                )}
-              </TableCell>
+                {/* Bitiş */}
+                <TableCell>
+                  {editingRow === row._id ? (
+                    <TextField
+                      name="endDate"
+                      type="date"
+                      value={editForm.endDate}
+                      onChange={handleEditChange}
+                      size="small"
+                    />
+                  ) : row.endDate ? (
+                    new Date(row.endDate).toLocaleDateString()
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
 
-              {/* Owner/Realtor bilgisi */}
-              <TableCell>
-                {userRole === "realtor" ? (
-                  <>
-                    {row.owner ? (
-                      editingRow === row._id ? (
-                        // Düzenle modunda: yeni owner maili girilebilir
+                {/* Konum */}
+                <TableCell>
+                  {editingRow === row._id ? (
+                    <TextField
+                      name="location"
+                      value={editForm.location}
+                      onChange={handleEditChange}
+                      size="small"
+                    />
+                  ) : (
+                    row.location
+                  )}
+                </TableCell>
+
+                {/* Owner/Realtor bilgisi */}
+                <TableCell>
+                  {userRole === "realtor" ? (
+                    <>
+                      {row.owner ? (
+                        editingRow === row._id ? (
+                          // Düzenle modunda: yeni owner maili girilebilir
+                          <div style={{ display: "flex", gap: "0.5rem" }}>
+                            <TextField
+                              size="small"
+                              placeholder="Yeni Ev Sahibi Mail"
+                              value={ownerInput[row._id] || ""}
+                              onChange={(e) =>
+                                setOwnerInput({
+                                  ...ownerInput,
+                                  [row._id]: e.target.value,
+                                })
+                              }
+                            />
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() =>
+                                handleAssign(row._id, {
+                                  ownerMail: ownerInput[row._id],
+                                })
+                              }
+                            >
+                              Ata
+                            </Button>
+                          </div>
+                        ) : (
+                          <span>{row.owner.name || row.owner.mail}</span>
+                        )
+                      ) : (
+                        // Hiç atama yapılmamışsa her zaman input gelsin
                         <div style={{ display: "flex", gap: "0.5rem" }}>
                           <TextField
                             size="small"
-                            placeholder="Yeni Ev Sahibi Mail"
+                            placeholder="Ev Sahibi Mail"
                             value={ownerInput[row._id] || ""}
                             onChange={(e) =>
                               setOwnerInput({
@@ -372,184 +543,257 @@ export default function BasicTable({ data = [], onUpdate }) {
                             Ata
                           </Button>
                         </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {row.realtor ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.5rem",
+                            alignItems: "center",
+                          }}
+                        >
+                          <span>{row.realtor.name || row.realtor.mail}</span>
+                          <Button
+                            variant="text"
+                            color="error"
+                            size="small"
+                            onClick={() =>
+                              handleAssign(row._id, { realtorMail: null })
+                            }
+                          >
+                            Yetkiyi Kaldır
+                          </Button>
+                        </div>
+                      ) : editingRow === row._id ? (
+                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                          <TextField
+                            size="small"
+                            placeholder="Realtor Mail"
+                            value={realtorInput[row._id] || ""}
+                            onChange={(e) =>
+                              setRealtorInput({
+                                ...realtorInput,
+                                [row._id]: e.target.value,
+                              })
+                            }
+                          />
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() =>
+                              handleAssign(row._id, {
+                                realtorMail: realtorInput[row._id],
+                              })
+                            }
+                          >
+                            Ata
+                          </Button>
+                        </div>
                       ) : (
-                        <span>{row.owner.name || row.owner.mail}</span>
-                      )
-                    ) : (
-                      // Hiç atama yapılmamışsa her zaman input gelsin
-                      <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <TextField
-                          size="small"
-                          placeholder="Ev Sahibi Mail"
-                          value={ownerInput[row._id] || ""}
-                          onChange={(e) =>
-                            setOwnerInput({
-                              ...ownerInput,
-                              [row._id]: e.target.value,
-                            })
-                          }
-                        />
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() =>
-                            handleAssign(row._id, {
-                              ownerMail: ownerInput[row._id],
-                            })
-                          }
-                        >
-                          Ata
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {row.realtor ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.5rem",
-                          alignItems: "center",
-                        }}
-                      >
-                        <span>{row.realtor.name || row.realtor.mail}</span>
-                        <Button
-                          variant="text"
-                          color="error"
-                          size="small"
-                          onClick={() =>
-                            handleAssign(row._id, { realtorMail: null })
-                          }
-                        >
-                          Yetkiyi Kaldır
-                        </Button>
-                      </div>
-                    ) : editingRow === row._id ? (
-                      <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <TextField
-                          size="small"
-                          placeholder="Realtor Mail"
-                          value={realtorInput[row._id] || ""}
-                          onChange={(e) =>
-                            setRealtorInput({
-                              ...realtorInput,
-                              [row._id]: e.target.value,
-                            })
-                          }
-                        />
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() =>
-                            handleAssign(row._id, {
-                              realtorMail: realtorInput[row._id],
-                            })
-                          }
-                        >
-                          Ata
-                        </Button>
-                      </div>
-                    ) : (
-                      "Henüz atanmadı"
-                    )}
-                  </>
-                )}
-              </TableCell>
+                        "Henüz atanmadı"
+                      )}
+                    </>
+                  )}
+                </TableCell>
 
-              {/* Sözleşme */}
-              <TableCell>
-                {!row.contractFile ? (
-                  // Eğer sözleşme yoksa yükleme butonu
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<CloudUploadIcon />}
-                  >
-                    Sözleşme Yükle
-                    <input
-                      type="file"
-                      hidden
-                      accept="application/pdf"
-                      onChange={(e) =>
-                        handleUploadContract(row._id, e.target.files[0])
-                      }
-                    />
-                  </Button>
-                ) : editingRow === row._id ? (
-                  // Düzenleme modundaysa sil
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={() => handleDeleteContract(row._id)}
-                    startIcon={<DeleteIcon />}
-                  >
-                    Sözleşmeyi Sil
-                  </Button>
-                ) : (
-                  // Normal modda görüntüle
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() =>
-                      window.open(
-                        `http://localhost:5000/${row.contractFile}`,
-                        "_blank"
-                      )
-                    }
-                    startIcon={<SaveIcon />}
-                  >
-                    Sözleşmeyi Görüntüle
-                  </Button>
-                )}
-              </TableCell>
-
-              {/* İşlemler */}
-              <TableCell>
-                {editingRow === row._id ? (
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() => handleSave(row._id)}
-                    >
-                      Kaydet
-                    </Button>
-
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() => setEditingRow(null)}
-                    >
-                      Vazgeç
-                    </Button>
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                {/* Sözleşme */}
+                {/* <TableCell>
+                  {!row.contractFile ? (
+                    // Eğer sözleşme yoksa yükleme butonu
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={() => handleEditClick(row)}
+                      component="label"
+                      disabled={loadingState[row._id]?.action === "upload"}
+                      startIcon={
+                        loadingState[row._id]?.action === "upload" ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <CloudUploadIcon />
+                        )
+                      }
                     >
-                      <EditIcon />
+                      {loadingState[row._id]?.action === "upload"
+                        ? "Yükleniyor..."
+                        : "Sözleşme Yükle"}
+                      <input
+                        type="file"
+                        hidden
+                        accept="application/pdf,image/*"
+                        onChange={(e) =>
+                          handleUploadContract(row._id, e.target.files[0])
+                        }
+                      />
                     </Button>
-
+                  ) : editingRow === row._id ? (
+                    // Düzenleme modundaysa sil
                     <Button
                       variant="outlined"
                       color="error"
                       size="small"
-                      onClick={() => handleDelete(row._id)}
+                      disabled={loadingState[row._id]?.action === "delete"}
+                      startIcon={
+                        loadingState[row._id]?.action === "delete" ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <DeleteIcon />
+                        )
+                      }
+                      onClick={() => handleDeleteContract(row._id)}
                     >
-                      <DeleteIcon />
+                      {loadingState[row._id]?.action === "delete"
+                        ? "Siliniyor..."
+                        : "Sözleşmeyi Sil"}
                     </Button>
-                  </div>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                  ) : (
+                    // Normal modda görüntüle
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() =>
+                        window.open(
+                          `http://localhost:5000/${row.contractFile}`,
+                          "_blank"
+                        )
+                      }
+                      startIcon={<SaveIcon />}
+                    >
+                      Sözleşmeyi Görüntüle
+                    </Button>
+                  )}
+                </TableCell> */}
+
+                <TableCell>
+                  {/* 1) Önce global loading durumu */}
+                  {loadingState[row._id] === "upload" ? (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      disabled
+                      startIcon={<CircularProgress size={16} />}
+                    >
+                      Yükleniyor...
+                    </Button>
+                  ) : loadingState[row._id] === "delete" ? (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      disabled
+                      startIcon={<CircularProgress size={16} />}
+                    >
+                      Siliniyor...
+                    </Button>
+                  ) : /* 2) Normal dallar */ !row.contractFile ? (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      component="label"
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      Sözleşme Yükle
+                      <input
+                        type="file"
+                        hidden
+                        accept="application/pdf,image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadContract(row._id, file);
+                          // Aynı dosyayı üst üste seçince change tetiklensin
+                          e.target.value = null;
+                        }}
+                      />
+                    </Button>
+                  ) : editingRow === row._id ? (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => handleDeleteContract(row._id)}
+                      startIcon={<DeleteIcon />}
+                    >
+                      Sözleşmeyi Sil
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() =>
+                        window.open(
+                          `http://localhost:5000/${row.contractFile}`,
+                          "_blank"
+                        )
+                      }
+                      startIcon={<SaveIcon />}
+                    >
+                      Sözleşmeyi Görüntüle
+                    </Button>
+                  )}
+                </TableCell>
+
+                {/* İşlemler */}
+                <TableCell>
+                  {editingRow === row._id ? (
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleSave(row._id)}
+                      >
+                        Kaydet
+                      </Button>
+
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => setEditingRow(null)}
+                      >
+                        Vazgeç
+                      </Button>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleEditClick(row)}
+                      >
+                        <EditIcon />
+                      </Button>
+
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => handleDelete(row._id)}
+                      >
+                        <DeleteIcon />
+                      </Button>
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
