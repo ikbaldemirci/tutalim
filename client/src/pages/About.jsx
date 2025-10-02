@@ -1,10 +1,7 @@
+import Navbar from "../components/Navbar";
+
 function About() {
-  return (
-    <div className="container py-5">
-      <h2>Hakkında</h2>
-      <p>Buraya hakkında içerikleri gelecek.</p>
-    </div>
-  );
+  return <Navbar />;
 }
 
 export default About;
