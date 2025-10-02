@@ -1,6 +1,16 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 function Navbar() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const decoded = token ? jwtDecode(token) : null;
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-transparent shadow-sm">
       <div className="container">
@@ -35,16 +45,27 @@ function Navbar() {
                 Hakkında
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink to="/services" className="nav-link">
-                Hizmetlerimiz
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink to="/portfolio" className="nav-link">
-                Portföy
-              </NavLink>
-            </li>
+            {token ? (
+              <>
+                <li className="nav-item">
+                  <NavLink
+                    to={decoded?.role === "owner" ? "/owner" : "/realtor"}
+                    className="nav-link"
+                  >
+                    Portföy
+                  </NavLink>
+                </li>
+
+                <li className="nav-item">
+                  <button
+                    className="btn btn-link nav-link"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : null}
           </ul>
         </div>
       </div>
