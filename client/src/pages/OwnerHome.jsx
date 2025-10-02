@@ -3,7 +3,6 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
 import { Typography, Button } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
 import BasicTable from "../components/BasicTable";
 
 function OwnerHome() {
@@ -38,11 +37,6 @@ function OwnerHome() {
     }
   }, [token]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/";
-  };
-
   return (
     <div>
       <Navbar />
@@ -56,14 +50,6 @@ function OwnerHome() {
         }}
       >
         <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
-        <Button
-          variant="contained"
-          endIcon={<LogoutIcon />}
-          onClick={handleLogout}
-          sx={{ m: 2 }}
-        >
-          Logout
-        </Button>
       </div>
       <BasicTable
         data={properties}

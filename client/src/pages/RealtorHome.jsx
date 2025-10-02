@@ -11,7 +11,6 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
 import BasicTable from "../components/BasicTable";
 
 function RealtorHome() {
@@ -98,11 +97,6 @@ function RealtorHome() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/";
-  };
-
   return (
     <div>
       <Navbar />
@@ -116,14 +110,6 @@ function RealtorHome() {
         }}
       >
         <Typography>Hoş geldiniz, {decoded?.name}!</Typography>
-        <Button
-          variant="contained"
-          endIcon={<LogoutIcon />}
-          onClick={handleLogout}
-          sx={{ m: 2 }}
-        >
-          Logout
-        </Button>
       </div>
 
       <Paper sx={{ maxWidth: 900, margin: "1rem auto", p: 2 }}>
