@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -58,10 +59,10 @@ function Navbar() {
 
                 <li className="nav-item">
                   <button
-                    className="btn btn-link nav-link"
+                    className="btn btn-link nav-link d-flex align-items-center"
                     onClick={handleLogout}
                   >
-                    Logout
+                    <LogoutIcon />
                   </button>
                 </li>
               </>
