@@ -1,0 +1,55 @@
+0000000000000000000000000000000000000000 4694638d08ffa5a900eea48f8dfe155347a173a4 ikbal <muhammed_5m@hotmail.com> 1742689781 +0300	branch: Created from HEAD
+4694638d08ffa5a900eea48f8dfe155347a173a4 2d2ae7b49775d205067e9fc1f47b3b496a63cc27 ikbal <muhammed_5m@hotmail.com> 1742689829 +0300	commit: npm start yapabiliyoruz
+2d2ae7b49775d205067e9fc1f47b3b496a63cc27 e1a4c80e464bfe96169433218d010be1d9439473 ikbal <muhammed_5m@hotmail.com> 1742707541 +0300	commit: login signup database bağlantısı oldu
+e1a4c80e464bfe96169433218d010be1d9439473 ae4aa81385a5dee854c45309b1284ac359869c9b ikbal <muhammed_5m@hotmail.com> 1743081888 +0300	commit: login signup
+ae4aa81385a5dee854c45309b1284ac359869c9b 16d68b34c99e528cba9558b49b0f69b7a2b67a7b ikbal <muhammed_5m@hotmail.com> 1743088121 +0300	merge main: Fast-forward
+16d68b34c99e528cba9558b49b0f69b7a2b67a7b 54c45c71fb2740652939ffe39998c244c623dae0 ikbal <muhammed_5m@hotmail.com> 1748364519 +0300	merge main: Fast-forward
+54c45c71fb2740652939ffe39998c244c623dae0 e600c400df944025c2610c5c49b4431c129f2131 ikbal <muhammed_5m@hotmail.com> 1748900690 +0300	merge main: Fast-forward
+e600c400df944025c2610c5c49b4431c129f2131 336c031ac2a836370d9a443ec2ca925e3bf70a5b ikbal <muhammed_5m@hotmail.com> 1748902202 +0300	commit: navbar
+336c031ac2a836370d9a443ec2ca925e3bf70a5b d840e59edf7ed9433632d90e5e95edd9ee19d7d6 ikbal <muhammed_5m@hotmail.com> 1748955043 +0300	merge main: Fast-forward
+d840e59edf7ed9433632d90e5e95edd9ee19d7d6 12db6a5083144cdc03bdccf2de817e12256e9f38 ikbal <muhammed_5m@hotmail.com> 1748956387 +0300	merge main: Fast-forward
+12db6a5083144cdc03bdccf2de817e12256e9f38 652e2454fd6a95a7e0a82e9dd447aeaf5067327e ikbal <muhammed_5m@hotmail.com> 1749045081 +0300	commit: npm install @mui/material
+652e2454fd6a95a7e0a82e9dd447aeaf5067327e 1e35381f703c5e72a676384606b267091d6e0a98 ikbal <muhammed_5m@hotmail.com> 1749813411 +0300	commit: package conflict solved
+1e35381f703c5e72a676384606b267091d6e0a98 575c3caf24189f16688b27a95b2badd2cf9610ef ikbal <muhammed_5m@hotmail.com> 1749813461 +0300	commit: role based login orientation
+575c3caf24189f16688b27a95b2badd2cf9610ef 3cfe55aaf56b100b365dc158b92eb8d1d7df8373 ikbal <muhammed_5m@hotmail.com> 1749820126 +0300	commit: @mui/icons-material package added
+3cfe55aaf56b100b365dc158b92eb8d1d7df8373 c7dde6f50c45a693588770e09c1f5d7fe68f712d ikbal <muhammed_5m@hotmail.com> 1749821570 +0300	commit: roles updated to turkish, no need to UTF-8
+c7dde6f50c45a693588770e09c1f5d7fe68f712d 3cfe55aaf56b100b365dc158b92eb8d1d7df8373 ikbal <muhammed_5m@hotmail.com> 1749821613 +0300	reset: moving to HEAD~
+3cfe55aaf56b100b365dc158b92eb8d1d7df8373 11d41f519dec74ffd73d086154e3a9750229f969 ikbal <muhammed_5m@hotmail.com> 1749821634 +0300	commit: roles updated to turkish, no need to UTF-8
+11d41f519dec74ffd73d086154e3a9750229f969 2b99baf757d31e381480a341d67ca90431e3dc00 ikbal <muhammed_5m@hotmail.com> 1749821663 +0300	commit: role based login orientation for "realtor"
+2b99baf757d31e381480a341d67ca90431e3dc00 07f237ba96fdbe6b436c6c9014aec8ae801d657b ikbal <muhammed_5m@hotmail.com> 1749822692 +0300	commit: userHome prepaid just in case
+07f237ba96fdbe6b436c6c9014aec8ae801d657b d550ae32bef65b227b40f7714ff9640b7ae34037 ikbal <muhammed_5m@hotmail.com> 1749831167 +0300	merge main: Fast-forward
+d550ae32bef65b227b40f7714ff9640b7ae34037 8d5ac60727e3ab605af81ea8d17e0b9e6aa8d808 ikbal <muhammed_5m@hotmail.com> 1749904377 +0300	commit: new model added
+8d5ac60727e3ab605af81ea8d17e0b9e6aa8d808 e5859ab682292d1f0b603bc675d89f1d171cb39e ikbal <muhammed_5m@hotmail.com> 1750110376 +0300	commit: basicTable component added with mock data
+e5859ab682292d1f0b603bc675d89f1d171cb39e 4cae1accca4a6ca486cd19074f4db2ea8365a417 ikbal <muhammed_5m@hotmail.com> 1750149689 +0300	commit: basic table with api
+4cae1accca4a6ca486cd19074f4db2ea8365a417 7f3f42fae3ac6ddd2a9e015c1c1f38016f88de75 ikbal <muhammed_5m@hotmail.com> 1757251104 +0300	commit: try
+7f3f42fae3ac6ddd2a9e015c1c1f38016f88de75 4964e20eb870d655f944309d055db8422d9cc79b ikbal <muhammed_5m@hotmail.com> 1757251127 +0300	commit: try2
+4964e20eb870d655f944309d055db8422d9cc79b ae191c74ba4b7efac982f2e9f0fa2c299664b291 ikbal <muhammed_5m@hotmail.com> 1757251174 +0300	commit: fail try
+ae191c74ba4b7efac982f2e9f0fa2c299664b291 441419ac3e1d23297ec9653352382b28dc493ff4 ikbal <muhammed_5m@hotmail.com> 1757251428 +0300	commit: eliftry
+441419ac3e1d23297ec9653352382b28dc493ff4 c7bb0d183042fe8014b0c40258baaf0b016c9b64 ikbal <muhammed_5m@hotmail.com> 1757252414 +0300	merge main: Fast-forward
+c7bb0d183042fe8014b0c40258baaf0b016c9b64 a2cc0e527bcf6b855ab9eab41add768a774e800b ikbal <muhammed_5m@hotmail.com> 1757252429 +0300	commit: elif okey artık
+a2cc0e527bcf6b855ab9eab41add768a774e800b 637bbc53dcc45a2bd70ee46c3d215747fa863e36 ikbal <muhammed_5m@hotmail.com> 1758400080 +0300	merge main: Fast-forward
+637bbc53dcc45a2bd70ee46c3d215747fa863e36 fcddab92b56df00efb8fcf6d457d116a5a4041e4 ikbal <muhammed_5m@hotmail.com> 1758400195 +0300	commit: fixed
+fcddab92b56df00efb8fcf6d457d116a5a4041e4 b6d30001627f1ce2ec0781aa074be03ee1fa2563 ikbal <muhammed_5m@hotmail.com> 1758478908 +0300	commit: assigning and table view done
+b6d30001627f1ce2ec0781aa074be03ee1fa2563 69f657232909fc89186d6b307a89b1b6672f5cd0 ikbal <muhammed_5m@hotmail.com> 1758482175 +0300	commit: searchInput and filter added
+69f657232909fc89186d6b307a89b1b6672f5cd0 68d50d7ff7ba89555baeede5c8586d72819ae9d7 ikbal <muhammed_5m@hotmail.com> 1758571211 +0300	commit: logout button relocated
+68d50d7ff7ba89555baeede5c8586d72819ae9d7 484f753cad2b06bdb39b1071ddab8ab730353a5f ikbal <muhammed_5m@hotmail.com> 1758571231 +0300	commit: filtering is about date now
+484f753cad2b06bdb39b1071ddab8ab730353a5f 10bd8738f98a0d0ce680ad30fad139eab6490197 ikbal <muhammed_5m@hotmail.com> 1758575100 +0300	commit: delete button added
+10bd8738f98a0d0ce680ad30fad139eab6490197 92fdeaa2ded2d21bff9c9e48b5c6c0a16a3523f1 ikbal <muhammed_5m@hotmail.com> 1758646264 +0300	commit: assigned with "mail" not id
+92fdeaa2ded2d21bff9c9e48b5c6c0a16a3523f1 a47d5354b8901ec57be26e7179cd5508eca241f6 ikbal <muhammed_5m@hotmail.com> 1758662363 +0300	commit: assigned with "mail" not id 2
+a47d5354b8901ec57be26e7179cd5508eca241f6 e1ad3cc8e3faf83f71d89a37e4be89e73ca3d274 ikbal <muhammed_5m@hotmail.com> 1758664384 +0300	commit: show the realtor name on owner page and show the owner name on realtor page
+e1ad3cc8e3faf83f71d89a37e4be89e73ca3d274 fe796c331cd5274d60392448b832c883b43d433e ikbal <muhammed_5m@hotmail.com> 1758827556 +0300	commit: role based assigning & showing done
+fe796c331cd5274d60392448b832c883b43d433e 39b60bf1a42873391ba90ff2c1dd0bc0a5d78c41 ikbal <muhammed_5m@hotmail.com> 1758878725 +0300	commit: price fixed
+39b60bf1a42873391ba90ff2c1dd0bc0a5d78c41 7654bc7d83c4f204925eec6ee462a8a1385d9338 ikbal <muhammed_5m@hotmail.com> 1758912330 +0300	commit: owner can revoke auth from realtor and still can see the portfolio and can still attend to diffrent realtor
+7654bc7d83c4f204925eec6ee462a8a1385d9338 323563d95e1164db865beb254798b8fc02f817a8 ikbal <muhammed_5m@hotmail.com> 1758983905 +0300	merge main: Fast-forward
+323563d95e1164db865beb254798b8fc02f817a8 a691e5d4d99cee1986b10a729913c67e93368a66 ikbal <muhammed_5m@hotmail.com> 1759055320 +0300	commit: user can delete what he/she upload
+a691e5d4d99cee1986b10a729913c67e93368a66 3eaf28a814e397e0d65cf48db19ed09d14ab137f ikbal <muhammed_5m@hotmail.com> 1759080243 +0300	commit: some customizations about buttons
+3eaf28a814e397e0d65cf48db19ed09d14ab137f 6f4cac762ec71878b3f21517ed04e6ed905e6c91 ikbal <muhammed_5m@hotmail.com> 1759100838 +0300	commit: spinner & snackbar added
+6f4cac762ec71878b3f21517ed04e6ed905e6c91 d72bd9cc2683f65db31150f7a61376f489954a42 ikbal <muhammed_5m@hotmail.com> 1759100892 +0300	merge main: Fast-forward
+d72bd9cc2683f65db31150f7a61376f489954a42 4f5c3e7e9a299fab075d3cc7f8da288060d094a8 ikbal <muhammed_5m@hotmail.com> 1759101105 +0300	commit: comments deleted
+4f5c3e7e9a299fab075d3cc7f8da288060d094a8 122df8ef7d76d009cf1367e5ea91dee9cb196f02 ikbal <muhammed_5m@hotmail.com> 1759434483 +0300	commit: logged in vs signed out linking
+122df8ef7d76d009cf1367e5ea91dee9cb196f02 0680896f41a468320e7310f1d732147aa6cd238a ikbal <muhammed_5m@hotmail.com> 1759436151 +0300	commit: logout transfared to navbar
+0680896f41a468320e7310f1d732147aa6cd238a f8dda47058434ae982520e1c50c25524de07e77a ikbal <muhammed_5m@hotmail.com> 1760464374 +0300	commit: a lot of changes
+f8dda47058434ae982520e1c50c25524de07e77a 9c2be02474422700d0ecb90c48317392d30e4261 ikbal <muhammed_5m@hotmail.com> 1760603001 +0300	commit: backend security
+9c2be02474422700d0ecb90c48317392d30e4261 f8929f790c9fcf7ce9535433fdaf426b97222b7e ikbal <muhammed_5m@hotmail.com> 1760611816 +0300	commit: loadingscreen, fadein-fadeout
+f8929f790c9fcf7ce9535433fdaf426b97222b7e 4770d17d171932374c4c9277470c27f9b594c6b2 ikbal <muhammed_5m@hotmail.com> 1760623402 +0300	commit: profile padding-bottom added
+4770d17d171932374c4c9277470c27f9b594c6b2 390fbe2baf093b5454f2c02ab939b681bca92e86 ikbal <muhammed_5m@hotmail.com> 1760623428 +0300	commit: footer component added
