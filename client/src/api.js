@@ -41,7 +41,7 @@ api.interceptors.response.use(
       } catch (refreshErr) {
         console.warn("Refresh başarısız, yeniden giriş gerekli.");
         localStorage.removeItem("token");
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     }
 

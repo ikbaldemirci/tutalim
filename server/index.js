@@ -135,18 +135,6 @@ app.post("/api/login", async (req, res) => {
     userId: user._id,
     expiresAt: refreshExpires,
   });
-
-  // ✅ Refresh token’ı HttpOnly cookie olarak gönder
-  // res
-  //   .cookie("refreshToken", refreshTokenValue, {
-  //     httpOnly: true,
-  //     secure: false, // canlıda true olacak
-  //     sameSite: "None", // cross-site için
-  //     maxAge: REFRESH_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
-  //   })
-  //   .json({ status: "success", token: accessToken });
-
-  // ✅ Refresh token'ı HttpOnly cookie olarak gönder
   res
     .cookie("refreshToken", refreshTokenValue, {
       httpOnly: true,
@@ -411,44 +399,53 @@ app.put("/api/properties/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Assign a property to an owner
-// app.put("/api/properties/:id/assign", async (req, res) => {
+// ✅ Property assign güvenli versiyon
+// app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
 //   try {
 //     const { ownerMail, realtorMail } = req.body;
 //     let updateData = {};
 
-//     // if (ownerMail === null) {
-//     //   updateData.owner = null;
-//     // } else
-//     if (ownerMail) {
-//       const owner = await collection.findOne({ mail: ownerMail });
-//       if (!owner) {
-//         return res
-//           .status(404)
-//           .json({ status: "fail", message: "Owner not found" });
-//       }
-//       updateData.owner = owner._id;
-//     }
+//     // 🔹 Eğer atama iptali geliyorsa (null)
+//     if (ownerMail === null) updateData.owner = null;
+//     if (realtorMail === null) updateData.realtor = null;
 
-//     if (realtorMail === null) {
-//       updateData.realtor = null;
-//     } else if (realtorMail) {
-//       const realtor = await collection.findOne({ mail: realtorMail });
-//       if (!realtor) {
-//         return res
-//           .status(404)
-//           .json({ status: "fail", message: "Realtor not found" });
-//       }
-//       updateData.realtor = realtor._id;
-//     }
-
-//     // Eğer hiç mail gelmediyse
-//     if (Object.keys(updateData).length === 0) {
+//     // 🔹 Eğer mail adresi geldiyse, kullanıcıyı bul
+//     const mail = ownerMail || realtorMail;
+//     if (!mail)
 //       return res
 //         .status(400)
-//         .json({ status: "fail", message: "No mail provided" });
+//         .json({ status: "fail", message: "Mail adresi gerekli" });
+
+//     const user = await collection.findOne({ mail });
+//     if (!user)
+//       return res
+//         .status(404)
+//         .json({ status: "fail", message: "Kullanıcı bulunamadı" });
+
+//     // 🔹 Rol kontrolü
+//     if (ownerMail) {
+//       // Emlakçı -> Ev sahibi atayabilir
+//       if (user.role !== "owner") {
+//         return res.status(400).json({
+//           status: "fail",
+//           message: "Lütfen bir ev sahibi maili girin.",
+//         });
+//       }
+//       updateData.owner = user._id;
 //     }
 
+//     if (realtorMail) {
+//       // Ev sahibi -> Emlakçı atayabilir
+//       if (user.role !== "realtor") {
+//         return res.status(400).json({
+//           status: "fail",
+//           message: "Lütfen bir emlakçı maili girin.",
+//         });
+//       }
+//       updateData.realtor = user._id;
+//     }
+
+//     // 🔹 Güncelleme işlemi
 //     const property = await Property.findByIdAndUpdate(
 //       req.params.id,
 //       updateData,
@@ -457,24 +454,47 @@ app.put("/api/properties/:id", verifyToken, async (req, res) => {
 //       .populate("realtor", "name mail")
 //       .populate("owner", "name mail");
 
-//     res.json({ status: "success", property });
+//     res.json({
+//       status: "success",
+//       property,
+//       message: "Atama işlemi başarılı ✅",
+//     });
 //   } catch (err) {
 //     console.error("Assign error:", err);
-//     res.status(500).json({ status: "error", message: "Server error" });
+//     res.status(500).json({ status: "error", message: "Sunucu hatası oluştu" });
 //   }
 // });
-
-// ✅ Property assign güvenli versiyon
 app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
   try {
     const { ownerMail, realtorMail } = req.body;
     let updateData = {};
 
-    // 🔹 Eğer atama iptali geliyorsa (null)
-    if (ownerMail === null) updateData.owner = null;
-    if (realtorMail === null) updateData.realtor = null;
+    // 🔹 1) Eğer kaldırma isteği geldiyse (null gönderilmişse)
+    if (ownerMail === null) {
+      updateData.owner = null;
+    }
+    if (realtorMail === null) {
+      updateData.realtor = null;
+    }
 
-    // 🔹 Eğer mail adresi geldiyse, kullanıcıyı bul
+    // Eğer null kaldırma dışında bir işlem yoksa (sadece kaldırma yapıldıysa)
+    if (Object.keys(updateData).length > 0) {
+      const property = await Property.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { new: true }
+      )
+        .populate("realtor", "name mail")
+        .populate("owner", "name mail");
+
+      return res.json({
+        status: "success",
+        property,
+        message: "Atama kaldırıldı ✅",
+      });
+    }
+
+    // 🔹 2) Eğer mail adresi geldiyse, kullanıcıyı bul
     const mail = ownerMail || realtorMail;
     if (!mail)
       return res
@@ -487,7 +507,7 @@ app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
         .status(404)
         .json({ status: "fail", message: "Kullanıcı bulunamadı" });
 
-    // 🔹 Rol kontrolü
+    // 🔹 3) Rol kontrolü
     if (ownerMail) {
       // Emlakçı -> Ev sahibi atayabilir
       if (user.role !== "owner") {
@@ -510,7 +530,7 @@ app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
       updateData.realtor = user._id;
     }
 
-    // 🔹 Güncelleme işlemi
+    // 🔹 4) Güncelleme işlemi (normal atama)
     const property = await Property.findByIdAndUpdate(
       req.params.id,
       updateData,
@@ -937,18 +957,67 @@ app.post("/api/refresh", async (req, res) => {
 });
 
 // 🔹 Çıkış Yap (Logout)
+// app.post("/api/logout", async (req, res) => {
+//   try {
+//     const refreshTokenValue = req.cookies.refreshToken;
+//     if (!refreshTokenValue)
+//       return res.json({ status: "success", message: "Zaten çıkış yapılmış" });
+
+//     await RefreshToken.deleteOne({ token: refreshTokenValue });
+//     res.clearCookie("refreshToken");
+//     res.json({ status: "success", message: "Başarıyla çıkış yapıldı" });
+//   } catch (err) {
+//     console.error("Logout hatası:", err);
+//     res.status(500).json({ status: "error", message: "Sunucu hatası" });
+//   }
+// });
 app.post("/api/logout", async (req, res) => {
   try {
     const refreshTokenValue = req.cookies.refreshToken;
-    if (!refreshTokenValue)
-      return res.json({ status: "success", message: "Zaten çıkış yapılmış" });
+    console.log("🚪 Çıkış isteği geldi, cookie:", refreshTokenValue);
 
-    await RefreshToken.deleteOne({ token: refreshTokenValue });
-    res.clearCookie("refreshToken");
-    res.json({ status: "success", message: "Başarıyla çıkış yapıldı" });
+    // 🔹 Cookie hiç yoksa bile, kullanıcıya başarılı dönelim
+    if (!refreshTokenValue) {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: false, // prod'da true
+        sameSite: "Lax",
+        path: "/",
+      });
+      return res.json({
+        status: "success",
+        message: "Zaten çıkış yapılmış (cookie yoktu)",
+      });
+    }
+
+    // 🔹 DB'de token varsa sil, yoksa hata vermeden devam et
+    const deleted = await RefreshToken.deleteOne({ token: refreshTokenValue });
+    if (deleted.deletedCount > 0) {
+      console.log("🗑️ RefreshToken DB'den silindi.");
+    } else {
+      console.log(
+        "⚠️ DB'de RefreshToken bulunamadı (zaten silinmiş olabilir)."
+      );
+    }
+
+    // 🔹 Tarayıcıdaki cookie’yi kesin olarak temizle
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: false, // localde false, deploy'da true
+      sameSite: "Lax",
+      path: "/", // aynı path olmalı!
+    });
+
+    return res.json({
+      status: "success",
+      message: "Başarıyla çıkış yapıldı",
+    });
   } catch (err) {
-    console.error("Logout hatası:", err);
-    res.status(500).json({ status: "error", message: "Sunucu hatası" });
+    console.error("❌ Logout hatası:", err);
+    return res.status(500).json({
+      status: "error",
+      message: "Sunucu hatası, çıkış başarısız",
+    });
   }
 });
 

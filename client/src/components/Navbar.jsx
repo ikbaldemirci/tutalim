@@ -89,6 +89,7 @@ import {
   Divider,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
+import api from "../api";
 
 function Navbar({ onLogout, bg }) {
   const navigate = useNavigate();
@@ -99,10 +100,18 @@ function Navbar({ onLogout, bg }) {
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    if (onLogout) onLogout();
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const res = await api.post("/logout", {}, { withCredentials: true });
+      console.log("🟢 Logout response:", res.data);
+    } catch (err) {
+      console.error("🔴 Logout hatası:", err);
+    } finally {
+      // her durumda token’ı sil
+      localStorage.removeItem("token");
+      if (onLogout) onLogout();
+      navigate("/", { state: { showLogoutMsg: true } });
+    }
   };
 
   const navStyle = bg
@@ -234,8 +243,8 @@ function Navbar({ onLogout, bg }) {
 
                     <MenuItem
                       onClick={() => {
-                        handleMenuClose();
                         handleLogout();
+                        handleMenuClose();
                       }}
                       sx={{
                         color: "error.main",

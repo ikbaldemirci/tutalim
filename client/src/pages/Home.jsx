@@ -216,7 +216,7 @@ function Home() {
           filter: "brightness(60%)",
         }}
       >
-        <source src="/videos/video_3.mp4" type="video/mp4" />
+        <source src="/videos/video_1.mp4" type="video/mp4" />
         Tarayıcınız video etiketini desteklemiyor.
       </video>
 

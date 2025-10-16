@@ -109,6 +109,11 @@ function Profile() {
         {
           currentPassword: form.currentPassword,
           newPassword: form.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
 
@@ -126,7 +131,7 @@ function Profile() {
 
         setTimeout(() => {
           localStorage.removeItem("token");
-          navigate("/login");
+          navigate("/");
         }, 2500);
       } else {
         setSnackbar({
