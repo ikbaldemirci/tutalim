@@ -32,3 +32,5 @@ client/public/videos/
 server/uploads/
 
 client/build/
+
+git_backup/
