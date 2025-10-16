@@ -145,7 +145,7 @@ export default function ProtectedRoute({ children, role }) {
 
   // 🔐 Token yoksa
   const token = localStorage.getItem("token");
-  if (!token) return <Navigate to="/login" replace />;
+  if (!token) return <Navigate to="/" replace />;
 
   try {
     const decoded = jwtDecode(token);
@@ -155,11 +155,11 @@ export default function ProtectedRoute({ children, role }) {
       console.warn(
         `Rol uyuşmazlığı. Beklenen: ${role}, Bulunan: ${decoded.role}`
       );
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/" replace />;
     }
 
     return children;
   } catch {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 }
