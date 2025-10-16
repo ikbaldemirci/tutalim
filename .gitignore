@@ -29,3 +29,6 @@ dist/
 .env
 
 client/public/videos/
+server/uploads/
+
+client/build/
