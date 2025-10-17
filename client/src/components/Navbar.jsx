@@ -122,7 +122,10 @@ function Navbar({ onLogout, bg }) {
       };
 
   return (
-    <nav className="navbar navbar-expand-lg shadow-sm" style={navStyle}>
+    <nav
+      className="navbar navbar-expand-lg shadow-sm navbar-dark"
+      style={navStyle}
+    >
       <div className="container py-2">
         {/* Logo */}
         <NavLink to="/" className="navbar-brand d-flex align-items-center">
