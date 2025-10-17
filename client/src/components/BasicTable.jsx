@@ -644,7 +644,7 @@
 //   );
 // }
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   Table,
@@ -695,6 +695,34 @@ export default function BasicTable({
     message: "",
     severity: "success",
   });
+
+  // Keep filter toolbar width in sync with table's intrinsic width
+  const tableRef = useRef(null);
+  const [tableScrollWidth, setTableScrollWidth] = useState(0);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      const el = tableRef.current;
+      if (el) setTableScrollWidth(el.scrollWidth || 0);
+    };
+
+    // Initial and async layout pass
+    updateWidth();
+    const raf = requestAnimationFrame(updateWidth);
+
+    // Observe size changes of the table content
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateWidth) : null;
+    if (ro && tableRef.current) ro.observe(tableRef.current);
+
+    // Window resize
+    window.addEventListener("resize", updateWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateWidth);
+      if (ro) ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [data]);
 
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
@@ -1023,6 +1051,8 @@ export default function BasicTable({
               borderTopRightRadius: "12px",
               gap: 2,
               py: 2,
+              // Match the table's scroll width so the right side doesn't show white
+              minWidth: tableScrollWidth || undefined,
             }}
           >
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
@@ -1059,7 +1089,7 @@ export default function BasicTable({
           </Toolbar>
 
           {/* 📋 Tablo */}
-          <Table>
+          <Table ref={tableRef}>
             <TableHead sx={{ backgroundColor: "#2E86C1" }}>
               <TableRow>
                 {[
