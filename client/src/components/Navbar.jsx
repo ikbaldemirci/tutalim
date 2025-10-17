@@ -202,7 +202,7 @@ function Navbar({ onLogout, bg }) {
         {/* Menu items */}
         <div className="collapse navbar-collapse" id="mainNavbar">
           <ul className="navbar-nav ms-auto align-items-center gap-2 gap-lg-0">
-            <li className="nav-item mx-2 mb-3 mb-lg-0">
+            <li className="nav-item mx-2 mb-2 mb-lg-0">
               <NavLink
                 end
                 to="/"
@@ -210,21 +210,21 @@ function Navbar({ onLogout, bg }) {
                 onClick={closeMobileMenu}
                 style={({ isActive }) => ({
                   borderBottom: isActive ? "2px solid white" : "none",
-                  paddingBottom: 4,
+                  paddingBottom: 2,
                 })}
               >
                 Ana Sayfa
               </NavLink>
             </li>
 
-            <li className="nav-item mx-2 mb-3 mb-lg-0">
+            <li className="nav-item mx-2 mb-2 mb-lg-0">
               <NavLink
                 to="/about"
                 className="nav-link text-white fw-semibold"
                 onClick={closeMobileMenu}
                 style={({ isActive }) => ({
                   borderBottom: isActive ? "2px solid white" : "none",
-                  paddingBottom: 4,
+                  paddingBottom: 2,
                 })}
               >
                 Hakkında
@@ -233,14 +233,14 @@ function Navbar({ onLogout, bg }) {
 
             {token && (
               <>
-                <li className="nav-item mx-2 mb-3 mb-lg-0">
+                <li className="nav-item mx-2 mb-2 mb-lg-0">
                   <NavLink
                     to={decoded?.role === "owner" ? "/owner" : "/realtor"}
                     className="nav-link text-white fw-semibold"
                     onClick={closeMobileMenu}
                     style={({ isActive }) => ({
                       borderBottom: isActive ? "2px solid white" : "none",
-                      paddingBottom: 4,
+                      paddingBottom: 2,
                     })}
                   >
                     Portföy
@@ -248,7 +248,7 @@ function Navbar({ onLogout, bg }) {
                 </li>
 
                 {/* Avatar menüsü */}
-                <li className="nav-item d-flex align-items-center mx-2 mt-4 mt-lg-0">
+                <li className="nav-item d-flex align-items-center mx-2 mt-3 mt-lg-0">
                   <Tooltip title="Hesap Menüsü" arrow>
                     <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
                       <Avatar
