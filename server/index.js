@@ -956,21 +956,6 @@ app.post("/api/refresh", async (req, res) => {
   }
 });
 
-// 🔹 Çıkış Yap (Logout)
-// app.post("/api/logout", async (req, res) => {
-//   try {
-//     const refreshTokenValue = req.cookies.refreshToken;
-//     if (!refreshTokenValue)
-//       return res.json({ status: "success", message: "Zaten çıkış yapılmış" });
-
-//     await RefreshToken.deleteOne({ token: refreshTokenValue });
-//     res.clearCookie("refreshToken");
-//     res.json({ status: "success", message: "Başarıyla çıkış yapıldı" });
-//   } catch (err) {
-//     console.error("Logout hatası:", err);
-//     res.status(500).json({ status: "error", message: "Sunucu hatası" });
-//   }
-// });
 app.post("/api/logout", async (req, res) => {
   try {
     const refreshTokenValue = req.cookies.refreshToken;
@@ -1018,6 +1003,20 @@ app.post("/api/logout", async (req, res) => {
       status: "error",
       message: "Sunucu hatası, çıkış başarısız",
     });
+  }
+});
+
+app.put("/api/properties/:id/notes", verifyToken, async (req, res) => {
+  try {
+    const { notes } = req.body;
+    const property = await Property.findByIdAndUpdate(
+      req.params.id,
+      { notes },
+      { new: true }
+    );
+    res.json({ status: "success", property });
+  } catch (err) {
+    res.status(500).json({ status: "error", message: "Not kaydedilemedi" });
   }
 });
 

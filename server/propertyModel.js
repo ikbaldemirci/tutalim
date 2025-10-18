@@ -15,6 +15,7 @@ const PropertySchema = new mongoose.Schema({
   tenantName: { type: String, default: "" },
 
   contractFile: { type: String, default: "" },
+  notes: { type: String, default: "" },
 });
 
 const Property = mongoose.model("properties", PropertySchema);

@@ -1,651 +1,6 @@
-// import React, { useState } from "react";
-// import axios from "axios";
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableContainer,
-//   TableHead,
-//   TableRow,
-//   Paper,
-//   Button,
-//   TextField,
-//   Toolbar,
-//   Snackbar,
-//   Alert,
-//   CircularProgress,
-// } from "@mui/material";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import EditIcon from "@mui/icons-material/Edit";
-// import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-// import SaveIcon from "@mui/icons-material/Save";
-
-// export default function BasicTable({
-//   data = [],
-//   onUpdate,
-//   loadingState,
-//   setLoadingState,
-// }) {
-//   const [editingRow, setEditingRow] = useState(null);
-//   const [editForm, setEditForm] = useState({});
-//   const [ownerInput, setOwnerInput] = useState({}); // propertyId -> ownerId
-//   const [realtorInput, setRealtorInput] = useState({}); // propertyId -> realtorId
-
-//   const [search, setSearch] = useState("");
-//   const [startDate, setStartDate] = useState("");
-//   const [endDate, setEndDate] = useState("");
-
-//   const token = localStorage.getItem("token");
-//   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
-//   const userRole = decoded?.role;
-
-//   const [snackbar, setSnackbar] = useState({
-//     open: false,
-//     message: "",
-//     severity: "success",
-//   });
-
-//   const handleEditClick = (row) => {
-//     setEditingRow(row._id);
-//     setEditForm({
-//       rentPrice: row.rentPrice,
-//       rentDate: row.rentDate?.split("T")[0] || "",
-//       endDate: row.endDate?.split("T")[0] || "",
-//       location: row.location,
-//       tenantName: row.tenantName || "",
-//     });
-//   };
-
-//   const handleEditChange = (e) => {
-//     setEditForm({ ...editForm, [e.target.name]: e.target.value });
-//   };
-
-//   const handleSave = async (id) => {
-//     try {
-//       const res = await axios.put(
-//         `http://localhost:5000/api/properties/${id}`,
-//         {
-//           ...editForm,
-//           rentDate: editForm.rentDate ? new Date(editForm.rentDate) : undefined,
-//           endDate: editForm.endDate ? new Date(editForm.endDate) : undefined,
-//         }
-//       );
-
-//       if (res.data.status === "success") {
-//         onUpdate(res.data.property); // parent state güncelle
-//         setEditingRow(null);
-//       }
-//     } catch (err) {
-//       alert("Güncelleme sırasında hata oluştu.");
-//     }
-//   };
-
-//   const handleDelete = async (id) => {
-//     const confirmDelete = window.confirm(
-//       "Bu mülkü silmek istediğinize emin misiniz?"
-//     );
-//     if (!confirmDelete) return;
-
-//     try {
-//       const res = await axios.delete(
-//         `http://localhost:5000/api/properties/${id}`
-//       );
-//       if (res.data.status === "success") {
-//         onUpdate({ _id: id, deleted: true }); // parent state güncelle
-//       }
-//     } catch (err) {
-//       alert("Silme sırasında hata oluştu.");
-//     }
-//   };
-
-//   const handleAssign = async (id, payload) => {
-//     try {
-//       const res = await axios.put(
-//         `http://localhost:5000/api/properties/${id}/assign`,
-//         payload // { ownerMail: "..."} veya { realtorMail: "..." }
-//       );
-
-//       if (res.data.status === "success") {
-//         onUpdate(res.data.property);
-//         setOwnerInput({ ...ownerInput, [id]: "" });
-//         setRealtorInput({ ...realtorInput, [id]: "" });
-//       }
-//     } catch (err) {
-//       console.error("Assign error:", err);
-//     }
-//   };
-
-//   const getUserDisplay = (user) => {
-//     if (!user) return null;
-//     // Eğer populate edilmiş obje ise object, değilse string id olabilir
-//     if (typeof user === "object") {
-//       // name varsa name + (opsiyonel) surname yoksa mail göster
-//       return (
-//         user.name || user.mail || (user._id && user._id.toString()) || null
-//       );
-//     }
-//     // user string ise (objectId string) => gösterilecek okunabilir bilgi yok, döndür id
-//     return String(user);
-//   };
-
-//   // hangi sütunda ne gösterilecek: eğer kullanıcının rolü realtor ise Owner gösterilsin,
-//   // eğer owner ise Realtor gösterilsin
-//   const renderOwnerOrRealtorCell = (row) => {
-//     const token = localStorage.getItem("token");
-//     const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
-//     if (!decoded) return "Henüz atanmadı";
-
-//     if (decoded.role === "realtor") {
-//       // Emlakçı görüyorsa -> ev sahibinin bilgisini göster (owner)
-//       const ownerName = getUserDisplay(row.owner);
-//       return ownerName || "Henüz atanmadı";
-//     } else {
-//       // Ev sahibi görüyorsa -> emlakçının bilgisini göster (realtor)
-//       const realtorName = getUserDisplay(row.realtor);
-//       return realtorName || "Henüz atanmadı";
-//     }
-//   };
-
-//   const filteredData = data.filter((row) => {
-//     const searchLower = search?.toString().toLowerCase() || "";
-
-//     const matchSearch =
-//       (row.tenantName && row.tenantName.toLowerCase().includes(searchLower)) ||
-//       (row.location && row.location.toLowerCase().includes(searchLower)) ||
-//       (row.rentPrice && row.rentPrice.toString().includes(search)) ||
-//       (row.owner &&
-//         typeof row.owner === "object" &&
-//         row.owner.name &&
-//         row.owner.name.toLowerCase().includes(searchLower)) ||
-//       (row.realtor &&
-//         typeof row.realtor === "object" &&
-//         row.realtor.name &&
-//         row.realtor.name.toLowerCase().includes(searchLower));
-
-//     const matchDate =
-//       (!startDate ||
-//         (row.rentDate && new Date(row.rentDate) >= new Date(startDate))) &&
-//       (!endDate || (row.endDate && new Date(row.endDate) <= new Date(endDate)));
-
-//     return matchSearch && matchDate;
-//   });
-
-//   const handleClearFilters = () => {
-//     setStartDate("");
-//     setEndDate("");
-//     setSearch("");
-//   };
-
-//   // upload
-//   const handleUploadContract = async (id, file) => {
-//     if (!file) return;
-
-//     const formData = new FormData();
-//     formData.append("contract", file);
-
-//     setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
-//     const startTime = Date.now();
-
-//     try {
-//       const res = await axios.post(
-//         `http://localhost:5000/api/properties/${id}/contract`,
-//         formData,
-//         { headers: { "Content-Type": "multipart/form-data" } }
-//       );
-
-//       if (res.data.status === "success") {
-//         onUpdate(res.data.property);
-
-//         // snackbar'ı spinner bitiminde gösterebilmek için state'e kaydediyoruz
-//         const elapsed = Date.now() - startTime;
-//         const delay = Math.max(0, 2000 - elapsed);
-//         setTimeout(() => {
-//           setLoadingState((prev) => ({ ...prev, [id]: null }));
-//           setSnackbar({
-//             open: true,
-//             message: "Sözleşme başarıyla yüklendi.",
-//             severity: "success",
-//           });
-//         }, delay);
-//       }
-//     } catch (err) {
-//       console.error("Upload error:", err);
-//       setLoadingState((prev) => ({ ...prev, [id]: null }));
-//       setSnackbar({
-//         open: true,
-//         message: "Sözleşme yüklenemedi.",
-//         severity: "error",
-//       });
-//     }
-//   };
-
-//   // delete
-//   const handleDeleteContract = async (id) => {
-//     const confirmDelete = window.confirm(
-//       "Bu sözleşmeyi silmek istediğinize emin misiniz?"
-//     );
-//     if (!confirmDelete) return;
-
-//     setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
-//     const startTime = Date.now();
-
-//     try {
-//       const res = await axios.delete(
-//         `http://localhost:5000/api/properties/${id}/contract`
-//       );
-
-//       if (res.data.status === "success") {
-//         onUpdate(res.data.property);
-
-//         const elapsed = Date.now() - startTime;
-//         const delay = Math.max(0, 2000 - elapsed);
-//         setTimeout(() => {
-//           setLoadingState((prev) => ({ ...prev, [id]: null }));
-//           setSnackbar({
-//             open: true,
-//             message: "Sözleşme silindi.",
-//             severity: "info",
-//           });
-//         }, delay);
-//       }
-//     } catch (err) {
-//       console.error("Delete error:", err);
-//       setLoadingState((prev) => ({ ...prev, [id]: null }));
-//       setSnackbar({
-//         open: true,
-//         message: "Sözleşme silinemedi.",
-//         severity: "error",
-//       });
-//     }
-//   };
-
-//   return (
-//     <>
-//       <TableContainer
-//         component={Paper}
-//         sx={{ maxWidth: 1000, margin: "2rem auto" }}
-//       >
-//         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-//           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-//             <TextField
-//               size="small"
-//               placeholder="Ara"
-//               value={search}
-//               onChange={(e) => setSearch(e.target.value)}
-//               sx={{ width: 220 }}
-//             />
-//             <TextField
-//               size="small"
-//               type="date"
-//               label="Başlangıç"
-//               InputLabelProps={{ shrink: true }}
-//               value={startDate}
-//               onChange={(e) => setStartDate(e.target.value)}
-//             />
-//             <TextField
-//               size="small"
-//               type="date"
-//               label="Bitiş"
-//               InputLabelProps={{ shrink: true }}
-//               value={endDate}
-//               onChange={(e) => setEndDate(e.target.value)}
-//             />
-//             <Button onClick={handleClearFilters}>Filtreleri Temizle</Button>
-//           </div>
-//         </Toolbar>
-
-//         <Table>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell>Kiracı</TableCell>
-//               <TableCell>Fiyat</TableCell>
-//               <TableCell>Başlangıç</TableCell>
-//               <TableCell>Bitiş</TableCell>
-//               <TableCell>Konum</TableCell>
-//               <TableCell>
-//                 {(() => {
-//                   const token = localStorage.getItem("token");
-//                   if (token) {
-//                     const decoded = JSON.parse(atob(token.split(".")[1]));
-//                     return decoded.role === "realtor" ? "Ev Sahibi" : "Emlakçı";
-//                   }
-//                   return "";
-//                 })()}
-//               </TableCell>
-//               <TableCell>Sözleşme</TableCell>
-//               <TableCell>İşlemler</TableCell>
-//             </TableRow>
-//           </TableHead>
-
-//           <TableBody>
-//             {filteredData.map((row) => (
-//               <TableRow key={row._id}>
-//                 <TableCell>
-//                   {editingRow === row._id ? (
-//                     <TextField
-//                       name="tenantName"
-//                       value={editForm.tenantName}
-//                       onChange={handleEditChange}
-//                       size="small"
-//                     />
-//                   ) : (
-//                     row.tenantName || "Henüz atanmadı"
-//                   )}
-//                 </TableCell>
-//                 {/* Fiyat */}
-//                 <TableCell>
-//                   {editingRow === row._id ? (
-//                     <TextField
-//                       name="rentPrice"
-//                       type="number"
-//                       value={editForm.rentPrice}
-//                       onChange={handleEditChange}
-//                       size="small"
-//                     />
-//                   ) : (
-//                     row.rentPrice?.toLocaleString("tr-TR") + " ₺"
-//                   )}
-//                 </TableCell>
-
-//                 {/* Başlangıç */}
-//                 <TableCell>
-//                   {editingRow === row._id ? (
-//                     <TextField
-//                       name="rentDate"
-//                       type="date"
-//                       value={editForm.rentDate}
-//                       onChange={handleEditChange}
-//                       size="small"
-//                     />
-//                   ) : row.rentDate ? (
-//                     new Date(row.rentDate).toLocaleDateString()
-//                   ) : (
-//                     "-"
-//                   )}
-//                 </TableCell>
-
-//                 {/* Bitiş */}
-//                 <TableCell>
-//                   {editingRow === row._id ? (
-//                     <TextField
-//                       name="endDate"
-//                       type="date"
-//                       value={editForm.endDate}
-//                       onChange={handleEditChange}
-//                       size="small"
-//                     />
-//                   ) : row.endDate ? (
-//                     new Date(row.endDate).toLocaleDateString()
-//                   ) : (
-//                     "-"
-//                   )}
-//                 </TableCell>
-
-//                 {/* Konum */}
-//                 <TableCell>
-//                   {editingRow === row._id ? (
-//                     <TextField
-//                       name="location"
-//                       value={editForm.location}
-//                       onChange={handleEditChange}
-//                       size="small"
-//                     />
-//                   ) : (
-//                     row.location
-//                   )}
-//                 </TableCell>
-
-//                 {/* Owner/Realtor bilgisi */}
-//                 <TableCell>
-//                   {userRole === "realtor" ? (
-//                     <>
-//                       {row.owner ? (
-//                         editingRow === row._id ? (
-//                           // Düzenle modunda: yeni owner maili girilebilir
-//                           <div style={{ display: "flex", gap: "0.5rem" }}>
-//                             <TextField
-//                               size="small"
-//                               placeholder="Yeni Ev Sahibi Mail"
-//                               value={ownerInput[row._id] || ""}
-//                               onChange={(e) =>
-//                                 setOwnerInput({
-//                                   ...ownerInput,
-//                                   [row._id]: e.target.value,
-//                                 })
-//                               }
-//                             />
-//                             <Button
-//                               variant="outlined"
-//                               size="small"
-//                               onClick={() =>
-//                                 handleAssign(row._id, {
-//                                   ownerMail: ownerInput[row._id],
-//                                 })
-//                               }
-//                             >
-//                               Ata
-//                             </Button>
-//                           </div>
-//                         ) : (
-//                           <span>{row.owner.name || row.owner.mail}</span>
-//                         )
-//                       ) : (
-//                         // Hiç atama yapılmamışsa her zaman input gelsin
-//                         <div style={{ display: "flex", gap: "0.5rem" }}>
-//                           <TextField
-//                             size="small"
-//                             placeholder="Ev Sahibi Mail"
-//                             value={ownerInput[row._id] || ""}
-//                             onChange={(e) =>
-//                               setOwnerInput({
-//                                 ...ownerInput,
-//                                 [row._id]: e.target.value,
-//                               })
-//                             }
-//                           />
-//                           <Button
-//                             variant="outlined"
-//                             size="small"
-//                             onClick={() =>
-//                               handleAssign(row._id, {
-//                                 ownerMail: ownerInput[row._id],
-//                               })
-//                             }
-//                           >
-//                             Ata
-//                           </Button>
-//                         </div>
-//                       )}
-//                     </>
-//                   ) : (
-//                     <>
-//                       {row.realtor ? (
-//                         <div
-//                           style={{
-//                             display: "flex",
-//                             gap: "0.5rem",
-//                             alignItems: "center",
-//                           }}
-//                         >
-//                           <span>{row.realtor.name || row.realtor.mail}</span>
-//                           <Button
-//                             variant="text"
-//                             color="error"
-//                             size="small"
-//                             onClick={() =>
-//                               handleAssign(row._id, { realtorMail: null })
-//                             }
-//                           >
-//                             Yetkiyi Kaldır
-//                           </Button>
-//                         </div>
-//                       ) : editingRow === row._id ? (
-//                         <div style={{ display: "flex", gap: "0.5rem" }}>
-//                           <TextField
-//                             size="small"
-//                             placeholder="Realtor Mail"
-//                             value={realtorInput[row._id] || ""}
-//                             onChange={(e) =>
-//                               setRealtorInput({
-//                                 ...realtorInput,
-//                                 [row._id]: e.target.value,
-//                               })
-//                             }
-//                           />
-//                           <Button
-//                             variant="outlined"
-//                             size="small"
-//                             onClick={() =>
-//                               handleAssign(row._id, {
-//                                 realtorMail: realtorInput[row._id],
-//                               })
-//                             }
-//                           >
-//                             Ata
-//                           </Button>
-//                         </div>
-//                       ) : (
-//                         "Henüz atanmadı"
-//                       )}
-//                     </>
-//                   )}
-//                 </TableCell>
-
-//                 {/* Sözleşme */}
-//                 <TableCell>
-//                   {/* 1) Önce global loading durumu */}
-//                   {loadingState[row._id] === "upload" ? (
-//                     <Button
-//                       variant="outlined"
-//                       size="small"
-//                       disabled
-//                       startIcon={<CircularProgress size={16} />}
-//                     >
-//                       Yükleniyor...
-//                     </Button>
-//                   ) : loadingState[row._id] === "delete" ? (
-//                     <Button
-//                       variant="outlined"
-//                       color="error"
-//                       size="small"
-//                       disabled
-//                       startIcon={<CircularProgress size={16} />}
-//                     >
-//                       Siliniyor...
-//                     </Button>
-//                   ) : /* 2) Normal dallar */ !row.contractFile ? (
-//                     <Button
-//                       variant="outlined"
-//                       size="small"
-//                       component="label"
-//                       startIcon={<CloudUploadIcon />}
-//                     >
-//                       Sözleşme Yükle
-//                       <input
-//                         type="file"
-//                         hidden
-//                         accept="application/pdf,image/*"
-//                         onChange={(e) => {
-//                           const file = e.target.files?.[0];
-//                           if (file) handleUploadContract(row._id, file);
-//                           // Aynı dosyayı üst üste seçince change tetiklensin
-//                           e.target.value = null;
-//                         }}
-//                       />
-//                     </Button>
-//                   ) : editingRow === row._id ? (
-//                     <Button
-//                       variant="outlined"
-//                       color="error"
-//                       size="small"
-//                       onClick={() => handleDeleteContract(row._id)}
-//                       startIcon={<DeleteIcon />}
-//                     >
-//                       Sözleşmeyi Sil
-//                     </Button>
-//                   ) : (
-//                     <Button
-//                       variant="outlined"
-//                       size="small"
-//                       onClick={() =>
-//                         window.open(
-//                           `http://localhost:5000/${row.contractFile}`,
-//                           "_blank"
-//                         )
-//                       }
-//                       startIcon={<SaveIcon />}
-//                     >
-//                       Sözleşmeyi Görüntüle
-//                     </Button>
-//                   )}
-//                 </TableCell>
-
-//                 {/* İşlemler */}
-//                 <TableCell>
-//                   {editingRow === row._id ? (
-//                     <div style={{ display: "flex", gap: "0.5rem" }}>
-//                       <Button
-//                         variant="contained"
-//                         size="small"
-//                         onClick={() => handleSave(row._id)}
-//                       >
-//                         Kaydet
-//                       </Button>
-
-//                       <Button
-//                         variant="contained"
-//                         size="small"
-//                         onClick={() => setEditingRow(null)}
-//                       >
-//                         Vazgeç
-//                       </Button>
-//                     </div>
-//                   ) : (
-//                     <div style={{ display: "flex", gap: "0.5rem" }}>
-//                       <Button
-//                         variant="outlined"
-//                         size="small"
-//                         onClick={() => handleEditClick(row)}
-//                       >
-//                         <EditIcon />
-//                       </Button>
-
-//                       <Button
-//                         variant="outlined"
-//                         color="error"
-//                         size="small"
-//                         onClick={() => handleDelete(row._id)}
-//                       >
-//                         <DeleteIcon />
-//                       </Button>
-//                     </div>
-//                   )}
-//                 </TableCell>
-//               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-
-//       <Snackbar
-//         open={snackbar.open}
-//         autoHideDuration={3000}
-//         onClose={() => setSnackbar({ ...snackbar, open: false })}
-//       >
-//         <Alert
-//           onClose={() => setSnackbar({ ...snackbar, open: false })}
-//           severity={snackbar.severity}
-//           sx={{ width: "100%" }}
-//         >
-//           {snackbar.message}
-//         </Alert>
-//       </Snackbar>
-//     </>
-//   );
-// }
-
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import api from "../api";
 import {
   Table,
   TableBody,
@@ -666,14 +21,16 @@ import {
   Zoom,
   Fade,
   Dialog,
+  DialogActions,
+  DialogContent,
   Typography,
+  GlobalStyles,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SaveIcon from "@mui/icons-material/Save";
 import SearchIcon from "@mui/icons-material/Search";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import PersonAddDisabledIcon from "@mui/icons-material/PersonAddDisabled";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -707,23 +64,21 @@ export default function BasicTable({
   const [tableScrollWidth, setTableScrollWidth] = useState(0);
 
   // Notes popover state
-  const [notes, setNotes] = useState({}); // { [rowId]: string }
+  const [notesSaved, setNotesSaved] = useState({});
+  const [notesDraft, setNotesDraft] = useState({});
   const [openRowId, setOpenRowId] = useState(null);
-
-  // const openNotes = (e, rowId) => {
-  //   setNotesAnchorEl(e.currentTarget);
-  //   setNotesRowId(rowId);
-  // };
-  // const closeNotes = () => {
-  //   setNotesAnchorEl(null);
-  //   setNotesRowId(null);
-  // };
+  const autoSaveTimers = useRef({});
 
   const openNotes = (rowId) => {
     setOpenRowId(rowId);
+    setNotesDraft((prev) => ({ ...prev, [rowId]: notesSaved[rowId] || "" }));
   };
 
   const closeNotes = () => {
+    if (autoSaveTimers.current[openRowId]) {
+      clearTimeout(autoSaveTimers.current[openRowId]);
+      delete autoSaveTimers.current[openRowId];
+    }
     setOpenRowId(null);
   };
 
@@ -733,18 +88,15 @@ export default function BasicTable({
       if (el) setTableScrollWidth(el.scrollWidth || 0);
     };
 
-    // Initial and async layout pass
     updateWidth();
     const raf = requestAnimationFrame(updateWidth);
 
-    // Observe size changes of the table content
     const ro =
       typeof ResizeObserver !== "undefined"
         ? new ResizeObserver(updateWidth)
         : null;
     if (ro && tableRef.current) ro.observe(tableRef.current);
 
-    // Window resize
     window.addEventListener("resize", updateWidth);
 
     return () => {
@@ -754,17 +106,24 @@ export default function BasicTable({
     };
   }, [data]);
 
-  // Persist notes in localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("tutalimNotes");
-    if (stored) setNotes(JSON.parse(stored));
-  }, []);
-
-  useEffect(() => {
-    if (openRowId === null) {
-      localStorage.setItem("tutalimNotes", JSON.stringify(notes));
+    if (data?.length > 0) {
+      const synced = {};
+      data.forEach((p) => {
+        if (p.notes) synced[p._id] = p.notes;
+      });
+      setNotesSaved(synced);
     }
-  }, [openRowId]);
+  }, [data]);
+
+  // useEffect(() => {
+  //   // properties state’in değiştiği yerde:
+  //   const map = {};
+  //   properties.forEach((p) => {
+  //     map[p._id] = p.notes || "";
+  //   });
+  //   setNotesSaved(map);
+  // }, [properties]);
 
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
@@ -772,6 +131,10 @@ export default function BasicTable({
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRowId, setMenuRowId] = useState(null);
+
+  const Transition = React.forwardRef((props, ref) => (
+    <Zoom ref={ref} {...props} timeout={400} />
+  ));
 
   // ✅ edit mode
   const handleEditClick = (row) => {
@@ -968,9 +331,100 @@ export default function BasicTable({
     }
   };
 
-  const Transition = React.forwardRef((props, ref) => (
-    <Zoom ref={ref} {...props} timeout={400} />
-  ));
+  // const handleNotes = async (id, isAutoSave = false) => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const payload = { notes: notesDraft[id] ?? "" };
+
+  //     const res = await axios.put(
+  //       `http://localhost:5000/api/properties/${id}/notes`,
+  //       payload,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+
+  //     if (res.data.status === "success") {
+  //       setNotesSaved((prev) => ({ ...prev, [id]: payload.notes }));
+  //       if (!isAutoSave) {
+  //         setSnackbar({
+  //           open: true,
+  //           message: "Not başarıyla kaydedildi ✅",
+  //           severity: "success",
+  //         });
+  //         closeNotes();
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error("Not kaydetme hatası:", err);
+  //     if (!isAutoSave) {
+  //       setSnackbar({
+  //         open: true,
+  //         message: "Not kaydedilemedi ❌",
+  //         severity: "error",
+  //       });
+  //     }
+  //   }
+  // };
+
+  const handleNotes = async (id, isAutoSave = false) => {
+    try {
+      const payload = { notes: notesDraft[id] ?? "" };
+
+      const res = await api.put(`/properties/${id}/notes`, payload);
+
+      if (res.data.status === "success") {
+        setNotesSaved((prev) => ({ ...prev, [id]: payload.notes }));
+
+        if (!isAutoSave) {
+          setSnackbar({
+            open: true,
+            message: "Not başarıyla kaydedildi ✅",
+            severity: "success",
+          });
+          closeNotes();
+        }
+      }
+    } catch (err) {
+      console.error("❌ Not kaydetme hatası:", err);
+
+      if (!isAutoSave) {
+        setSnackbar({
+          open: true,
+          message:
+            err.response?.data?.message ||
+            "Not kaydedilemedi. Lütfen tekrar deneyin ❌",
+          severity: "error",
+        });
+      }
+    }
+  };
+
+  const handleNoteChange = (id, value) => {
+    setNotesDraft((prev) => ({ ...prev, [id]: value }));
+
+    if (autoSaveTimers.current[id]) {
+      clearTimeout(autoSaveTimers.current[id]);
+    }
+
+    autoSaveTimers.current[id] = setTimeout(() => {
+      if (openRowId === id) {
+        handleNotes(id, true);
+      }
+    }, 1200);
+  };
+
+  // İsteğe bağlı: component unmount'ta temizle
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimers?.current) {
+        Object.values(autoSaveTimers.current).forEach((t) => clearTimeout(t));
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -1364,14 +818,18 @@ export default function BasicTable({
                   {/* Notlar (popover from button) */}
                   <TableCell>
                     <Chip
-                      label={notes[row._id]?.trim() ? "Notu Gör" : "Not Ekle"}
+                      label={
+                        notesSaved[row._id]?.trim() ? "Notu Gör" : "Not Ekle"
+                      }
                       color="primary"
-                      variant={notes[row._id]?.trim() ? "filled" : "outlined"}
+                      variant={
+                        notesSaved[row._id]?.trim() ? "filled" : "outlined"
+                      }
                       onClick={() => openNotes(row._id)}
                       sx={{ cursor: "pointer" }}
                     />
 
-                    <Dialog
+                    {/* <Dialog
                       open={openRowId === row._id}
                       onClose={closeNotes}
                       fullWidth
@@ -1430,17 +888,215 @@ export default function BasicTable({
                         sx={{
                           display: "flex",
                           justifyContent: "flex-end",
-                          mt: 2,
+                          mt: 3,
+                          gap: 2,
+                          pt: 2,
+                          borderTop: "1px solid rgba(0,0,0,0.1)",
                         }}
                       >
                         <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => closeNotes(row._id)}
+                          sx={{
+                            px: 3,
+                            borderWidth: 2,
+                            fontWeight: 600,
+                            "&:hover": {
+                              borderColor: "#d32f2f",
+                              backgroundColor: "rgba(255,0,0,0.05)",
+                            },
+                          }}
+                        >
+                          Vazgeç
+                        </Button>
+
+                        <Button
                           variant="contained"
+                          color="success"
+                          onClick={() => handleNotes(row._id)}
+                          sx={{
+                            px: 4,
+                            fontWeight: 700,
+                            background:
+                              "linear-gradient(135deg, #27ae60, #2ecc71)",
+                            "&:hover": {
+                              background:
+                                "linear-gradient(135deg, #1e8449, #27ae60)",
+                            },
+                            boxShadow: "0 3px 8px rgba(46, 204, 113, 0.4)",
+                          }}
+                        >
+                          Kaydet
+                        </Button>
+                      </Box>
+                    </Dialog> */}
+                    <GlobalStyles
+                      styles={{
+                        ".ql-toolbar.ql-snow": {
+                          border: "0 !important",
+                          borderBottom: "1px solid rgba(0,0,0,0.08) !important",
+                          background: "#fff",
+                          borderTopLeftRadius: 10,
+                          borderTopRightRadius: 10,
+                        },
+                        ".ql-container.ql-snow": {
+                          border: "0 !important",
+                          background: "#fff",
+                          borderBottomLeftRadius: 10,
+                          borderBottomRightRadius: 10,
+                          overflow: "hidden",
+                        },
+                        ".ql-editor": {
+                          minHeight: "55vh",
+                          padding: "16px !important",
+                          lineHeight: "1.6",
+                          overflowWrap: "break-word",
+                        },
+                        ".ql-editor strong": { color: "#000" },
+                      }}
+                    />
+                    <Dialog
+                      open={openRowId === row._id}
+                      onClose={closeNotes}
+                      fullWidth
+                      maxWidth="md"
+                      keepMounted
+                      disableEnforceFocus
+                      disableRestoreFocus
+                      disableScrollLock
+                      slotProps={{
+                        paper: {
+                          sx: {
+                            borderRadius: 3,
+                            width: "80vw",
+                            height: "80vh",
+                            backgroundColor: "#fff",
+                            display: "flex",
+                          },
+                        },
+                      }}
+                    >
+                      <Box sx={{ px: 3, pt: 2 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 700,
+                            color: "#2E86C1",
+                            textAlign: "center",
+                          }}
+                        >
+                          📝 Notlar
+                        </Typography>
+                      </Box>
+
+                      <DialogContent
+                        dividers={false}
+                        sx={{
+                          pt: 2,
+                          px: 3,
+                          flex: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 2,
+                          overflow: "hidden",
+                        }}
+                      >
+                        {/* <ReactQuill
+                          theme="snow"
+                          value={notesDraft[row._id] || ""}
+                          onChange={(value) => handleNoteChange(row._id, value)}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "#fff",
+                            borderRadius: "8px",
+                            flex: 1,
+                            overflow: "auto", // 🔹 içeriğin dışa taşmasını engeller
+                          }}
+                        /> */}
+                        <ReactQuill
+                          theme="snow"
+                          value={notesDraft[row._id] || ""}
+                          onChange={(value) =>
+                            setNotesDraft((prev) => ({
+                              ...prev,
+                              [row._id]: value,
+                            }))
+                          }
+                          modules={{
+                            toolbar: [
+                              [{ header: [1, 2, 3, false] }],
+                              ["bold", "italic", "underline", "strike"],
+                              [{ color: [] }, { background: [] }],
+                              [{ align: [] }],
+                              [{ list: "ordered" }, { list: "bullet" }],
+                              ["blockquote", "code-block"],
+                              ["link", "image"],
+                              ["clean"],
+                            ],
+                          }}
+                          formats={[
+                            "header",
+                            "bold",
+                            "italic",
+                            "underline",
+                            "strike",
+                            "color",
+                            "background",
+                            "align",
+                            "list",
+                            "blockquote",
+                            "code-block",
+                            "link",
+                            "image",
+                          ]}
+                          style={{
+                            flex: 1,
+                            backgroundColor: "#fff",
+                            borderRadius: "8px",
+                            minHeight: "60vh",
+                          }}
+                        />
+                      </DialogContent>
+
+                      <DialogActions
+                        sx={{
+                          px: 3,
+                          py: 2,
+                          borderTop: "none", // 🔥 alttaki çizgiyi tamamen kapat
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          gap: 1.5,
+                        }}
+                      >
+                        <Button
+                          variant="outlined"
                           color="primary"
                           onClick={closeNotes}
+                          sx={{ px: 3, fontWeight: 600 }}
                         >
                           Kapat
                         </Button>
-                      </Box>
+
+                        <Button
+                          variant="contained"
+                          color="success"
+                          onClick={() => handleNotes(row._id)}
+                          sx={{
+                            px: 4,
+                            fontWeight: 700,
+                            background:
+                              "linear-gradient(135deg, #27ae60, #2ecc71)",
+                            "&:hover": {
+                              background:
+                                "linear-gradient(135deg, #1e8449, #27ae60)",
+                            },
+                          }}
+                        >
+                          Kaydet
+                        </Button>
+                      </DialogActions>
                     </Dialog>
                   </TableCell>
 
