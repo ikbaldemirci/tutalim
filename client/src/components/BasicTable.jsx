@@ -663,6 +663,10 @@ import {
   Chip,
   Box,
   Slide,
+  Zoom,
+  Fade,
+  Dialog,
+  Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -676,6 +680,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 export default function BasicTable({
   data = [],
@@ -700,6 +706,27 @@ export default function BasicTable({
   const tableRef = useRef(null);
   const [tableScrollWidth, setTableScrollWidth] = useState(0);
 
+  // Notes popover state
+  const [notes, setNotes] = useState({}); // { [rowId]: string }
+  const [openRowId, setOpenRowId] = useState(null);
+
+  // const openNotes = (e, rowId) => {
+  //   setNotesAnchorEl(e.currentTarget);
+  //   setNotesRowId(rowId);
+  // };
+  // const closeNotes = () => {
+  //   setNotesAnchorEl(null);
+  //   setNotesRowId(null);
+  // };
+
+  const openNotes = (rowId) => {
+    setOpenRowId(rowId);
+  };
+
+  const closeNotes = () => {
+    setOpenRowId(null);
+  };
+
   useEffect(() => {
     const updateWidth = () => {
       const el = tableRef.current;
@@ -711,7 +738,10 @@ export default function BasicTable({
     const raf = requestAnimationFrame(updateWidth);
 
     // Observe size changes of the table content
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateWidth) : null;
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(updateWidth)
+        : null;
     if (ro && tableRef.current) ro.observe(tableRef.current);
 
     // Window resize
@@ -723,6 +753,18 @@ export default function BasicTable({
       cancelAnimationFrame(raf);
     };
   }, [data]);
+
+  // Persist notes in localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("tutalimNotes");
+    if (stored) setNotes(JSON.parse(stored));
+  }, []);
+
+  useEffect(() => {
+    if (openRowId === null) {
+      localStorage.setItem("tutalimNotes", JSON.stringify(notes));
+    }
+  }, [openRowId]);
 
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
@@ -805,106 +847,6 @@ export default function BasicTable({
       });
     }
   };
-
-  // const handleAssign = async (id, payload) => {
-  //   try {
-  //     const res = await axios.put(
-  //       `http://localhost:5000/api/properties/${id}/assign`,
-  //       payload
-  //     );
-
-  //     if (res.data.status === "success") {
-  //       onUpdate(res.data.property);
-  //       setOwnerInput({ ...ownerInput, [id]: "" });
-  //       setRealtorInput({ ...realtorInput, [id]: "" });
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Atama başarılı ✅",
-  //         severity: "success",
-  //       });
-  //     }
-  //   } catch {
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Atama sırasında hata oluştu",
-  //       severity: "error",
-  //     });
-  //   }
-  // };
-
-  //   const handleAssign = async (id, payload) => {
-  //   try {
-  //     // 🔹 Atanacak maili bul (emlakçı mı ev sahibi mi?)
-  //     const mail = payload.ownerMail || payload.realtorMail;
-  //     if (!mail) {
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Lütfen bir mail adresi girin.",
-  //         severity: "warning",
-  //       });
-  //       return;
-  //     }
-
-  //     // 🔹 Önce bu mail hangi role ait, onu kontrol et
-  //     const userRes = await axios.get(
-  //       `http://localhost:5000/api/users?mail=${mail}`
-  //     );
-  //     const user = userRes.data.user;
-
-  //     if (!user) {
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Bu mail adresine sahip bir kullanıcı bulunamadı.",
-  //         severity: "error",
-  //       });
-  //       return;
-  //     }
-
-  //     // 🔹 Şimdi rol kontrolü yap
-  //     if (userRole === "realtor" && user.role !== "owner") {
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Lütfen bir ev sahibi maili girin.",
-  //         severity: "warning",
-  //       });
-  //       return;
-  //     }
-
-  //     if (userRole === "owner" && user.role !== "realtor") {
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Lütfen bir emlakçı maili girin.",
-  //         severity: "warning",
-  //       });
-  //       return;
-  //     }
-
-  //     // 🔹 Kontrol geçtiyse normal atama yap
-  //     const res = await axios.put(
-  //       `http://localhost:5000/api/properties/${id}/assign`,
-  //       payload
-  //     );
-
-  //     if (res.data.status === "success") {
-  //       onUpdate(res.data.property);
-  //       setOwnerInput({ ...ownerInput, [id]: "" });
-  //       setRealtorInput({ ...realtorInput, [id]: "" });
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Atama başarılı ✅",
-  //         severity: "success",
-  //       });
-  //     }
-  //   } catch (err) {
-  //     console.error("Atama hatası:", err);
-  //     setSnackbar({
-  //       open: true,
-  //       message:
-  //         err.response?.data?.message || "Atama sırasında hata oluştu ❌",
-  //       severity: "error",
-  //     });
-  //   }
-  // };
 
   const handleAssign = async (id, payload) => {
     try {
@@ -1026,6 +968,10 @@ export default function BasicTable({
     }
   };
 
+  const Transition = React.forwardRef((props, ref) => (
+    <Zoom ref={ref} {...props} timeout={400} />
+  ));
+
   return (
     <>
       <Box sx={{ mb: 6, display: "flow-root" }}>
@@ -1100,6 +1046,7 @@ export default function BasicTable({
                   "Konum",
                   userRole === "realtor" ? "Ev Sahibi" : "Emlakçı",
                   "Sözleşme",
+                  "Notlar",
                   "İşlemler",
                 ].map((header) => (
                   <TableCell
@@ -1206,121 +1153,6 @@ export default function BasicTable({
                       row.location
                     )}
                   </TableCell>
-
-                  {/* Ev Sahibi / Emlakçı bilgisi */}
-                  {/* <TableCell>
-                  {userRole === "realtor" ? (
-                    <>
-                      {row.owner ? (
-                        <span style={{ fontWeight: 500 }}>
-                          {row.owner.name || row.owner.mail}
-                        </span>
-                      ) : (
-                        <Box sx={{ display: "flex", gap: "0.5rem" }}>
-                          <TextField
-                            size="small"
-                            placeholder="Ev Sahibi Mail"
-                            value={ownerInput[row._id] || ""}
-                            onChange={(e) =>
-                              setOwnerInput({
-                                ...ownerInput,
-                                [row._id]: e.target.value,
-                              })
-                            }
-                          />
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() =>
-                              handleAssign(row._id, {
-                                ownerMail: ownerInput[row._id],
-                              })
-                            }
-                          >
-                            Ata
-                          </Button>
-                        </Box>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {row.realtor ? (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.5rem",
-                          }}
-                        >
-                          <span style={{ fontWeight: 500 }}>
-                            {row.realtor.name || row.realtor.mail}
-                          </span>
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            size="small"
-                            // startIcon={<HighlightOffIcon fontSize="small" />}
-                            startIcon={
-                              <PersonAddDisabledIcon fontSize="small" />
-                            }
-                            sx={{
-                              fontWeight: 600,
-                              textTransform: "none",
-                              borderRadius: "8px",
-                              "&:hover": {
-                                backgroundColor: "rgba(255, 0, 0, 0.05)",
-                                borderColor: "#d32f2f",
-                              },
-                            }}
-                            onClick={() =>
-                              handleAssign(row._id, { realtorMail: null })
-                            }
-                          >
-                            Kaldır
-                          </Button>
-                        </Box>
-                      ) : (
-                        <Box sx={{ display: "flex", gap: "0.5rem" }}>
-                          <TextField
-                            size="small"
-                            placeholder="Mail"
-                            value={realtorInput[row._id] || ""}
-                            onChange={(e) =>
-                              setRealtorInput({
-                                ...realtorInput,
-                                [row._id]: e.target.value,
-                              })
-                            }
-                          />
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                            startIcon={<PersonAddAltIcon fontSize="small" />}
-                            sx={{
-                              fontWeight: 600,
-                              textTransform: "none",
-                              borderRadius: "8px",
-                              boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
-                              "&:hover": {
-                                backgroundColor: "#1f5fa3",
-                                boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
-                              },
-                            }}
-                            onClick={() =>
-                              handleAssign(row._id, {
-                                ownerMail:
-                                  ownerInput[row._id] || realtorInput[row._id],
-                              })
-                            }
-                          >
-                            Ata
-                          </Button>
-                        </Box>
-                      )}
-                    </>
-                  )}
-                </TableCell> */}
 
                   {/* Ev Sahibi / Emlakçı bilgisi */}
                   <TableCell>
@@ -1508,15 +1340,6 @@ export default function BasicTable({
                         />
                       </Button>
                     ) : editingRow === row._id ? (
-                      // <Button
-                      //   variant="outlined"
-                      //   color="error"
-                      //   size="small"
-                      //   onClick={() => handleDeleteContract(row._id)}
-                      //   startIcon={<DeleteIcon />}
-                      // >
-                      //   Sil
-                      // </Button>
                       <Chip
                         label="Sözleşmeyi Sil"
                         color="error"
@@ -1536,6 +1359,89 @@ export default function BasicTable({
                         sx={{ cursor: "pointer" }}
                       />
                     )}
+                  </TableCell>
+
+                  {/* Notlar (popover from button) */}
+                  <TableCell>
+                    <Chip
+                      label={notes[row._id]?.trim() ? "Notu Gör" : "Not Ekle"}
+                      color="primary"
+                      variant={notes[row._id]?.trim() ? "filled" : "outlined"}
+                      onClick={() => openNotes(row._id)}
+                      sx={{ cursor: "pointer" }}
+                    />
+
+                    <Dialog
+                      open={openRowId === row._id}
+                      onClose={closeNotes}
+                      fullWidth
+                      maxWidth="md"
+                      disableEnforceFocus
+                      disableRestoreFocus
+                      disableScrollLock
+                      slotProps={{
+                        transition: { timeout: 400 },
+                        paper: {
+                          sx: {
+                            borderRadius: 3,
+                            width: "80vw",
+                            height: "80vh",
+                            p: 3,
+                            background:
+                              "linear-gradient(135deg, #ffffff, #eaf2f8)",
+                            boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
+                            display: "flex",
+                            flexDirection: "column",
+                          },
+                        },
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mb: 2,
+                          fontWeight: 600,
+                          color: "#2E86C1",
+                          textAlign: "center",
+                        }}
+                      >
+                        📝 Notlar
+                      </Typography>
+
+                      <ReactQuill
+                        theme="snow"
+                        value={notes[row._id] || ""}
+                        onChange={(value) =>
+                          setNotes((prev) => ({
+                            ...prev,
+                            [row._id]: value,
+                          }))
+                        }
+                        bounds=".ql-container"
+                        scrollingContainer=".ql-editor"
+                        style={{
+                          flex: 1,
+                          backgroundColor: "#fff",
+                          borderRadius: "8px",
+                        }}
+                      />
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          mt: 2,
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={closeNotes}
+                        >
+                          Kapat
+                        </Button>
+                      </Box>
+                    </Dialog>
                   </TableCell>
 
                   {/* İşlemler */}
@@ -1559,25 +1465,6 @@ export default function BasicTable({
                         </Button>
                       </Box>
                     ) : (
-                      // <Box sx={{ display: "flex", gap: "0.5rem" }}>
-                      //   <Button
-                      //     variant="outlined"
-                      //     size="small"
-                      //     onClick={() => handleEditClick(row)}
-                      //     startIcon={<EditIcon />}
-                      //   >
-                      //     Düzenle
-                      //   </Button>
-                      //   <Button
-                      //     variant="outlined"
-                      //     color="error"
-                      //     size="small"
-                      //     onClick={() => handleDelete(row._id)}
-                      //     startIcon={<DeleteIcon />}
-                      //   >
-                      //     Sil
-                      //   </Button>
-                      // </Box>
                       <Box sx={{ display: "flex", justifyContent: "center" }}>
                         <IconButton
                           aria-label="işlemler"
