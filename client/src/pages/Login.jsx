@@ -73,7 +73,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 import "../styles/Login.css";
-import { Snackbar, Alert, Portal } from "@mui/material";
+import {
+  Snackbar,
+  Alert,
+  Portal,
+  Dialog,
+  Typography,
+  TextField,
+  Button,
+} from "@mui/material";
 
 function Login({ onSwitch }) {
   const [mail, setMail] = useState("");
@@ -84,6 +92,10 @@ function Login({ onSwitch }) {
     message: "",
     severity: "error",
   });
+
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotMail, setForgotMail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -148,6 +160,19 @@ function Login({ onSwitch }) {
           >
             Kayıt Ol
           </button>
+          <button
+            type="button"
+            onClick={() => setForgotOpen(true)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#2E86C1",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            Şifremi Unuttum
+          </button>
         </p>
       </div>
       <Portal>
@@ -166,6 +191,67 @@ function Login({ onSwitch }) {
           </Alert>
         </Snackbar>
       </Portal>
+      <Dialog
+        open={forgotOpen}
+        onClose={() => setForgotOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3, p: 2 },
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            textAlign: "center",
+            fontWeight: 600,
+            color: "#2E86C1",
+            mb: 2,
+          }}
+        >
+          🔒 Şifremi Unuttum
+        </Typography>
+
+        <TextField
+          fullWidth
+          label="Kayıtlı E-posta Adresiniz"
+          type="email"
+          value={forgotMail}
+          onChange={(e) => setForgotMail(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+
+        <Button
+          variant="contained"
+          fullWidth
+          disabled={loading}
+          onClick={async () => {
+            try {
+              setLoading(true);
+              const res = await api.post("/forgot-password", {
+                mail: forgotMail,
+              });
+              setSnackbar({
+                open: true,
+                message: res.data.message,
+                severity: "success",
+              });
+              setForgotOpen(false);
+            } catch (err) {
+              console.error("Şifre sıfırlama hatası:", err);
+              setSnackbar({
+                open: true,
+                message: "E-posta gönderilemedi. Lütfen tekrar deneyin.",
+                severity: "error",
+              });
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          Gönder
+        </Button>
+      </Dialog>
     </div>
   );
 }

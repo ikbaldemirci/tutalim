@@ -13,6 +13,7 @@ import RealtorHome from "./pages/RealtorHome";
 import ProtectedRoute from "./ProtectedRoute";
 import Profile from "./pages/Profile";
 import LoadingScreen from "./components/LoadingScreen";
+import ResetPassword from "./pages/ResetPassword";
 import { Fade } from "@mui/material";
 
 // 🎨 Tutalım kurumsal renk teması
@@ -61,6 +62,10 @@ function App() {
                   <Route path="/about" element={<About />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
+                  <Route
+                    path="/reset-password/:token"
+                    element={<ResetPassword />}
+                  />
                   <Route
                     path="/owner"
                     element={

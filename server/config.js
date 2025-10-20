@@ -11,6 +11,9 @@ const LoginSchema = new mongoose.Schema({
   mail: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, required: true, enum: ["realtor", "owner"] },
+
+  resetToken: { type: String, default: null },
+  resetExpires: { type: Date, default: null },
 });
 
 module.exports = mongoose.model("users", LoginSchema);

@@ -8,6 +8,7 @@ const Property = require("./propertyModel");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
 
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
@@ -1017,6 +1018,76 @@ app.put("/api/properties/:id/notes", verifyToken, async (req, res) => {
     res.json({ status: "success", property });
   } catch (err) {
     res.status(500).json({ status: "error", message: "Not kaydedilemedi" });
+  }
+});
+
+// 🔹 Şifre sıfırlama isteği
+app.post("/api/forgot-password", async (req, res) => {
+  try {
+    const { mail } = req.body;
+    const user = await collection.findOne({ mail });
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Bu e-posta adresiyle kayıt bulunamadı.",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const resetExpires = Date.now() + 15 * 60 * 1000; // 15 dk geçerli
+
+    user.resetToken = resetToken;
+    user.resetExpires = resetExpires;
+    await user.save();
+
+    const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+
+    res.json({
+      status: "success",
+      message: "Şifre sıfırlama bağlantısı oluşturuldu.",
+      link: resetLink,
+    });
+  } catch (err) {
+    console.error("Şifre sıfırlama hatası:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Sunucu hatası, lütfen tekrar deneyin.",
+    });
+  }
+});
+
+app.post("/api/reset-password/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password: newPassword } = req.body;
+
+    const user = await collection.findOne({
+      resetToken: token,
+      resetExpires: { $gt: Date.now() },
+    });
+
+    if (!user)
+      return res.status(400).json({
+        status: "fail",
+        message: "Geçersiz veya süresi dolmuş bağlantı.",
+      });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    user.resetToken = undefined;
+    user.resetExpires = undefined;
+    await user.save();
+
+    res.json({
+      status: "success",
+      message: "Şifreniz başarıyla güncellendi.",
+    });
+  } catch (err) {
+    console.error("Şifre sıfırlama hatası:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Sunucu hatası, lütfen tekrar deneyin.",
+    });
   }
 });
 
