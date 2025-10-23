@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../api";
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
 import { CircularProgress, Box, Typography } from "@mui/material";
@@ -13,6 +14,8 @@ function OwnerHome() {
   const [properties, setProperties] = useState([]);
   const [loadingState, setLoadingState] = useState({});
   const [loading, setLoading] = useState(true);
+  const [invites, setInvites] = useState([]);
+  const [loadingInvites, setLoadingInvites] = useState(true);
 
   useEffect(() => {
     if (token) {
@@ -31,11 +34,73 @@ function OwnerHome() {
     }
   }, [token]);
 
+  // Fetch pending invitations for current owner
+  useEffect(() => {
+    if (!token) return;
+    api
+      .get("/assignments/pending")
+      .then((res) => {
+        if (res.data.status === "success") setInvites(res.data.assignments || []);
+      })
+      .finally(() => setLoadingInvites(false));
+  }, [token]);
+
+  const acceptInvite = async (id) => {
+    try {
+      const res = await api.post(`/assignments/${id}/accept`);
+      if (res.data.status === "success") {
+        setInvites((prev) => prev.filter((i) => i._id !== id));
+        // refresh properties
+        setLoading(true);
+        axios
+          .get("http://localhost:5000/api/properties", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((r) => {
+            if (r.data.status === "success") setProperties(r.data.properties);
+          })
+          .finally(() => setLoading(false));
+      }
+    } catch (err) {}
+  };
+
+  const rejectInvite = async (id) => {
+    try {
+      const res = await api.post(`/assignments/${id}/reject`);
+      if (res.data.status === "success") {
+        setInvites((prev) => prev.filter((i) => i._id !== id));
+      }
+    } catch (err) {}
+  };
+
   return (
     <>
       <Navbar />
 
       <WelcomeHeader name={decoded?.name || "Kullanıcı"} />
+
+      {/* Pending invitations */}
+      <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
+        {(!loadingInvites && invites.length > 0) && (
+          <Box sx={{ p: 2, border: "1px solid #e0e0e0", borderRadius: 2, background: "#fff9f1" }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+              Bekleyen Davetler ({invites.length})
+            </Typography>
+            {invites.map((inv) => (
+              <Box key={inv._id} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 1 }}>
+                <Typography sx={{ fontSize: 14 }}>
+                  {inv.fromUser?.name || inv.fromUser?.mail} sizi bu mülke {inv.role === "realtor" ? "emlakçı" : "ev sahibi"} olarak atamak istiyor:
+                  <strong> {inv.property?.location}</strong>
+                </Typography>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <button onClick={() => acceptInvite(inv._id)} style={{ padding: "6px 10px", background: "#2E86C1", color: "#fff", border: 0, borderRadius: 6, cursor: "pointer" }}>Kabul Et</button>
+                  <button onClick={() => rejectInvite(inv._id)} style={{ padding: "6px 10px", background: "#eee", color: "#333", border: 0, borderRadius: 6, cursor: "pointer" }}>Reddet</button>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
 
       {loading ? (
         <Box

@@ -58,6 +58,7 @@ export default function BasicTable({
     message: "",
     severity: "success",
   });
+  const [sentInvitesMap, setSentInvitesMap] = useState({});
 
   const tableRef = useRef(null);
   const [tableScrollWidth, setTableScrollWidth] = useState(0);
@@ -124,6 +125,26 @@ export default function BasicTable({
   const Transition = React.forwardRef((props, ref) => (
     <Zoom ref={ref} {...props} timeout={400} />
   ));
+
+  useEffect(() => {
+    // Load pending invites created by current user (for all properties)
+    const loadSent = async () => {
+      try {
+        const res = await api.get("/assignments/sent");
+        if (res.data?.status === "success") {
+          const map = {};
+          (res.data.assignments || []).forEach((a) => {
+            const pid = a.property?._id || a.property;
+            if (!pid) return;
+            if (!map[pid]) map[pid] = {};
+            map[pid][a.role] = true;
+          });
+          setSentInvitesMap(map);
+        }
+      } catch (e) {}
+    };
+    loadSent();
+  }, [data?.length]);
 
   const handleEditClick = (row) => {
     setEditingRow(row._id);
@@ -194,6 +215,50 @@ export default function BasicTable({
       setSnackbar({
         open: true,
         message: "Silme sırasında hata oluştu",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleInvite = async (id, targetMail, role) => {
+    try {
+      if (!targetMail) {
+        setSnackbar({
+          open: true,
+          message: "Mail gerekli",
+          severity: "warning",
+        });
+        return;
+      }
+      const res = await api.post("/assignments", {
+        propertyId: id,
+        targetMail,
+        role,
+      });
+      if (res.data.status === "success") {
+        if (role === "owner") setOwnerInput({ ...ownerInput, [id]: "" });
+        if (role === "realtor") setRealtorInput({ ...realtorInput, [id]: "" });
+        setSentInvitesMap((prev) => ({
+          ...prev,
+          [id]: { ...(prev[id] || {}), [role]: true },
+        }));
+        setSnackbar({
+          open: true,
+          message: res.data.message || "Davet gönderildi. Onay bekleniyor.",
+          severity: "success",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: res.data.message || "Davet oluşturulamadı",
+          severity: "warning",
+        });
+      }
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message:
+          err.response?.data?.message || "İşlem sırasında bir hata oluştu",
         severity: "error",
       });
     }
@@ -561,6 +626,12 @@ export default function BasicTable({
                           <span style={{ fontWeight: 500 }}>
                             {row.owner.name || row.owner.mail}
                           </span>
+                        ) : sentInvitesMap[row._id]?.owner ? (
+                          <Chip
+                            label="Yanıt bekleniyor"
+                            color="warning"
+                            variant="outlined"
+                          />
                         ) : (
                           <Box
                             sx={{
@@ -598,9 +669,11 @@ export default function BasicTable({
                                 },
                               }}
                               onClick={() =>
-                                handleAssign(row._id, {
-                                  ownerMail: ownerInput[row._id],
-                                })
+                                handleInvite(
+                                  row._id,
+                                  ownerInput[row._id],
+                                  "owner"
+                                )
                               }
                             >
                               Ata
@@ -646,6 +719,12 @@ export default function BasicTable({
                               Kaldır
                             </Button>
                           </Box>
+                        ) : sentInvitesMap[row._id]?.realtor ? (
+                          <Chip
+                            label="Yanıt bekleniyor"
+                            color="warning"
+                            variant="outlined"
+                          />
                         ) : (
                           <Box
                             sx={{
@@ -683,9 +762,11 @@ export default function BasicTable({
                                 },
                               }}
                               onClick={() =>
-                                handleAssign(row._id, {
-                                  realtorMail: realtorInput[row._id],
-                                })
+                                handleInvite(
+                                  row._id,
+                                  realtorInput[row._id],
+                                  "realtor"
+                                )
                               }
                             >
                               Ata
