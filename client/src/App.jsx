@@ -14,6 +14,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import Profile from "./pages/Profile";
 import LoadingScreen from "./components/LoadingScreen";
 import ResetPassword from "./pages/ResetPassword";
+import ResetSuccess from "./pages/ResetSuccess";
+import CheckMail from "./pages/CheckMail";
 import { Fade } from "@mui/material";
 
 // 🎨 Tutalım kurumsal renk teması
@@ -66,6 +68,8 @@ function App() {
                     path="/reset-password/:token"
                     element={<ResetPassword />}
                   />
+                  <Route path="/reset-success" element={<ResetSuccess />} />
+                  <Route path="/check-mail" element={<CheckMail />} />
                   <Route
                     path="/owner"
                     element={

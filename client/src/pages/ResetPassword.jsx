@@ -56,7 +56,7 @@ function ResetPassword() {
           message: "Şifre başarıyla değiştirildi ✅",
           severity: "success",
         });
-        setTimeout(() => navigate("/"), 2000);
+        setTimeout(() => navigate("/reset-success"), 2000);
       } else {
         setSnackbar({
           open: true,
