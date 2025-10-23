@@ -18,11 +18,10 @@ import ResetSuccess from "./pages/ResetSuccess";
 import CheckMail from "./pages/CheckMail";
 import { Fade } from "@mui/material";
 
-// 🎨 Tutalım kurumsal renk teması
 const theme = createTheme({
   palette: {
-    primary: { main: "#2E86C1" }, // koyu mavi
-    secondary: { main: "#5DADE2" }, // açık mavi
+    primary: { main: "#2E86C1" },
+    secondary: { main: "#5DADE2" },
     background: { default: "#f8f9fa" },
   },
   shape: { borderRadius: 10 },

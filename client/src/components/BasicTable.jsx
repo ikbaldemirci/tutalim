@@ -59,11 +59,9 @@ export default function BasicTable({
     severity: "success",
   });
 
-  // Keep filter toolbar width in sync with table's intrinsic width
   const tableRef = useRef(null);
   const [tableScrollWidth, setTableScrollWidth] = useState(0);
 
-  // Notes popover state
   const [notesSaved, setNotesSaved] = useState({});
   const [notesDraft, setNotesDraft] = useState({});
   const [openRowId, setOpenRowId] = useState(null);
@@ -116,15 +114,6 @@ export default function BasicTable({
     }
   }, [data]);
 
-  // useEffect(() => {
-  //   // properties state’in değiştiği yerde:
-  //   const map = {};
-  //   properties.forEach((p) => {
-  //     map[p._id] = p.notes || "";
-  //   });
-  //   setNotesSaved(map);
-  // }, [properties]);
-
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
   const userRole = decoded?.role;
@@ -136,7 +125,6 @@ export default function BasicTable({
     <Zoom ref={ref} {...props} timeout={400} />
   ));
 
-  // ✅ edit mode
   const handleEditClick = (row) => {
     setEditingRow(row._id);
     setEditForm({
@@ -331,45 +319,6 @@ export default function BasicTable({
     }
   };
 
-  // const handleNotes = async (id, isAutoSave = false) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const payload = { notes: notesDraft[id] ?? "" };
-
-  //     const res = await axios.put(
-  //       `http://localhost:5000/api/properties/${id}/notes`,
-  //       payload,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     if (res.data.status === "success") {
-  //       setNotesSaved((prev) => ({ ...prev, [id]: payload.notes }));
-  //       if (!isAutoSave) {
-  //         setSnackbar({
-  //           open: true,
-  //           message: "Not başarıyla kaydedildi ✅",
-  //           severity: "success",
-  //         });
-  //         closeNotes();
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error("Not kaydetme hatası:", err);
-  //     if (!isAutoSave) {
-  //       setSnackbar({
-  //         open: true,
-  //         message: "Not kaydedilemedi ❌",
-  //         severity: "error",
-  //       });
-  //     }
-  //   }
-  // };
-
   const handleNotes = async (id, isAutoSave = false) => {
     try {
       const payload = { notes: notesDraft[id] ?? "" };
@@ -417,7 +366,6 @@ export default function BasicTable({
     }, 1200);
   };
 
-  // İsteğe bağlı: component unmount'ta temizle
   useEffect(() => {
     return () => {
       if (autoSaveTimers?.current) {
@@ -439,7 +387,6 @@ export default function BasicTable({
             overflowX: "auto",
           }}
         >
-          {/* 🔎 Filtre Alanı */}
           <Toolbar
             sx={{
               display: "flex",
@@ -451,7 +398,6 @@ export default function BasicTable({
               borderTopRightRadius: "12px",
               gap: 2,
               py: 2,
-              // Match the table's scroll width so the right side doesn't show white
               minWidth: tableScrollWidth || undefined,
             }}
           >
@@ -608,10 +554,8 @@ export default function BasicTable({
                     )}
                   </TableCell>
 
-                  {/* Ev Sahibi / Emlakçı bilgisi */}
                   <TableCell>
                     {userRole === "realtor" ? (
-                      // 🔹 Realtor paneli -> Ev sahibi atama
                       <>
                         {row.owner ? (
                           <span style={{ fontWeight: 500 }}>
@@ -665,7 +609,6 @@ export default function BasicTable({
                         )}
                       </>
                     ) : (
-                      // 🔹 Owner paneli -> Emlakçı atama veya kaldırma
                       <>
                         {row.realtor ? (
                           <Box
@@ -828,109 +771,6 @@ export default function BasicTable({
                       onClick={() => openNotes(row._id)}
                       sx={{ cursor: "pointer" }}
                     />
-
-                    {/* <Dialog
-                      open={openRowId === row._id}
-                      onClose={closeNotes}
-                      fullWidth
-                      maxWidth="md"
-                      disableEnforceFocus
-                      disableRestoreFocus
-                      disableScrollLock
-                      slotProps={{
-                        transition: { timeout: 400 },
-                        paper: {
-                          sx: {
-                            borderRadius: 3,
-                            width: "80vw",
-                            height: "80vh",
-                            p: 3,
-                            background:
-                              "linear-gradient(135deg, #ffffff, #eaf2f8)",
-                            boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
-                            display: "flex",
-                            flexDirection: "column",
-                          },
-                        },
-                      }}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          mb: 2,
-                          fontWeight: 600,
-                          color: "#2E86C1",
-                          textAlign: "center",
-                        }}
-                      >
-                        📝 Notlar
-                      </Typography>
-
-                      <ReactQuill
-                        theme="snow"
-                        value={notes[row._id] || ""}
-                        onChange={(value) =>
-                          setNotes((prev) => ({
-                            ...prev,
-                            [row._id]: value,
-                          }))
-                        }
-                        bounds=".ql-container"
-                        scrollingContainer=".ql-editor"
-                        style={{
-                          flex: 1,
-                          backgroundColor: "#fff",
-                          borderRadius: "8px",
-                        }}
-                      />
-
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "flex-end",
-                          mt: 3,
-                          gap: 2,
-                          pt: 2,
-                          borderTop: "1px solid rgba(0,0,0,0.1)",
-                        }}
-                      >
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={() => closeNotes(row._id)}
-                          sx={{
-                            px: 3,
-                            borderWidth: 2,
-                            fontWeight: 600,
-                            "&:hover": {
-                              borderColor: "#d32f2f",
-                              backgroundColor: "rgba(255,0,0,0.05)",
-                            },
-                          }}
-                        >
-                          Vazgeç
-                        </Button>
-
-                        <Button
-                          variant="contained"
-                          color="success"
-                          onClick={() => handleNotes(row._id)}
-                          sx={{
-                            px: 4,
-                            fontWeight: 700,
-                            background:
-                              "linear-gradient(135deg, #27ae60, #2ecc71)",
-                            "&:hover": {
-                              background:
-                                "linear-gradient(135deg, #1e8449, #27ae60)",
-                            },
-                            boxShadow: "0 3px 8px rgba(46, 204, 113, 0.4)",
-                          }}
-                        >
-                          Kaydet
-                        </Button>
-                      </Box>
-                    </Dialog> */}
                     <GlobalStyles
                       styles={{
                         ".ql-toolbar.ql-snow": {
@@ -1002,19 +842,6 @@ export default function BasicTable({
                           overflow: "hidden",
                         }}
                       >
-                        {/* <ReactQuill
-                          theme="snow"
-                          value={notesDraft[row._id] || ""}
-                          onChange={(value) => handleNoteChange(row._id, value)}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            backgroundColor: "#fff",
-                            borderRadius: "8px",
-                            flex: 1,
-                            overflow: "auto", // 🔹 içeriğin dışa taşmasını engeller
-                          }}
-                        /> */}
                         <ReactQuill
                           theme="snow"
                           value={notesDraft[row._id] || ""}
@@ -1064,7 +891,7 @@ export default function BasicTable({
                         sx={{
                           px: 3,
                           py: 2,
-                          borderTop: "none", // 🔥 alttaki çizgiyi tamamen kapat
+                          borderTop: "none",
                           display: "flex",
                           justifyContent: "flex-end",
                           gap: 1.5,
@@ -1126,7 +953,7 @@ export default function BasicTable({
                           aria-label="işlemler"
                           onClick={(e) => {
                             setAnchorEl(e.currentTarget);
-                            setMenuRowId(row._id); // ✅ hangi satır olduğunu kaydet
+                            setMenuRowId(row._id);
                           }}
                           size="small"
                           sx={{

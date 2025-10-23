@@ -11,11 +11,10 @@ export default function LoadingScreen() {
         background: "linear-gradient(to right, #eaf2f8, #f4f9ff)",
       }}
     >
-      {/* Logo alanı */}
       <Box
         sx={{
           position: "relative",
-          width: 260, // 🔹 logo boyutu (biraz büyüttük)
+          width: 260,
           height: 100,
         }}
       >
@@ -30,7 +29,6 @@ export default function LoadingScreen() {
           }}
         />
 
-        {/* ✨ Parlaklık efekti katmanı */}
         <Box
           sx={{
             position: "absolute",
@@ -45,7 +43,6 @@ export default function LoadingScreen() {
         />
       </Box>
 
-      {/* 🔹 Işık animasyonu */}
       <style>{`
         @keyframes shine {
           0% { left: -150%; opacity: 0.3; }
@@ -56,21 +53,3 @@ export default function LoadingScreen() {
     </Box>
   );
 }
-
-// return (
-//   <Box
-//     sx={{
-//       height: "100vh",
-//       display: "flex",
-//       justifyContent: "center",
-//       alignItems: "center",
-//       flexDirection: "column",
-//       color: "#2E86C1",
-//     }}
-//   >
-//     <CircularProgress color="primary" size={60} thickness={5} />
-//     <p style={{ marginTop: "1rem", fontWeight: 600 }}>
-//       Giriş doğrulanıyor...
-//     </p>
-//   </Box>
-// );

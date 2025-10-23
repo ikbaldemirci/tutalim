@@ -9,7 +9,7 @@ export default function Footer() {
         textAlign: "center",
         backgroundColor: "rgba(0,0,0,0.3)",
         color: "#fff",
-        mt: "auto", // sayfa sonuna yapışması için
+        mt: "auto",
       }}
     >
       <Typography variant="body2">

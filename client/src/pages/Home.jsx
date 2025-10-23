@@ -72,9 +72,6 @@ function Home() {
           left: 0,
           width: "100%",
           height: "100%",
-          // mixBlendMode: "overlay",
-          // background:
-          //   "linear-gradient(to bottom right, rgba(52, 158, 235, 0.65), rgba(118, 193, 247, 0.55))",
           zIndex: -1,
         }}
       />

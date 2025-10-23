@@ -47,7 +47,6 @@ function Profile() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔹 1) Ad Soyad Güncelle
   const handleProfileUpdate = async () => {
     try {
       const res = await axios.put(
@@ -61,7 +60,6 @@ function Profile() {
       );
 
       if (res.data.status === "success") {
-        // ✅ backend artık yeni token gönderiyor
         if (res.data.token) {
           localStorage.setItem("token", res.data.token);
           setDecoded(jwtDecode(res.data.token));
@@ -91,13 +89,11 @@ function Profile() {
     }
   };
 
-  // 🔹 Cancel butonuna basınca eski değerlere dön
   const handleCancel = (field) => {
     setForm((prev) => ({ ...prev, [field]: decoded?.[field] || "" }));
     setIsEditing((prev) => ({ ...prev, [field]: false }));
   };
 
-  // 🔹 2) Şifre Değiştir
   const handlePasswordChange = async () => {
     if (!form.currentPassword || !form.newPassword) {
       setSnackbar({
@@ -158,7 +154,6 @@ function Profile() {
   return (
     <>
       <Navbar />
-      {/* Wrap content with padding-bottom to avoid margin collapse at page end */}
       <Box sx={{ pb: 1 }}>
         <WelcomeHeader
           name={`${decoded?.name || ""} ${decoded?.surname || ""}`}
@@ -215,7 +210,6 @@ function Profile() {
               )}
             </Box>
 
-            {/* Soyad */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <TextField
                 label="Soyad"
@@ -255,11 +249,6 @@ function Profile() {
                 name="mail"
                 value={form.mail}
                 fullWidth
-                //   InputProps={{ readOnly: true }}
-                //   sx={{
-                //     backgroundColor: "#f5f6fa",
-                //     borderRadius: 1,
-                //   }}
                 InputProps={{
                   readOnly: true,
                   sx: {

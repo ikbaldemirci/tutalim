@@ -29,10 +29,6 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
-    // cb(
-    //   null,
-    //   file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
-    // );
   },
 });
 
@@ -41,7 +37,6 @@ const upload = multer({ storage: storage });
 app.use(
   cors({
     origin: "http://localhost:5173",
-    // origin: "http://127.0.0.1:5173",
     methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -53,7 +48,6 @@ app.use(express.json());
 app.options("*", cors());
 app.use("/uploads", express.static("uploads"));
 
-// Signup endpoint
 app.post("/api/signup", async (req, res) => {
   try {
     const { name, surname, mail, password, role } = req.body;
@@ -78,31 +72,6 @@ app.post("/api/signup", async (req, res) => {
 });
 
 const jwt = require("jsonwebtoken");
-// const SECRET_KEY = "tutalim-secret";
-
-// Login endpoint
-// app.post("/api/login", async (req, res) => {
-//   const { mail, password } = req.body;
-//   const user = await collection.findOne({ mail });
-
-//   if (!user) return res.json({ status: "fail", message: "User not found" });
-
-//   const isMatch = await bcrypt.compare(password, user.password);
-//   if (!isMatch) return res.json({ status: "fail", message: "Wrong password" });
-
-//   const token = jwt.sign(
-//     {
-//       id: user._id,
-//       role: user.role,
-//       name: user.name,
-//       surname: user.surname,
-//       mail: user.mail,
-//     },
-//     SECRET_KEY,
-//     { expiresIn: "1h" }
-//   );
-//   res.json({ status: "success", token });
-// });
 
 app.post("/api/login", async (req, res) => {
   const { mail, password } = req.body;
@@ -113,7 +82,6 @@ app.post("/api/login", async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.json({ status: "fail", message: "Yanlış Şifre" });
 
-  // 🔹 Access Token (15 dk)
   const accessToken = jwt.sign(
     {
       id: user._id,
@@ -126,7 +94,6 @@ app.post("/api/login", async (req, res) => {
     { expiresIn: `${ACCESS_EXPIRES_MIN}m` }
   );
 
-  // 🔹 Refresh Token (30 gün)
   const refreshTokenValue = uuidv4();
   const refreshExpires = new Date();
   refreshExpires.setDate(refreshExpires.getDate() + REFRESH_EXPIRES_DAYS);
@@ -139,15 +106,14 @@ app.post("/api/login", async (req, res) => {
   res
     .cookie("refreshToken", refreshTokenValue, {
       httpOnly: true,
-      secure: false, // ⚠️ localde HTTPS olmadığı için false
-      sameSite: "Lax", // 🔥 Chrome 2025 için zorunlu tutalim.com
-      path: "/", // her endpointte geçerli
+      secure: false,
+      sameSite: "Lax",
+      path: "/",
       maxAge: REFRESH_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
     })
     .json({ status: "success", token: accessToken });
 });
 
-// Kullanıcıyı mail ile bul
 app.get("/api/users", verifyToken, async (req, res) => {
   try {
     const { mail } = req.query;
@@ -167,54 +133,12 @@ app.get("/api/users", verifyToken, async (req, res) => {
   }
 });
 
-// Create a new property
-// app.post("/api/properties", verifyToken, async (req, res) => {
-//   try {
-//     const {
-//       rentPrice,
-//       rentDate,
-//       endDate,
-//       location,
-//       realtorId,
-//       ownerId,
-//       tenantName,
-//     } = req.body;
-
-//     if (!rentPrice || !rentDate || !endDate || !location || !realtorId) {
-//       return res
-//         .status(400)
-//         .json({ status: "fail", message: "Eksik alanlar var" });
-//     }
-
-//     const property = await Property.create({
-//       rentPrice,
-//       rentDate: new Date(rentDate),
-//       endDate: new Date(endDate),
-//       location,
-//       realtor: realtorId,
-//       owner: ownerId || null,
-//       tenantName: tenantName || "",
-//     });
-
-//     const populatedProperty = await Property.findById(property._id)
-//       .populate("realtor", "name mail")
-//       .populate("owner", "name mail");
-
-//     res.json({ status: "success", property: populatedProperty });
-//   } catch (err) {
-//     console.error("Property ekleme hatası:", err);
-//     res.status(500).json({ status: "error", message: "Server error" });
-//   }
-// });
-
-// ✅ Güvenli: sadece girişli emlakçı ilan ekleyebilir
 app.post("/api/properties", verifyToken, async (req, res) => {
   try {
     const { rentPrice, rentDate, endDate, location, tenantName } = req.body;
     const userId = req.user.id;
     const userRole = req.user.role;
 
-    // 🔒 Sadece emlakçılar mülk ekleyebilir
     if (userRole !== "realtor") {
       return res.status(403).json({
         status: "fail",
@@ -222,22 +146,20 @@ app.post("/api/properties", verifyToken, async (req, res) => {
       });
     }
 
-    // 🧾 Zorunlu alan kontrolü
     if (!rentPrice || !rentDate || !endDate || !location) {
       return res
         .status(400)
         .json({ status: "fail", message: "Eksik alanlar var" });
     }
 
-    // 🏠 Yeni mülk oluştur
     const property = await Property.create({
       rentPrice,
       rentDate: new Date(rentDate),
       endDate: new Date(endDate),
       location,
-      realtor: userId, // ✅ artık token'dan geliyor
+      realtor: userId,
       tenantName: tenantName || "",
-      owner: null, // ilk başta ev sahibi atanmaz
+      owner: null,
     });
 
     const populatedProperty = await Property.findById(property._id)
@@ -257,21 +179,17 @@ app.post("/api/properties", verifyToken, async (req, res) => {
   }
 });
 
-// Get properties filtered by realtor and owner
-// ✅ Güvenli hale getirildi — verifyToken eklendi
 app.get("/api/properties", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const userRole = req.user.role;
     const filter = {};
 
-    // 🔹 Role göre sadece kendi mülklerini getir
     if (userRole === "realtor") {
       filter.realtor = userId;
     } else if (userRole === "owner") {
       filter.owner = userId;
     } else {
-      // diğer roller erişemesin
       return res
         .status(403)
         .json({ status: "fail", message: "Erişim yetkiniz yok" });
@@ -288,54 +206,6 @@ app.get("/api/properties", verifyToken, async (req, res) => {
   }
 });
 
-// Update a property
-// app.put("/api/properties/:id", verifyToken, async (req, res) => {
-//   try {
-//     const {
-//       rentPrice,
-//       rentDate,
-//       endDate,
-//       location,
-//       tenantName,
-//       ownerId,
-//       ownerMail,
-//     } = req.body;
-
-//     let updateData = {
-//       rentPrice,
-//       rentDate: new Date(rentDate),
-//       endDate: new Date(endDate),
-//       location,
-//       tenantName,
-//     };
-
-//     // Eğer ownerMail gönderildiyse ev sahibini mail üzerinden bul ve ata
-//     if (ownerMail) {
-//       const owner = await collection.findOne({ mail: ownerMail });
-//       if (!owner) {
-//         return res
-//           .status(404)
-//           .json({ status: "fail", message: "Owner not found" });
-//       }
-//       updateData.owner = owner._id;
-//     }
-
-//     const property = await Property.findByIdAndUpdate(
-//       req.params.id,
-//       updateData,
-//       { new: true }
-//     )
-//       .populate("realtor", "name mail")
-//       .populate("owner", "name mail");
-
-//     res.json({ status: "success", property });
-//   } catch (err) {
-//     console.error("Property update error:", err);
-//     res.status(500).json({ status: "error", message: "Server error" });
-//   }
-// });
-
-// ✅ Güvenli property güncelleme
 app.put("/api/properties/:id", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -344,7 +214,6 @@ app.put("/api/properties/:id", verifyToken, async (req, res) => {
 
     const { rentPrice, rentDate, endDate, location, tenantName } = req.body;
 
-    // 🔹 Property'i bul
     const property = await Property.findById(propertyId);
 
     if (!property) {
@@ -353,7 +222,6 @@ app.put("/api/properties/:id", verifyToken, async (req, res) => {
         .json({ status: "fail", message: "Mülk bulunamadı" });
     }
 
-    // 🔒 Yetki kontrolü
     if (
       userRole === "realtor" &&
       property.realtor?.toString() !== userId.toString()
@@ -374,7 +242,6 @@ app.put("/api/properties/:id", verifyToken, async (req, res) => {
       });
     }
 
-    // 🔹 Güncellemeyi uygula
     property.rentPrice = rentPrice ?? property.rentPrice;
     property.rentDate = rentDate ? new Date(rentDate) : property.rentDate;
     property.endDate = endDate ? new Date(endDate) : property.endDate;
@@ -400,77 +267,11 @@ app.put("/api/properties/:id", verifyToken, async (req, res) => {
   }
 });
 
-// ✅ Property assign güvenli versiyon
-// app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
-//   try {
-//     const { ownerMail, realtorMail } = req.body;
-//     let updateData = {};
-
-//     // 🔹 Eğer atama iptali geliyorsa (null)
-//     if (ownerMail === null) updateData.owner = null;
-//     if (realtorMail === null) updateData.realtor = null;
-
-//     // 🔹 Eğer mail adresi geldiyse, kullanıcıyı bul
-//     const mail = ownerMail || realtorMail;
-//     if (!mail)
-//       return res
-//         .status(400)
-//         .json({ status: "fail", message: "Mail adresi gerekli" });
-
-//     const user = await collection.findOne({ mail });
-//     if (!user)
-//       return res
-//         .status(404)
-//         .json({ status: "fail", message: "Kullanıcı bulunamadı" });
-
-//     // 🔹 Rol kontrolü
-//     if (ownerMail) {
-//       // Emlakçı -> Ev sahibi atayabilir
-//       if (user.role !== "owner") {
-//         return res.status(400).json({
-//           status: "fail",
-//           message: "Lütfen bir ev sahibi maili girin.",
-//         });
-//       }
-//       updateData.owner = user._id;
-//     }
-
-//     if (realtorMail) {
-//       // Ev sahibi -> Emlakçı atayabilir
-//       if (user.role !== "realtor") {
-//         return res.status(400).json({
-//           status: "fail",
-//           message: "Lütfen bir emlakçı maili girin.",
-//         });
-//       }
-//       updateData.realtor = user._id;
-//     }
-
-//     // 🔹 Güncelleme işlemi
-//     const property = await Property.findByIdAndUpdate(
-//       req.params.id,
-//       updateData,
-//       { new: true }
-//     )
-//       .populate("realtor", "name mail")
-//       .populate("owner", "name mail");
-
-//     res.json({
-//       status: "success",
-//       property,
-//       message: "Atama işlemi başarılı ✅",
-//     });
-//   } catch (err) {
-//     console.error("Assign error:", err);
-//     res.status(500).json({ status: "error", message: "Sunucu hatası oluştu" });
-//   }
-// });
 app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
   try {
     const { ownerMail, realtorMail } = req.body;
     let updateData = {};
 
-    // 🔹 1) Eğer kaldırma isteği geldiyse (null gönderilmişse)
     if (ownerMail === null) {
       updateData.owner = null;
     }
@@ -478,7 +279,6 @@ app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
       updateData.realtor = null;
     }
 
-    // Eğer null kaldırma dışında bir işlem yoksa (sadece kaldırma yapıldıysa)
     if (Object.keys(updateData).length > 0) {
       const property = await Property.findByIdAndUpdate(
         req.params.id,
@@ -495,7 +295,6 @@ app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
       });
     }
 
-    // 🔹 2) Eğer mail adresi geldiyse, kullanıcıyı bul
     const mail = ownerMail || realtorMail;
     if (!mail)
       return res
@@ -508,9 +307,7 @@ app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
         .status(404)
         .json({ status: "fail", message: "Kullanıcı bulunamadı" });
 
-    // 🔹 3) Rol kontrolü
     if (ownerMail) {
-      // Emlakçı -> Ev sahibi atayabilir
       if (user.role !== "owner") {
         return res.status(400).json({
           status: "fail",
@@ -521,7 +318,6 @@ app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
     }
 
     if (realtorMail) {
-      // Ev sahibi -> Emlakçı atayabilir
       if (user.role !== "realtor") {
         return res.status(400).json({
           status: "fail",
@@ -531,7 +327,6 @@ app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
       updateData.realtor = user._id;
     }
 
-    // 🔹 4) Güncelleme işlemi (normal atama)
     const property = await Property.findByIdAndUpdate(
       req.params.id,
       updateData,
@@ -551,25 +346,12 @@ app.put("/api/properties/:id/assign", verifyToken, async (req, res) => {
   }
 });
 
-// Delete a property
-// app.delete("/api/properties/:id", verifyToken, async (req, res) => {
-//   try {
-//     await Property.findByIdAndDelete(req.params.id);
-//     res.json({ status: "success", message: "Property deleted" });
-//   } catch (err) {
-//     console.error("Property delete error:", err);
-//     res.status(500).json({ status: "error", message: "Server error" });
-//   }
-// });
-
-// ✅ Güvenli mülk silme
 app.delete("/api/properties/:id", verifyToken, async (req, res) => {
   try {
     const propertyId = req.params.id;
     const userId = req.user.id;
     const userRole = req.user.role;
 
-    // 🔹 Property'i bul
     const property = await Property.findById(propertyId);
     if (!property) {
       return res
@@ -577,7 +359,6 @@ app.delete("/api/properties/:id", verifyToken, async (req, res) => {
         .json({ status: "fail", message: "Mülk bulunamadı" });
     }
 
-    // 🔒 Yetki kontrolü
     const isAuthorized =
       (userRole === "realtor" &&
         property.realtor?.toString() === userId.toString()) ||
@@ -592,7 +373,6 @@ app.delete("/api/properties/:id", verifyToken, async (req, res) => {
       });
     }
 
-    // 🔹 Silme işlemi
     await Property.findByIdAndDelete(propertyId);
 
     res.json({
@@ -607,42 +387,6 @@ app.delete("/api/properties/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Sözleşme yükleme endpointi
-// app.post(
-//   "/api/properties/:id/contract",
-//   verifyToken,
-//   upload.single("contract"),
-//   async (req, res) => {
-//     try {
-//       const property = await Property.findByIdAndUpdate(
-//         req.params.id,
-//         { contractFile: req.file.path }, // dosya yolu kaydedilecek
-//         { new: true }
-//       )
-//         .populate("realtor", "name mail")
-//         .populate("owner", "name mail");
-
-//       if (!property) {
-//         return res
-//           .status(404)
-//           .json({ status: "fail", message: "Property not found" });
-//       }
-
-//       res.json({
-//         status: "success",
-//         message: "Sözleşme başarıyla yüklendi",
-//         property,
-//       });
-//     } catch (err) {
-//       console.error("Contract upload error:", err);
-//       res
-//         .status(500)
-//         .json({ status: "error", message: "Server error while uploading" });
-//     }
-//   }
-// );
-
-// ✅ Güvenli sözleşme yükleme
 app.post(
   "/api/properties/:id/contract",
   verifyToken,
@@ -660,7 +404,6 @@ app.post(
           .json({ status: "fail", message: "Mülk bulunamadı" });
       }
 
-      // 🔒 Yetki kontrolü
       const isAuthorized =
         (userRole === "realtor" &&
           property.realtor?.toString() === userId.toString()) ||
@@ -675,7 +418,6 @@ app.post(
         });
       }
 
-      // ✅ Güncelleme
       property.contractFile = req.file.path;
       await property.save();
 
@@ -698,58 +440,6 @@ app.post(
   }
 );
 
-// delete contract
-// app.delete("/api/properties/:id/contract", verifyToken, async (req, res) => {
-//   try {
-//     const property = await Property.findById(req.params.id);
-//     if (!property) {
-//       return res
-//         .status(404)
-//         .json({ status: "fail", message: "Property not found" });
-//     }
-
-//     // if (property.contractFile) {
-//     //   const filePath = path.resolve(property.contractFile);
-//     //   if (fs.existsSync(filePath)) {
-//     //     fs.unlinkSync(filePath);
-//     //   }
-//     //   property.contractFile = "";
-//     //   await property.save();
-//     // }
-
-//     if (property.contractFile) {
-//       // normalize et: başındaki / veya \ varsa kaldır
-//       const safePath = property.contractFile.replace(/^[/\\]+/, "");
-//       const filePath = path.join(__dirname, safePath);
-
-//       try {
-//         if (fs.existsSync(filePath)) {
-//           fs.unlinkSync(filePath);
-//         }
-//       } catch (fileErr) {
-//         console.error("Dosya silme hatası:", fileErr);
-//       }
-
-//       property.contractFile = "";
-//       await property.save();
-//     }
-
-//     const updatedProperty = await Property.findById(req.params.id)
-//       .populate("realtor", "name mail")
-//       .populate("owner", "name mail");
-
-//     res.json({
-//       status: "success",
-//       message: "Contract deleted",
-//       property: updatedProperty,
-//     });
-//   } catch (err) {
-//     console.error("Delete contract error:", err);
-//     res.status(500).json({ status: "error", message: "Server error" });
-//   }
-// });
-
-// ✅ Güvenli sözleşme silme
 app.delete("/api/properties/:id/contract", verifyToken, async (req, res) => {
   try {
     const propertyId = req.params.id;
@@ -763,7 +453,6 @@ app.delete("/api/properties/:id/contract", verifyToken, async (req, res) => {
         .json({ status: "fail", message: "Mülk bulunamadı" });
     }
 
-    // 🔒 Yetki kontrolü
     const isAuthorized =
       (userRole === "realtor" &&
         property.realtor?.toString() === userId.toString()) ||
@@ -778,7 +467,6 @@ app.delete("/api/properties/:id/contract", verifyToken, async (req, res) => {
       });
     }
 
-    // ✅ Dosya varsa sil
     if (property.contractFile) {
       const safePath = property.contractFile.replace(/^[/\\]+/, "");
       const filePath = path.join(__dirname, safePath);
@@ -813,7 +501,6 @@ app.delete("/api/properties/:id/contract", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Kullanıcı bilgilerini güncelle (ad + soyad) + yeni token üret
 app.put("/api/users/:id", verifyToken, async (req, res) => {
   try {
     const { name, surname } = req.body;
@@ -830,7 +517,6 @@ app.put("/api/users/:id", verifyToken, async (req, res) => {
         .json({ status: "fail", message: "Kullanıcı bulunamadı" });
     }
 
-    // ✅ Yeni JWT oluştur (surname dahil)
     const newToken = jwt.sign(
       {
         id: updatedUser._id,
@@ -843,7 +529,6 @@ app.put("/api/users/:id", verifyToken, async (req, res) => {
       { expiresIn: `${ACCESS_EXPIRES_MIN}m` }
     );
 
-    // ✅ Güncellenmiş kullanıcı ve token frontend’e gönder
     res.json({
       status: "success",
       message: "Kullanıcı bilgileri güncellendi",
@@ -859,7 +544,6 @@ app.put("/api/users/:id", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Şifre değiştir
 app.put("/api/users/:id/password", verifyToken, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -876,18 +560,16 @@ app.put("/api/users/:id/password", verifyToken, async (req, res) => {
         .status(400)
         .json({ status: "fail", message: "Mevcut şifre yanlış" });
 
-    // yeni şifre hashle
     const hashedNew = await bcrypt.hash(newPassword, 10);
     user.password = hashedNew;
     await user.save();
 
-    // ✅ yeni token oluştur
     const token = jwt.sign(
       {
         id: user._id,
         role: user.role,
         name: user.name,
-        surname: user.surname, // 👈 burada soyadı da eklendi
+        surname: user.surname,
       },
       ACCESS_SECRET,
       { expiresIn: `${ACCESS_EXPIRES_MIN}m` }
@@ -907,7 +589,6 @@ app.put("/api/users/:id/password", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Access Token Yenileme (Refresh)
 app.post("/api/refresh", async (req, res) => {
   console.log("req.cookies:", req.cookies);
   try {
@@ -937,7 +618,6 @@ app.post("/api/refresh", async (req, res) => {
         .status(404)
         .json({ status: "fail", message: "Kullanıcı bulunamadı" });
 
-    // ✅ Yeni access token oluştur
     const newAccessToken = jwt.sign(
       {
         id: user._id,
@@ -962,11 +642,10 @@ app.post("/api/logout", async (req, res) => {
     const refreshTokenValue = req.cookies.refreshToken;
     console.log("🚪 Çıkış isteği geldi, cookie:", refreshTokenValue);
 
-    // 🔹 Cookie hiç yoksa bile, kullanıcıya başarılı dönelim
     if (!refreshTokenValue) {
       res.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: false, // prod'da true
+        secure: false,
         sameSite: "Lax",
         path: "/",
       });
@@ -976,7 +655,6 @@ app.post("/api/logout", async (req, res) => {
       });
     }
 
-    // 🔹 DB'de token varsa sil, yoksa hata vermeden devam et
     const deleted = await RefreshToken.deleteOne({ token: refreshTokenValue });
     if (deleted.deletedCount > 0) {
       console.log("🗑️ RefreshToken DB'den silindi.");
@@ -986,12 +664,11 @@ app.post("/api/logout", async (req, res) => {
       );
     }
 
-    // 🔹 Tarayıcıdaki cookie’yi kesin olarak temizle
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: false, // localde false, deploy'da true
+      secure: false,
       sameSite: "Lax",
-      path: "/", // aynı path olmalı!
+      path: "/",
     });
 
     return res.json({
@@ -1021,7 +698,6 @@ app.put("/api/properties/:id/notes", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Şifre sıfırlama isteği
 app.post("/api/forgot-password", async (req, res) => {
   try {
     const { mail } = req.body;
@@ -1034,7 +710,7 @@ app.post("/api/forgot-password", async (req, res) => {
     }
 
     const resetToken = crypto.randomBytes(20).toString("hex");
-    const resetExpires = Date.now() + 15 * 60 * 1000; // 15 dk geçerli
+    const resetExpires = Date.now() + 15 * 60 * 1000;
 
     user.resetToken = resetToken;
     user.resetExpires = resetExpires;

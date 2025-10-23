@@ -7,7 +7,6 @@ const refreshTokenSchema = new mongoose.Schema({
     required: true,
   },
   token: {
-    // 👈 eksik alan buydu
     type: String,
     required: true,
     unique: true,
@@ -24,11 +23,6 @@ const refreshTokenSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  // jti: {
-  //   type: String,
-  //   required: true,
-  //   unique: true,
-  // },
 });
 
 module.exports = mongoose.model("RefreshToken", refreshTokenSchema);
