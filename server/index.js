@@ -1066,11 +1066,37 @@ app.post("/api/reset-password/:token", async (req, res) => {
       resetExpires: { $gt: Date.now() },
     });
 
-    if (!user)
+    if (!user) {
       return res.status(400).json({
         status: "fail",
         message: "Geçersiz veya süresi dolmuş bağlantı.",
       });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Şifre en az 8 karakter olmalıdır.",
+      });
+    }
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]+$/;
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({
+        status: "fail",
+        message:
+          "Şifre en az bir büyük harf, bir küçük harf, bir sayı ve bir özel karakter içermelidir.",
+      });
+    }
+
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Yeni şifre eski şifreyle aynı olamaz.",
+      });
+    }
 
     const hashed = await bcrypt.hash(newPassword, 10);
     user.password = hashed;

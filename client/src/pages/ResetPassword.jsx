@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 
 function ResetPassword() {
-  const { token } = useParams(); // URL'den token al
+  const { token } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -76,6 +76,16 @@ function ResetPassword() {
     }
   };
 
+  const getPasswordStrength = (password) => {
+    const regexStrong =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-]).{8,}$/;
+    if (regexStrong.test(password)) return "strong";
+    if (password.length >= 6) return "medium";
+    return "weak";
+  };
+
+  const strength = getPasswordStrength(form.password);
+
   return (
     <Fade in timeout={400}>
       <Box
@@ -104,7 +114,7 @@ function ResetPassword() {
             textAlign="center"
             sx={{ color: "#2E86C1", mb: 3 }}
           >
-            🔒 Şifre Sıfırla
+            Şifre Sıfırla
           </Typography>
 
           <form onSubmit={handleReset}>
@@ -117,7 +127,32 @@ function ResetPassword() {
               margin="normal"
               value={form.password}
               onChange={handleChange}
+              helperText="En az 8 karakter, 1 büyük harf, 1 küçük harf, 1 sayı ve 1 özel karakter içermelidir."
             />
+
+            {form.password && (
+              <Typography
+                sx={{
+                  fontSize: "0.85rem",
+                  mt: -1,
+                  mb: 1,
+                  color:
+                    strength === "strong"
+                      ? "green"
+                      : strength === "medium"
+                      ? "orange"
+                      : "red",
+                  fontWeight: 500,
+                }}
+              >
+                {strength === "strong"
+                  ? "Güçlü şifre 💪"
+                  : strength === "medium"
+                  ? "Orta seviye şifre ⚠️"
+                  : "Zayıf şifre ❌"}
+              </Typography>
+            )}
+
             <TextField
               label="Yeni Şifre (Tekrar)"
               name="confirm"
@@ -127,6 +162,12 @@ function ResetPassword() {
               margin="normal"
               value={form.confirm}
               onChange={handleChange}
+              error={form.confirm && form.password !== form.confirm}
+              helperText={
+                form.confirm && form.password !== form.confirm
+                  ? "Şifreler eşleşmiyor"
+                  : ""
+              }
             />
 
             <Button

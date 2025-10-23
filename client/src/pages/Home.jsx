@@ -1,156 +1,3 @@
-// import { useState, useEffect } from "react";
-// import { Box, Typography, Fade, Paper } from "@mui/material";
-// import Navbar from "../components/Navbar";
-// import Login from "./Login";
-// import Signup from "./Signup";
-// import { jwtDecode } from "jwt-decode";
-
-// function Home() {
-//   const [isLogin, setIsLogin] = useState(true);
-//   const [showForm, setShowForm] = useState(true);
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-//   // ✅ Token kontrolü
-//   useEffect(() => {
-//     const token = localStorage.getItem("token");
-//     if (token) {
-//       try {
-//         const decoded = jwtDecode(token);
-//         // token geçerli mi kontrol edelim
-//         if (decoded && decoded.exp * 1000 > Date.now()) {
-//           setIsAuthenticated(true);
-//         } else {
-//           localStorage.removeItem("token");
-//         }
-//       } catch (err) {
-//         console.error("Token doğrulama hatası:", err);
-//         localStorage.removeItem("token");
-//       }
-//     }
-//   }, []);
-
-//   const handleSwitch = () => {
-//     setShowForm(false);
-//     setTimeout(() => {
-//       setIsLogin((prev) => !prev);
-//       setShowForm(true);
-//     }, 200);
-//   };
-
-//   return (
-//     <Box
-//       sx={{
-//         height: "100vh",
-//         display: "flex",
-//         flexDirection: "column",
-//         background: "linear-gradient(to right, #eaf2f8 0%, #f4f9ff 100%)",
-//       }}
-//     >
-//       {/* Navbar */}
-//       <Navbar onLogout={() => setIsAuthenticated(false)} />
-
-//       {/* Orta alan */}
-//       <Box
-//         sx={{
-//           flex: 1,
-//           display: "flex",
-//           flexDirection: { xs: "column", md: "row" },
-//           alignItems: "center",
-//           justifyContent: "center",
-//           px: { xs: 2, md: 6 },
-//           gap: 4,
-
-//           overflow: "hidden",
-//         }}
-//       >
-//         {/* Sol taraf */}
-//         <Box
-//           sx={{
-//             flex: 1,
-//             maxWidth: 640,
-//             textAlign: { xs: "center", md: "left" },
-//             px: { xs: 2, md: 5 },
-//           }}
-//         >
-//           <Typography
-//             variant="h3"
-//             fontWeight="bold"
-//             sx={{ color: "#2E86C1", mb: 2 }}
-//           >
-//             🏠 Tutalım.com’a Hoş Geldiniz!
-//           </Typography>
-
-//           <Typography variant="h6" sx={{ color: "#555", mb: 2 }}>
-//             Ev sahipleri, emlakçılar ve kullanıcılar için güvenli, hızlı ve
-//             modern bir platform.
-//           </Typography>
-
-//           <Typography variant="body1" sx={{ color: "#777" }}>
-//             Şeffaf iletişim. Akıllı çözümler. Gerçek bağlantılar.
-//             <br />
-//             <strong>Tutalım.com</strong> ile emlak dünyası artık çok daha kolay!
-//           </Typography>
-//         </Box>
-
-//         {/* Sağ taraf */}
-//         {!isAuthenticated && (
-//           <Box
-//             sx={{
-//               flexShrink: 0,
-//               width: "100%",
-//               maxWidth: 350,
-//               display: "flex",
-//               justifyContent: "center", // merkeze al
-//               alignItems: "center", // dikey ortalama
-//             }}
-//           >
-//             <Paper
-//               elevation={4}
-//               sx={{
-//                 width: "100%",
-//                 maxWidth: 350,
-//                 p: 3,
-//                 borderRadius: 3,
-//                 boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-//                 backgroundColor: "#fff",
-//                 maxHeight: "80vh", // 🧩 sabit yükseklik
-//                 overflowY: "auto", // 🧩 kart içi scroll
-//               }}
-//             >
-//               <Fade in={showForm} timeout={300}>
-//                 <Box sx={{ width: "100%" }}>
-//                   {isLogin ? (
-//                     <Login onSwitch={handleSwitch} />
-//                   ) : (
-//                     <Signup onSwitch={handleSwitch} />
-//                   )}
-//                 </Box>
-//               </Fade>
-//             </Paper>
-//           </Box>
-//         )}
-//       </Box>
-
-//       {/* Footer */}
-//       <Box
-//         component="footer"
-//         sx={{
-//           py: 1.5,
-//           textAlign: "center",
-//           borderTop: "1px solid #e0e0e0",
-//           backgroundColor: "#f9f9f9",
-//         }}
-//       >
-//         <Typography variant="body2" color="text.secondary">
-//           © 2025 Tutalım.com – Tüm Hakları Saklıdır.
-//         </Typography>
-//       </Box>
-//     </Box>
-//   );
-// }
-
-// export default Home;
-
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { Box, Typography, Fade, Paper } from "@mui/material";
@@ -192,14 +39,13 @@ function Home() {
   return (
     <Box
       sx={{
-        // position: "relative",
-        height: "100vh",
-        // overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        position: "relative",
+        minHeight: "100vh",
+        overflowY: "auto",
       }}
     >
-      {/* 🔹 Arka plan videosu */}
       <video
         autoPlay
         muted
@@ -212,15 +58,27 @@ function Home() {
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          zIndex: -1,
-          filter: "brightness(60%)",
+          zIndex: -2,
         }}
       >
         <source src="/videos/video_1.mp4" type="video/mp4" />
         Tarayıcınız video etiketini desteklemiyor.
       </video>
 
-      {/* 🔹 Sayfa içeriği */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          // mixBlendMode: "overlay",
+          // background:
+          //   "linear-gradient(to bottom right, rgba(52, 158, 235, 0.65), rgba(118, 193, 247, 0.55))",
+          zIndex: -1,
+        }}
+      />
+
       <Navbar bg="rgba(0,0,0,0.3)" onLogout={() => setIsAuthenticated(false)} />
 
       <Box
@@ -230,54 +88,81 @@ function Home() {
           flexDirection: { xs: "column", md: "row" },
           alignItems: "center",
           justifyContent: "center",
-          px: { xs: 2, md: 6 },
-          gap: 4,
-          overflow: "hidden",
+          px: { xs: 2, sm: 4, md: 8 },
+          py: { xs: 4, md: 0 },
+          gap: { xs: 3, md: 6 },
+          position: "relative",
+          zIndex: 1,
         }}
       >
         {/* Sol taraf */}
-        <Fade in timeout={1000}>
+        <Fade in timeout={800}>
           <Box
             sx={{
               flex: 1,
               maxWidth: 640,
               textAlign: { xs: "center", md: "left" },
               px: { xs: 2, md: 5 },
+              color: "#fff",
             }}
           >
+            {/* Ana başlık */}
             <Typography
               variant="h3"
               fontWeight="bold"
               sx={{
-                color: "#fff",
                 mb: 2,
-                textShadow: "0 3px 10px rgba(0,0,0,0.6)",
+                fontSize: { xs: "1.9rem", sm: "2.3rem", md: "2.6rem" },
+                lineHeight: 1.2,
+                textShadow: "0 5px 20px rgba(255, 255, 255, 1)",
+                color: "#5DADE2",
               }}
             >
-              🏙️ Tutalım.com’a Hoş Geldiniz
+              Tutalım.com
             </Typography>
 
-            <Typography variant="h6" sx={{ color: "#f1f1f1", mb: 2 }}>
-              Lüks konut dünyasında güvenli, modern ve şeffaf bir deneyim.
-            </Typography>
+            {/* Slogan kutusu */}
+            <Box
+              sx={{
+                display: "inline-block",
+                px: 2,
+                py: 1.2,
+                borderRadius: 2,
+                background: "rgba(0,0,0,0.4)",
+                backdropFilter: "blur(4px)",
+                color: "#E0E0E0",
+                fontSize: { xs: "0.9rem", sm: "1rem" },
+                borderLeft: "4px solid #2E86C1",
+              }}
+            >
+              <Typography sx={{ mb: 0.5 }}>
+                Ev sahipleri ve emlakçılar için akıllı bağlantılar.
+              </Typography>
+              <Typography fontWeight="bold">
+                Tutalım.com ile gayrimenkul dünyasını yeniden keşfedin.
+              </Typography>
+            </Box>
 
-            <Typography variant="body1" sx={{ color: "#e0e0e0" }}>
-              Ev sahipleri ve emlakçılar için akıllı bağlantılar.
-              <br />
-              <strong>Tutalım.com</strong> ile gayrimenkul dünyasını yeniden
-              keşfedin.
-            </Typography>
+            <Box
+              sx={{
+                mt: 3,
+                width: { xs: "60%", md: "40%" },
+                height: "4px",
+                borderRadius: 2,
+                mx: { xs: "auto", md: 0 },
+                background: "linear-gradient(90deg, #2E86C1, #5DADE2)",
+              }}
+            />
           </Box>
         </Fade>
 
-        {/* Sağ taraf (Login / Signup Card) */}
         {!isAuthenticated && (
           <Fade in={showForm} timeout={500}>
             <Box
               sx={{
                 flexShrink: 0,
                 width: "100%",
-                maxWidth: 350,
+                maxWidth: { xs: "90%", sm: 400 },
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -287,35 +172,29 @@ function Home() {
                 elevation={10}
                 sx={{
                   width: "100%",
-                  maxWidth: 350,
-                  p: 3,
+                  p: { xs: 2, sm: 2.5 },
                   borderRadius: 3,
-                  backgroundColor: "rgba(255,255,255,0.15)",
-                  backdropFilter: "blur(10px)",
-
-                  maxHeight: "80vh",
-                  overflowY: "auto",
+                  backgroundColor: "rgba(255,255,255,0.25)",
+                  backdropFilter: "blur(15px)",
+                  borderLeft: "5px solid #2E86C1",
+                  boxShadow: "0 0 20px rgba(46,134,193,0.4)",
+                  maxHeight: "none",
+                  overflowY: "visible",
                 }}
               >
-                <Fade in={showForm} timeout={300}>
-                  <Box sx={{ width: "100%" }}>
-                    {isLogin ? (
-                      <Login onSwitch={handleSwitch} />
-                    ) : (
-                      <Signup onSwitch={handleSwitch} />
-                    )}
-                  </Box>
-                </Fade>
+                {isLogin ? (
+                  <Login onSwitch={handleSwitch} />
+                ) : (
+                  <Signup onSwitch={handleSwitch} />
+                )}
               </Paper>
             </Box>
           </Fade>
         )}
       </Box>
 
-      {/* Footer */}
       <Footer />
     </Box>
-    // </Box>
   );
 }
 

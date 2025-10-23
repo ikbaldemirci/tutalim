@@ -1,126 +1,17 @@
-// import { useState } from "react";
-// import { Link, useNavigate } from "react-router-dom";
-// import api from "../api";
-// import "../styles/Signup.css";
-
-// function Signup() {
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     surname: "",
-//     mail: "",
-//     password: "",
-//     role: "realtor",
-//   });
-
-//   const navigate = useNavigate();
-
-//   const handleChange = (e) => {
-//     setFormData({ ...formData, [e.target.name]: e.target.value });
-//   };
-
-//   const handleSignup = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const res = await api.post("/signup", formData);
-//       if (res.data.status === "success") {
-//         navigate("/login");
-//       } else {
-//         alert(res.data.message || "Signup failed");
-//       }
-//     } catch (err) {
-//       console.error(err);
-//       alert("Sunucu hatası");
-//     }
-//   };
-
-//   return (
-//     <div className="signup-container">
-//       {/* 2) Beyaz kart stili */}
-//       <div className="signup-box">
-//         <h2>Kayıt Ol</h2>
-
-//         <form onSubmit={handleSignup}>
-//           <div className="form-group">
-//             <label htmlFor="name">İsim</label>
-//             <input
-//               type="text"
-//               id="name"
-//               name="name"
-//               value={formData.name}
-//               onChange={handleChange}
-//               required
-//             />
-//           </div>
-
-//           <div className="form-group">
-//             <label htmlFor="surname">Soyisim</label>
-//             <input
-//               type="text"
-//               id="surname"
-//               name="surname"
-//               value={formData.surname}
-//               onChange={handleChange}
-//               required
-//             />
-//           </div>
-
-//           <div className="form-group">
-//             <label htmlFor="mail">E-posta</label>
-//             <input
-//               type="email"
-//               id="mail"
-//               name="mail"
-//               value={formData.mail}
-//               onChange={handleChange}
-//               required
-//             />
-//           </div>
-
-//           <div className="form-group">
-//             <label htmlFor="password">Parola</label>
-//             <input
-//               type="password"
-//               id="password"
-//               name="password"
-//               value={formData.password}
-//               onChange={handleChange}
-//               required
-//             />
-//           </div>
-
-//           <div className="form-group">
-//             <label htmlFor="role">Rol</label>
-//             <select
-//               id="role"
-//               name="role"
-//               value={formData.role}
-//               onChange={handleChange}
-//               required
-//             >
-//               <option value="realtor">Emlakçı</option>
-//               <option value="owner">Ev Sahibi</option>
-//               <option value="user">Kullanıcı</option>
-//             </select>
-//           </div>
-
-//           <button type="submit">Kayıt Ol</button>
-//         </form>
-
-//         <p className="login-link">
-//           Zaten hesabınız var mı? <Link to="/login">Giriş Yap</Link>
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Signup;
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
-import "../styles/Signup.css";
-import { Snackbar, Alert, Portal } from "@mui/material";
+import {
+  Snackbar,
+  Alert,
+  Portal,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
 
 function Signup({ onSwitch }) {
   const [formData, setFormData] = useState({
@@ -130,7 +21,6 @@ function Signup({ onSwitch }) {
     password: "",
     role: "realtor",
   });
-
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -150,24 +40,18 @@ function Signup({ onSwitch }) {
       if (res.data.status === "success") {
         setSnackbar({
           open: true,
-          message: "Kaydınız başarıyla oluşturuldu 🎉 Giriş yapabilirsiniz.",
+          message: "Kaydınız başarıyla oluşturuldu 🎉",
           severity: "success",
         });
-
-        // ✅ 2 saniye sonra login formuna dön
-        setTimeout(() => {
-          onSwitch();
-        }, 2000);
+        setTimeout(() => onSwitch(), 1500);
       } else {
         setSnackbar({
           open: true,
-          message:
-            res.data.message || "Kayıt başarısız. Lütfen tekrar deneyin.",
+          message: res.data.message || "Kayıt başarısız.",
           severity: "error",
         });
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setSnackbar({
         open: true,
         message: "Sunucu hatası. Lütfen tekrar deneyin.",
@@ -176,94 +60,124 @@ function Signup({ onSwitch }) {
     }
   };
 
+  const getPasswordStrength = (password) => {
+    const regexStrong =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-]).{8,}$/;
+    if (regexStrong.test(password)) return "strong";
+    if (password.length >= 6) return "medium";
+    return "weak";
+  };
+
+  const strength = getPasswordStrength(formData.password);
+
   return (
-    <div>
-      <div className="signup-box">
-        <h2>Kayıt Ol</h2>
-        <form onSubmit={handleSignup}>
-          <div className="form-group">
-            <label htmlFor="name">İsim</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
+    <Box
+      component="form"
+      onSubmit={handleSignup}
+      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+    >
+      <Typography variant="h5" fontWeight="bold" textAlign="center">
+        Kayıt Ol
+      </Typography>
 
-          <div className="form-group">
-            <label htmlFor="surname">Soyisim</label>
-            <input
-              type="text"
-              id="surname"
-              name="surname"
-              value={formData.surname}
-              onChange={handleChange}
-              required
-            />
-          </div>
+      <TextField
+        label="İsim"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        required
+        fullWidth
+      />
+      <TextField
+        label="Soyisim"
+        name="surname"
+        value={formData.surname}
+        onChange={handleChange}
+        required
+        fullWidth
+      />
+      <TextField
+        label="E-posta"
+        name="mail"
+        type="email"
+        value={formData.mail}
+        onChange={handleChange}
+        required
+        fullWidth
+      />
+      <Tooltip
+        title={
+          <Typography sx={{ fontSize: "0.85rem", p: 0.5 }}>
+            En az <strong>8 karakter</strong>, bir <strong>büyük harf</strong>,
+            bir <strong>küçük harf</strong>, bir <strong>sayı</strong> ve bir{" "}
+            <strong>özel karakter</strong> içermelidir.
+          </Typography>
+        }
+        placement="top-start"
+        arrow
+      >
+        <TextField
+          label="Parola"
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+          fullWidth
+        />
+      </Tooltip>
 
-          <div className="form-group">
-            <label htmlFor="mail">E-posta</label>
-            <input
-              type="email"
-              id="mail"
-              name="mail"
-              value={formData.mail}
-              onChange={handleChange}
-              required
-            />
-          </div>
+      {formData.password && (
+        <Typography
+          sx={{
+            fontSize: "0.85rem",
+            mt: -1,
+            mb: 1,
+            color:
+              strength === "strong"
+                ? "lightgreen"
+                : strength === "medium"
+                ? "orange"
+                : "tomato",
+            textAlign: "center",
+          }}
+        >
+          {strength === "strong"
+            ? "Güçlü şifre 💪"
+            : strength === "medium"
+            ? "Orta seviye şifre ⚠️"
+            : "Zayıf şifre ❌"}
+        </Typography>
+      )}
 
-          <div className="form-group">
-            <label htmlFor="password">Parola</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+      <TextField
+        select
+        label="Rol"
+        name="role"
+        value={formData.role}
+        onChange={handleChange}
+        fullWidth
+      >
+        <MenuItem value="realtor">Emlakçı</MenuItem>
+        <MenuItem value="owner">Ev Sahibi</MenuItem>
+        {/* <MenuItem value="user">Kullanıcı</MenuItem> */}
+      </TextField>
 
-          <div className="form-group">
-            <label htmlFor="role">Rol</label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-            >
-              <option value="realtor">Emlakçı</option>
-              <option value="owner">Ev Sahibi</option>
-              <option value="user">Kullanıcı</option>
-            </select>
-          </div>
+      <Button variant="contained" color="success" type="submit" fullWidth>
+        Kayıt Ol
+      </Button>
 
-          <button type="submit">Kayıt Ol</button>
-        </form>
-        <p className="login-link">
-          Zaten hesabınız var mı?{" "}
-          <button
-            type="button"
-            onClick={onSwitch}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#2E86C1",
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
-          >
-            Giriş Yap
-          </button>
-        </p>
-      </div>
-      {/* Snackbar (portaled to body so it's not clipped by parents) */}
+      <Button
+        onClick={onSwitch}
+        sx={{
+          textTransform: "none",
+          color: "#fff",
+          "&:hover": { color: "#5DADE2" },
+        }}
+      >
+        Giriş Yap
+      </Button>
+
       <Portal>
         <Snackbar
           open={snackbar.open}
@@ -271,16 +185,10 @@ function Signup({ onSwitch }) {
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
-          <Alert
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
-            {snackbar.message}
-          </Alert>
+          <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
         </Snackbar>
       </Portal>
-    </div>
+    </Box>
   );
 }
 

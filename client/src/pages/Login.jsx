@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
-import "../styles/Login.css";
 import {
   Snackbar,
   Alert,
@@ -10,6 +9,8 @@ import {
   Typography,
   TextField,
   Button,
+  Box,
+  CircularProgress,
 } from "@mui/material";
 
 function Login({ onSwitch }) {
@@ -43,7 +44,6 @@ function Login({ onSwitch }) {
         });
       }
     } catch (err) {
-      console.error(err);
       setSnackbar({
         open: true,
         message: "Sunucu hatası",
@@ -52,13 +52,11 @@ function Login({ onSwitch }) {
     }
   };
 
-  // 📨 Şifremi Unuttum
   const handleForgotPassword = async () => {
     if (!forgotMail) return;
     try {
       setLoading(true);
       const res = await api.post("/forgot-password", { mail: forgotMail });
-
       if (res.data.status === "success") {
         setForgotOpen(false);
         navigate("/check-mail");
@@ -69,8 +67,7 @@ function Login({ onSwitch }) {
           severity: "warning",
         });
       }
-    } catch (err) {
-      console.error("Şifre sıfırlama hatası:", err);
+    } catch {
       setSnackbar({
         open: true,
         message: "E-posta gönderilemedi. Lütfen tekrar deneyin.",
@@ -82,104 +79,103 @@ function Login({ onSwitch }) {
   };
 
   return (
-    <div>
-      <div className="login-box">
-        <h2>Giriş Yap</h2>
-        <form onSubmit={handleLogin}>
-          <label htmlFor="mail">E-posta</label>
-          <input
-            type="email"
-            id="mail"
-            value={mail}
-            onChange={(e) => setMail(e.target.value)}
-            required
-          />
+    <Box
+      component="form"
+      onSubmit={handleLogin}
+      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+    >
+      <Typography variant="h5" fontWeight="bold" textAlign="center">
+        Giriş Yap
+      </Typography>
 
-          <label htmlFor="password">Parola</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+      <TextField
+        label="E-posta"
+        type="email"
+        variant="outlined"
+        fullWidth
+        value={mail}
+        onChange={(e) => setMail(e.target.value)}
+        required
+      />
+      <TextField
+        label="Parola"
+        type="password"
+        variant="outlined"
+        fullWidth
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
 
-          <button type="submit">Giriş Yap</button>
-        </form>
+      <Button variant="contained" color="primary" type="submit" fullWidth>
+        Giriş Yap
+      </Button>
 
-        <p className="signup-link">
-          Hesabın yok mu?{" "}
-          <button
-            type="button"
-            onClick={onSwitch}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#2E86C1",
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
-          >
-            Kayıt Ol
-          </button>
-          <button
-            type="button"
-            onClick={() => setForgotOpen(true)}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#2E86C1",
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
-          >
-            Şifremi Unuttum
-          </button>
-        </p>
-      </div>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: "center",
+          mt: 1,
+          gap: 1,
+        }}
+      >
+        <Button
+          onClick={onSwitch}
+          sx={{
+            textTransform: "none",
+            color: "#fff",
+            "&:hover": { color: "#5DADE2" },
+          }}
+        >
+          Kayıt Ol
+        </Button>
+        <Button
+          onClick={() => setForgotOpen(true)}
+          sx={{
+            textTransform: "none",
+            color: "#fff",
+            "&:hover": { color: "#5DADE2" },
+          }}
+        >
+          Şifremi Unuttum
+        </Button>
+      </Box>
 
-      {/* 🔹 Şifremi Unuttum Dialog */}
       <Dialog
         open={forgotOpen}
         onClose={() => setForgotOpen(false)}
         maxWidth="xs"
         fullWidth
-        PaperProps={{
-          sx: { borderRadius: 3, p: 2 },
-        }}
       >
-        <Typography
-          variant="h6"
-          sx={{
-            textAlign: "center",
-            fontWeight: 600,
-            color: "#2E86C1",
-            mb: 2,
-          }}
-        >
-          🔒 Şifremi Unuttum
-        </Typography>
-
-        <TextField
-          fullWidth
-          label="Kayıtlı E-posta Adresiniz"
-          type="email"
-          value={forgotMail}
-          onChange={(e) => setForgotMail(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-
-        <Button
-          variant="contained"
-          fullWidth
-          disabled={loading}
-          onClick={handleForgotPassword}
-        >
-          Gönder
-        </Button>
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h6" textAlign="center" mb={2}>
+            🔒 Şifremi Unuttum
+          </Typography>
+          <TextField
+            fullWidth
+            label="Kayıtlı E-posta Adresiniz"
+            type="email"
+            value={forgotMail}
+            onChange={(e) => setForgotMail(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleForgotPassword}
+            disabled={loading}
+          >
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Gönder"
+            )}
+          </Button>
+        </Box>
       </Dialog>
 
-      {/* 🔔 Snackbar */}
       <Portal>
         <Snackbar
           open={snackbar.open}
@@ -188,15 +184,14 @@ function Login({ onSwitch }) {
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
           <Alert
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
             severity={snackbar.severity}
-            sx={{ width: "100%" }}
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
           >
             {snackbar.message}
           </Alert>
         </Snackbar>
       </Portal>
-    </div>
+    </Box>
   );
 }
 
