@@ -16,7 +16,7 @@ Tutalim is a simple MERN stack project that demonstrates a small property portal
 2. Start the API server:
 
    ```bash
-   npm start
+   npm run dev
    ```
 
    The server runs on `http://localhost:5000`.
