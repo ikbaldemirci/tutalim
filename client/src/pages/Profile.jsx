@@ -52,7 +52,12 @@ function Profile() {
     try {
       const res = await axios.put(
         `http://localhost:5000/api/users/${decoded.id}`,
-        { name: form.name.trim(), surname: form.surname.trim() }
+        { name: form.name.trim(), surname: form.surname.trim() },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
 
       if (res.data.status === "success") {
@@ -193,9 +198,7 @@ function Profile() {
                   </IconButton>
                   <IconButton
                     color="error"
-                    onClick={() =>
-                      setIsEditing((prev) => ({ ...prev, name: false }))
-                    }
+                    onClick={() => handleCancel("name")}
                   >
                     <CancelIcon />
                   </IconButton>
@@ -229,9 +232,7 @@ function Profile() {
                   </IconButton>
                   <IconButton
                     color="error"
-                    onClick={() =>
-                      setIsEditing((prev) => ({ ...prev, surname: false }))
-                    }
+                    onClick={() => handleCancel("surname")}
                   >
                     <CancelIcon />
                   </IconButton>
