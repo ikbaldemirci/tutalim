@@ -51,14 +51,17 @@ function Home() {
         muted
         loop
         playsInline
+        preload="auto"
+        poster="/images/video-placeholder.jpg"
         style={{
-          position: "absolute",
+          position: "fixed",
           top: 0,
           left: 0,
           width: "100%",
           height: "100%",
           objectFit: "cover",
           zIndex: -2,
+          pointerEvents: "none",
         }}
       >
         <source src="/videos/video_1.mp4" type="video/mp4" />
@@ -73,6 +76,8 @@ function Home() {
           width: "100%",
           height: "100%",
           zIndex: -1,
+          background: "transparent",
+          pointerEvents: "none",
         }}
       />
 

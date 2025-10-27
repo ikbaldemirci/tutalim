@@ -19,7 +19,7 @@ export default function LoadingScreen() {
         }}
       >
         <img
-          src="/images/tutalim.png"
+          src="/images/tutalim.webp"
           alt="Tutalım Logo"
           style={{
             width: "100%",

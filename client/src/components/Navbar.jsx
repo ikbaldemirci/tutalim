@@ -24,22 +24,28 @@ function Navbar({ onLogout, bg }) {
 
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 8);
-      const doc = document.documentElement;
-      const total = (doc.scrollHeight || 0) - (window.innerHeight || 0);
-      if (total > 0) {
-        setScrollProgress(
-          Math.min(100, Math.max(0, (window.scrollY / total) * 100))
-        );
-      } else {
-        setScrollProgress(0);
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const y = window.scrollY;
+          const total =
+            document.documentElement.scrollHeight - window.innerHeight;
+
+          setScrolled(y > 8);
+          setScrollProgress(total > 0 ? (y / total) * 100 : 0);
+
+          ticking = false;
+        });
+        ticking = true;
       }
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const closeMobileMenu = () => {
@@ -95,7 +101,7 @@ function Navbar({ onLogout, bg }) {
       >
         <NavLink to="/" className="navbar-brand d-flex align-items-center">
           <img
-            src="/images/tutalim.png"
+            src="/images/tutalim.webp"
             alt="Tutalım Logo"
             style={{
               width: "140px",
