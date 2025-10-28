@@ -2,21 +2,22 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-
-import { useState, useEffect } from "react";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import OwnerHome from "./pages/OwnerHome";
-import RealtorHome from "./pages/RealtorHome";
-import ProtectedRoute from "./ProtectedRoute";
-import Profile from "./pages/Profile";
-import LoadingScreen from "./components/LoadingScreen";
-import ResetPassword from "./pages/ResetPassword";
-import ResetSuccess from "./pages/ResetSuccess";
-import CheckMail from "./pages/CheckMail";
 import { Fade } from "@mui/material";
+import { lazy, Suspense, useState, useEffect } from "react";
+
+import ProtectedRoute from "./ProtectedRoute";
+import LoadingScreen from "./components/LoadingScreen";
+
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const OwnerHome = lazy(() => import("./pages/OwnerHome"));
+const RealtorHome = lazy(() => import("./pages/RealtorHome"));
+const Profile = lazy(() => import("./pages/Profile"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const ResetSuccess = lazy(() => import("./pages/ResetSuccess"));
+const CheckMail = lazy(() => import("./pages/CheckMail"));
 
 const theme = createTheme({
   palette: {
@@ -37,7 +38,6 @@ function App() {
   useEffect(() => {
     const fadeTimer = setTimeout(() => setFadeOut(true), 1200);
     const timer = setTimeout(() => setSplash(false), 1500);
-
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(timer);
@@ -58,42 +58,44 @@ function App() {
             <ThemeProvider theme={theme}>
               <CssBaseline />
               <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route
-                    path="/reset-password/:token"
-                    element={<ResetPassword />}
-                  />
-                  <Route path="/reset-success" element={<ResetSuccess />} />
-                  <Route path="/check-mail" element={<CheckMail />} />
-                  <Route
-                    path="/owner"
-                    element={
-                      <ProtectedRoute role="owner">
-                        <OwnerHome />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/realtor"
-                    element={
-                      <ProtectedRoute role="realtor">
-                        <RealtorHome />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile"
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    }
-                  />
-                </Routes>
+                <Suspense fallback={<LoadingScreen />}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route
+                      path="/reset-password/:token"
+                      element={<ResetPassword />}
+                    />
+                    <Route path="/reset-success" element={<ResetSuccess />} />
+                    <Route path="/check-mail" element={<CheckMail />} />
+                    <Route
+                      path="/owner"
+                      element={
+                        <ProtectedRoute role="owner">
+                          <OwnerHome />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/realtor"
+                      element={
+                        <ProtectedRoute role="realtor">
+                          <RealtorHome />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedRoute>
+                          <Profile />
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Routes>
+                </Suspense>
               </BrowserRouter>
             </ThemeProvider>
           </div>

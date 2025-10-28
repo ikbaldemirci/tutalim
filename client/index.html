@@ -12,9 +12,9 @@
 
     <link rel="icon" type="image/png" href="/images/tutalimson.png" />
 
+    <!-- ✅ Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
     <link
       rel="preload"
       as="style"
@@ -33,8 +33,19 @@
       />
     </noscript>
 
+    <!-- ✅ Main CSS preload + async -->
     <link rel="preload" as="style" href="/assets/index-BCVhZ_Z9.css" />
+    <link
+      rel="stylesheet"
+      href="/assets/index-BCVhZ_Z9.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="/assets/index-BCVhZ_Z9.css" />
+    </noscript>
 
+    <!-- ✅ Boxicons async -->
     <link
       rel="preload"
       as="style"
