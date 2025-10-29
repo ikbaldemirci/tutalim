@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "http://tutalim.com/api",
   withCredentials: true,
 });
 
@@ -23,7 +23,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshRes = await axios.post(
-          "http://localhost:5000/api/refresh",
+          "http://tutalim.com/api/refresh",
           {},
           { withCredentials: true }
         );

@@ -42,7 +42,7 @@ function RealtorHome() {
   useEffect(() => {
     if (token && decoded?.id) {
       axios
-        .get("http://localhost:5000/api/properties", {
+        .get("http://tutalim.com/api/properties", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -62,7 +62,8 @@ function RealtorHome() {
     api
       .get("/assignments/pending")
       .then((res) => {
-        if (res.data.status === "success") setInvites(res.data.assignments || []);
+        if (res.data.status === "success")
+          setInvites(res.data.assignments || []);
       })
       .finally(() => setLoadingInvites(false));
   }, [token]);
@@ -72,9 +73,8 @@ function RealtorHome() {
       const res = await api.post(`/assignments/${id}/accept`);
       if (res.data.status === "success") {
         setInvites((prev) => prev.filter((i) => i._id !== id));
-        // refresh properties
         axios
-          .get("http://localhost:5000/api/properties", {
+          .get("http://tutalim.com/api/properties", {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then((r) => {
@@ -109,7 +109,7 @@ function RealtorHome() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/properties",
+        "http://tutalim.com/api/properties",
         {
           rentPrice: form.rentPrice,
           rentDate: new Date(form.rentDate),
@@ -154,20 +154,61 @@ function RealtorHome() {
 
       {/* Pending invitations */}
       <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
-        {(!loadingInvites && invites.length > 0) && (
-          <Box sx={{ p: 2, border: "1px solid #e0e0e0", borderRadius: 2, background: "#fff9f1" }}>
+        {!loadingInvites && invites.length > 0 && (
+          <Box
+            sx={{
+              p: 2,
+              border: "1px solid #e0e0e0",
+              borderRadius: 2,
+              background: "#fff9f1",
+            }}
+          >
             <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
               Bekleyen Davetler ({invites.length})
             </Typography>
             {invites.map((inv) => (
-              <Box key={inv._id} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 1 }}>
+              <Box
+                key={inv._id}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  py: 1,
+                }}
+              >
                 <Typography sx={{ fontSize: 14 }}>
-                  {inv.fromUser?.name || inv.fromUser?.mail} sizi bu mülke {inv.role === "realtor" ? "emlakçı" : "ev sahibi"} olarak atamak istiyor:
+                  {inv.fromUser?.name || inv.fromUser?.mail} sizi bu mülke{" "}
+                  {inv.role === "realtor" ? "emlakçı" : "ev sahibi"} olarak
+                  atamak istiyor:
                   <strong> {inv.property?.location}</strong>
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1 }}>
-                  <button onClick={() => acceptInvite(inv._id)} style={{ padding: "6px 10px", background: "#2E86C1", color: "#fff", border: 0, borderRadius: 6, cursor: "pointer" }}>Kabul Et</button>
-                  <button onClick={() => rejectInvite(inv._id)} style={{ padding: "6px 10px", background: "#eee", color: "#333", border: 0, borderRadius: 6, cursor: "pointer" }}>Reddet</button>
+                  <button
+                    onClick={() => acceptInvite(inv._id)}
+                    style={{
+                      padding: "6px 10px",
+                      background: "#2E86C1",
+                      color: "#fff",
+                      border: 0,
+                      borderRadius: 6,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Kabul Et
+                  </button>
+                  <button
+                    onClick={() => rejectInvite(inv._id)}
+                    style={{
+                      padding: "6px 10px",
+                      background: "#eee",
+                      color: "#333",
+                      border: 0,
+                      borderRadius: 6,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Reddet
+                  </button>
                 </Box>
               </Box>
             ))}

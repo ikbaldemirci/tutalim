@@ -127,7 +127,6 @@ export default function BasicTable({
   ));
 
   useEffect(() => {
-    // Load pending invites created by current user (for all properties)
     const loadSent = async () => {
       try {
         const res = await api.get("/assignments/sent");
@@ -164,7 +163,7 @@ export default function BasicTable({
   const handleSave = async (id) => {
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/properties/${id}`,
+        `http://tutalim.com/api/properties/${id}`,
         {
           ...editForm,
           rentDate: editForm.rentDate ? new Date(editForm.rentDate) : undefined,
@@ -198,7 +197,7 @@ export default function BasicTable({
 
     try {
       const res = await axios.delete(
-        `http://localhost:5000/api/properties/${id}`,
+        `http://tutalim.com/api/properties/${id}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -267,7 +266,7 @@ export default function BasicTable({
   const handleAssign = async (id, payload) => {
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/properties/${id}/assign`,
+        `http://tutalim.com/api/properties/${id}/assign`,
         payload,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -326,7 +325,7 @@ export default function BasicTable({
     setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/properties/${id}/contract`,
+        `http://tutalim.com/api/properties/${id}/contract`,
         formData,
         {
           headers: {
@@ -360,7 +359,7 @@ export default function BasicTable({
     setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
     try {
       const res = await axios.delete(
-        `http://localhost:5000/api/properties/${id}/contract`,
+        `http://tutalim.com/api/properties/${id}/contract`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -830,7 +829,7 @@ export default function BasicTable({
                         color="success"
                         onClick={() =>
                           window.open(
-                            `http://localhost:5000/${row.contractFile}`,
+                            `http://tutalim.com/${row.contractFile}`,
                             "_blank"
                           )
                         }

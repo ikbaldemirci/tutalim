@@ -37,7 +37,7 @@ const upload = multer({ storage: storage });
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://tutalim.com",
     methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -699,7 +699,6 @@ app.put("/api/properties/:id/notes", verifyToken, async (req, res) => {
   }
 });
 
-// Create an assignment invite (owner <-> realtor)
 app.post("/api/assignments", verifyToken, async (req, res) => {
   try {
     const { propertyId, targetMail, role } = req.body;
@@ -778,7 +777,6 @@ app.post("/api/assignments", verifyToken, async (req, res) => {
   }
 });
 
-// List current user's pending assignment invites
 app.get("/api/assignments/pending", verifyToken, async (req, res) => {
   try {
     const list = await Assignment.find({
@@ -795,10 +793,12 @@ app.get("/api/assignments/pending", verifyToken, async (req, res) => {
   }
 });
 
-// List invites sent by current user (pending)
 app.get("/api/assignments/sent", verifyToken, async (req, res) => {
   try {
-    const list = await Assignment.find({ fromUser: req.user.id, status: "pending" })
+    const list = await Assignment.find({
+      fromUser: req.user.id,
+      status: "pending",
+    })
       .select("property role toUser status createdAt")
       .populate("property", "location rentPrice rentDate endDate");
     res.json({ status: "success", assignments: list });
@@ -808,7 +808,6 @@ app.get("/api/assignments/sent", verifyToken, async (req, res) => {
   }
 });
 
-// Accept an invite and apply assignment
 app.post("/api/assignments/:id/accept", verifyToken, async (req, res) => {
   try {
     const invite = await Assignment.findById(req.params.id);
@@ -855,7 +854,6 @@ app.post("/api/assignments/:id/accept", verifyToken, async (req, res) => {
   }
 });
 
-// Reject an invite
 app.post("/api/assignments/:id/reject", verifyToken, async (req, res) => {
   try {
     const invite = await Assignment.findById(req.params.id);
@@ -896,7 +894,7 @@ app.post("/api/forgot-password", async (req, res) => {
     user.resetExpires = resetExpires;
     await user.save();
 
-    const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetLink = `http://tutalim.com/reset-password/${resetToken}`;
 
     res.json({
       status: "success",
