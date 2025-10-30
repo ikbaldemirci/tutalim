@@ -25,7 +25,13 @@ const verifyToken = require("./middleware/verifyToken");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    let folder = "uploads";
+    if (req.originalUrl.includes("/contract")) folder = "uploads/contracts";
+    else if (req.originalUrl.includes("/note")) folder = "uploads/notes";
+
+    if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
+
+    cb(null, folder);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -33,7 +39,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 app.use(
   cors({
