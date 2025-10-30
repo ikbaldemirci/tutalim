@@ -113,8 +113,8 @@ app.post("/api/login", async (req, res) => {
   res
     .cookie("refreshToken", refreshTokenValue, {
       httpOnly: true,
-      secure: false,
-      sameSite: "Lax",
+      secure: true,
+      sameSite: "None",
       path: "/",
       maxAge: REFRESH_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
     })
