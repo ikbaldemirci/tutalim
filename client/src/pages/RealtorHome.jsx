@@ -109,7 +109,7 @@ function RealtorHome() {
 
     try {
       const res = await axios.post(
-        "http://tutalim.com/api/properties",
+        "https://tutalim.com/api/properties",
         {
           rentPrice: form.rentPrice,
           rentDate: new Date(form.rentDate),
