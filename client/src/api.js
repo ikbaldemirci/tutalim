@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://tutalim.com/api",
+  baseURL: "https://tutalim.com/api",
   withCredentials: true,
 });
 
