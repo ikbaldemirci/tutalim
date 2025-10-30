@@ -50,7 +50,7 @@ function Profile() {
   const handleProfileUpdate = async () => {
     try {
       const res = await axios.put(
-        `http://tutalim.com/api/users/${decoded.id}`,
+        `https://tutalim.com/api/users/${decoded.id}`,
         { name: form.name.trim(), surname: form.surname.trim() },
         {
           headers: {
@@ -106,7 +106,7 @@ function Profile() {
 
     try {
       const res = await axios.put(
-        `http://tutalim.com/api/users/${decoded.id}/password`,
+        `https://tutalim.com/api/users/${decoded.id}/password`,
         {
           currentPassword: form.currentPassword,
           newPassword: form.newPassword,

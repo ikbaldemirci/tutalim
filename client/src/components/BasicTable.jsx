@@ -163,7 +163,7 @@ export default function BasicTable({
   const handleSave = async (id) => {
     try {
       const res = await axios.put(
-        `http://tutalim.com/api/properties/${id}`,
+        `https://tutalim.com/api/properties/${id}`,
         {
           ...editForm,
           rentDate: editForm.rentDate ? new Date(editForm.rentDate) : undefined,
@@ -197,7 +197,7 @@ export default function BasicTable({
 
     try {
       const res = await axios.delete(
-        `http://tutalim.com/api/properties/${id}`,
+        `https://tutalim.com/api/properties/${id}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -266,7 +266,7 @@ export default function BasicTable({
   const handleAssign = async (id, payload) => {
     try {
       const res = await axios.put(
-        `http://tutalim.com/api/properties/${id}/assign`,
+        `https://tutalim.com/api/properties/${id}/assign`,
         payload,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -325,7 +325,7 @@ export default function BasicTable({
     setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
     try {
       const res = await axios.post(
-        `http://tutalim.com/api/properties/${id}/contract`,
+        `https://tutalim.com/api/properties/${id}/contract`,
         formData,
         {
           headers: {
@@ -359,7 +359,7 @@ export default function BasicTable({
     setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
     try {
       const res = await axios.delete(
-        `http://tutalim.com/api/properties/${id}/contract`,
+        `https://tutalim.com/api/properties/${id}/contract`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -829,7 +829,7 @@ export default function BasicTable({
                         color="success"
                         onClick={() =>
                           window.open(
-                            `http://tutalim.com/${row.contractFile}`,
+                            `https://tutalim.com/${row.contractFile}`,
                             "_blank"
                           )
                         }

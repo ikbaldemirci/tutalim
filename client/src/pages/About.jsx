@@ -67,7 +67,7 @@ function About() {
 
     const run = () => {
       axios
-        .get("http://tutalim.com/api/stats")
+        .get("https://tutalim.com/api/stats")
         .then((res) => {
           if (!ignore && res.data.status === "success") {
             setStats(res.data.stats);

@@ -42,7 +42,7 @@ function RealtorHome() {
   useEffect(() => {
     if (token && decoded?.id) {
       axios
-        .get("http://tutalim.com/api/properties", {
+        .get("https://tutalim.com/api/properties", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -74,7 +74,7 @@ function RealtorHome() {
       if (res.data.status === "success") {
         setInvites((prev) => prev.filter((i) => i._id !== id));
         axios
-          .get("http://tutalim.com/api/properties", {
+          .get("https://tutalim.com/api/properties", {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then((r) => {

@@ -21,7 +21,7 @@ function OwnerHome() {
     if (token) {
       const ownerId = decoded?.id;
       axios
-        .get("http://tutalim.com/api/properties", {
+        .get("https://tutalim.com/api/properties", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
@@ -52,7 +52,7 @@ function OwnerHome() {
         setInvites((prev) => prev.filter((i) => i._id !== id));
         setLoading(true);
         axios
-          .get("http://tutalim.com/api/properties", {
+          .get("https://tutalim.com/api/properties", {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then((r) => {
