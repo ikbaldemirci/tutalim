@@ -23,7 +23,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshRes = await axios.post(
-          "http://tutalim.com/api/refresh",
+          "https://tutalim.com/api/refresh",
           {},
           { withCredentials: true }
         );
