@@ -41,11 +41,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const allowedOrigins = ["https://tutalim.com", "https://www.tutalim.com"];
+
 app.use(
   cors({
-    origin: "https://tutalim.com",
-    methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ Engellenen origin:", origin);
+        callback(new Error("CORS engellendi"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -900,7 +909,7 @@ app.post("/api/forgot-password", async (req, res) => {
     user.resetExpires = resetExpires;
     await user.save();
 
-    const resetLink = `http://tutalim.com/reset-password/${resetToken}`;
+    const resetLink = `https://tutalim.com/reset-password/${resetToken}`;
 
     res.json({
       status: "success",
