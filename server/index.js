@@ -43,6 +43,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+app.use(cookieParser());
+app.use(express.json());
+app.options("*", cors());
+app.use("/uploads", express.static("uploads"));
+
 const allowedOrigins = ["https://tutalim.com", "https://www.tutalim.com"];
 
 app.post("/api/send-mail", async (req, res) => {
@@ -96,11 +101,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-app.use(cookieParser());
-app.use(express.json());
-app.options("*", cors());
-app.use("/uploads", express.static("uploads"));
 
 app.post("/api/signup", async (req, res) => {
   try {
