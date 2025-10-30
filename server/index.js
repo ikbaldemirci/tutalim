@@ -5,6 +5,8 @@ const collection = require("./config");
 const app = express();
 const Property = require("./propertyModel");
 
+const { sendMail } = require("./utils/mailer");
+
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -42,6 +44,44 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const allowedOrigins = ["https://tutalim.com", "https://www.tutalim.com"];
+
+// Basit test mail endpointi (hem POST body hem GET query ile çalışır)
+app.all("/api/test-mail", async (req, res) => {
+  try {
+    // GET ?to=&subject=&html=  veya POST JSON {to, subject, html, text}
+    const { to, subject, html, text } =
+      req.method === "GET" ? req.query : req.body;
+
+    const target = to || process.env.SMTP_USER; // to verilmezse .env’deki SMTP_USER'a yollar
+    const subj = subject || "Tutalım mail test";
+    const htmlBody = html || `<p>Merhaba! Bu bir <b>test</b> e-postasıdır.</p>`;
+    const textBody = text || "Merhaba! Bu bir test e-postasıdır.";
+
+    // Maili gönder
+    const info = await sendMail({
+      to: target,
+      subject: subj,
+      html: htmlBody,
+      text: textBody,
+    });
+
+    return res.json({
+      status: "success",
+      message: "Test mail kuyruğa alındı / gönderildi",
+      to: target,
+      messageId: info?.messageId || null,
+    });
+  } catch (err) {
+    console.error("Test mail hatası:", err);
+    return res
+      .status(500)
+      .json({
+        status: "error",
+        message: "Mail gönderilemedi",
+        error: String(err),
+      });
+  }
+});
 
 app.use(
   cors({
