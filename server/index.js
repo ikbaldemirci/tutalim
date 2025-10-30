@@ -43,7 +43,7 @@ const upload = multer({ storage });
 
 app.use(
   cors({
-    origin: "http://tutalim.com",
+    origin: "https://tutalim.com",
     methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
