@@ -945,6 +945,13 @@ app.post("/api/forgot-password", async (req, res) => {
 
     const resetLink = `https://tutalim.com/reset-password/${resetToken}`;
 
+    const { sendMail, resetPasswordHtml } = require("./utils/mailer");
+    await sendMail({
+      to: mail,
+      subject: "Şifre Sıfırlama",
+      html: resetPasswordHtml({ name: user.name, link: resetLink }),
+    });
+
     res.json({
       status: "success",
       message: "Şifre sıfırlama bağlantısı oluşturuldu.",
