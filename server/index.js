@@ -1,29 +1,25 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const collection = require("./config");
 const app = express();
 const Property = require("./propertyModel");
-
-const { sendMail } = require("./utils/mailer");
-
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-
-require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const { v4: uuidv4 } = require("uuid");
 const RefreshToken = require("./models/RefreshToken");
 const Assignment = require("./models/Assignment");
-
 const ACCESS_SECRET = process.env.ACCESS_SECRET || "tutalim-secret";
 const REFRESH_SECRET = process.env.REFRESH_SECRET || "tutalim-refresh-secret";
 const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN || 15);
 const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS || 30);
 
 const verifyToken = require("./middleware/verifyToken");
+const { sendMail } = require("./utils/mailer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
