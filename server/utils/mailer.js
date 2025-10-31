@@ -1,5 +1,7 @@
 const nodemailer = require("nodemailer");
 
+console.log("SMTP TEST:", process.env.SMTP_HOST, process.env.SMTP_USER);
+
 const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, SMTP_FROM } =
   process.env;
 
