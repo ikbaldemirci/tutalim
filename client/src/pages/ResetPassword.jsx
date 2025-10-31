@@ -38,7 +38,7 @@ function ResetPassword() {
     if (form.password !== form.confirm) {
       setSnackbar({
         open: true,
-        message: "Şifreler eşleşmiyor ❌",
+        message: "Şifreler eşleşmiyor",
         severity: "error",
       });
       return;
@@ -60,13 +60,13 @@ function ResetPassword() {
       } else {
         setSnackbar({
           open: true,
-          message: res.data.message || "Şifre sıfırlama başarısız ❌",
+          message: res.data.message || "Şifre sıfırlama başarısız",
           severity: "error",
         });
       }
     } catch (err) {
       const serverMessage = err.response?.data?.message;
-      let displayMessage = "Sunucu hatası. Lütfen tekrar deneyin ❌";
+      let displayMessage = "Sunucu hatası. Lütfen tekrar deneyin";
 
       if (
         serverMessage?.includes("Şifre en az 8 karakter") ||
@@ -75,8 +75,7 @@ function ResetPassword() {
         serverMessage?.includes("küçük harf") ||
         serverMessage?.includes("sayı")
       ) {
-        displayMessage =
-          "Şifreniz yeterince güçlü değil. Lütfen en az 8 karakter, 1 büyük harf, 1 küçük harf, 1 sayı ve 1 özel karakter içeren bir şifre oluşturun ";
+        displayMessage = "Şifreniz yeterince güçlü değil.";
       } else if (serverMessage?.includes("aynı olamaz")) {
         displayMessage = "Yeni şifreniz eski şifrenizle aynı olamaz ⚠️";
       } else if (serverMessage) {
@@ -182,7 +181,7 @@ function ResetPassword() {
               error={form.confirm && form.password !== form.confirm}
               helperText={
                 form.confirm && form.password !== form.confirm
-                  ? "Şifreler eşleşmiyor"
+                  ? "Şifreler Eşleşmiyor"
                   : ""
               }
             />
