@@ -25,6 +25,9 @@ async function sendMail({ to, subject, html, text }) {
 function resetPasswordHtml({ name, link }) {
   return `
     <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px;border:1px solid #eee;border-radius:12px">
+      <div style="text-align:center;margin-bottom:16px">
+        <img src="https://tutalim.com/images/tutalim.webp" alt="Tutalim" style="max-width:160px;height:auto" />
+      </div>
       <h2>Şifre Sıfırlama</h2>
       <p>Merhaba ${name || ""},</p>
       <p>Şifrenizi sıfırlamak için aşağıdaki butona tıklayın. Bu bağlantı <b>15 dakika</b> içinde geçerlidir.</p>

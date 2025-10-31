@@ -65,10 +65,27 @@ function ResetPassword() {
         });
       }
     } catch (err) {
-      console.error("Şifre sıfırlama hatası:", err);
+      const serverMessage = err.response?.data?.message;
+      let displayMessage = "Sunucu hatası. Lütfen tekrar deneyin ❌";
+
+      if (
+        serverMessage?.includes("Şifre en az 8 karakter") ||
+        serverMessage?.includes("özel karakter") ||
+        serverMessage?.includes("büyük harf") ||
+        serverMessage?.includes("küçük harf") ||
+        serverMessage?.includes("sayı")
+      ) {
+        displayMessage =
+          "Şifreniz yeterince güçlü değil. Lütfen en az 8 karakter, 1 büyük harf, 1 küçük harf, 1 sayı ve 1 özel karakter içeren bir şifre oluşturun ";
+      } else if (serverMessage?.includes("aynı olamaz")) {
+        displayMessage = "Yeni şifreniz eski şifrenizle aynı olamaz ⚠️";
+      } else if (serverMessage) {
+        displayMessage = serverMessage;
+      }
+
       setSnackbar({
         open: true,
-        message: "Sunucu hatası. Lütfen tekrar deneyin ❌",
+        message: displayMessage,
         severity: "error",
       });
     } finally {
