@@ -77,10 +77,7 @@ function App() {
                       path="/check-mail-verify"
                       element={<CheckMailVerify />}
                     />
-                    <Route
-                      path="/verify-result/:token"
-                      element={<VerifyResult />}
-                    />
+                    <Route path="/verify/:token" element={<VerifyResult />} />
                     <Route path="/resend-verify" element={<ResendVerify />} />
 
                     <Route
