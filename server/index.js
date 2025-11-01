@@ -144,11 +144,9 @@ app.post("/api/login", async (req, res) => {
   const { mail, password } = req.body;
   const user = await collection.findOne({ mail });
 
-  if (!user)
+  if (!user) {
     return res.json({ status: "fail", message: "Kullanıcı bulunamadı" });
-
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.json({ status: "fail", message: "Yanlış Şifre" });
+  }
 
   if (!user.isVerified) {
     return res.json({
@@ -156,6 +154,8 @@ app.post("/api/login", async (req, res) => {
       message: "Hesabınız henüz doğrulanmamış. Lütfen mailinizi kontrol edin.",
     });
   }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.json({ status: "fail", message: "Yanlış Şifre" });
 
   const accessToken = jwt.sign(
     {
@@ -1087,9 +1087,10 @@ app.get("/api/verify/:token", async (req, res) => {
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .send("<h3>Doğrulama bağlantısı geçersiz veya süresi dolmuş.</h3>");
+      return res.status(400).json({
+        status: "fail",
+        message: "Doğrulama bağlantısı geçersiz veya süresi dolmuş.",
+      });
     }
 
     user.isVerified = true;
@@ -1097,11 +1098,10 @@ app.get("/api/verify/:token", async (req, res) => {
     user.verifyExpires = null;
     await user.save();
 
-    res.send(`
-      <h2>Hesabınız başarıyla doğrulandı!</h2>
-      <p>Artık giriş yapabilirsiniz.</p>
-      <a href="https://tutalim.com">Tutalım'a Dön</a>
-    `);
+    res.json({
+      status: "success",
+      message: "Hesabınız başarıyla doğrulandı. Artık giriş yapabilirsiniz.",
+    });
   } catch (err) {
     console.error("Doğrulama hatası:", err);
     res.status(500).send("<h3>Sunucu hatası oluştu.</h3>");
