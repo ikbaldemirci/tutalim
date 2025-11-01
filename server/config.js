@@ -15,7 +15,7 @@ const LoginSchema = new mongoose.Schema(
     role: { type: String, required: true, enum: ["realtor", "owner"] },
     resetToken: { type: String, default: null },
     resetExpires: { type: Date, default: null },
-    verifyToken: { type: String, default: null },
+    verifyToken: { type: String, index: true, default: null },
     verifyExpires: { type: Date, default: null },
     isVerified: { type: Boolean, default: false },
   },
