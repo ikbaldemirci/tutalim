@@ -3,11 +3,11 @@ import { Box, Typography, Button, Fade } from "@mui/material";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import { useNavigate } from "react-router-dom";
 
-function CheckMail() {
+export default function CheckMailVerify() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => navigate("/"), 5000);
+    const timer = setTimeout(() => navigate("/"), 6000);
     return () => clearTimeout(timer);
   }, [navigate]);
 
@@ -24,24 +24,23 @@ function CheckMail() {
           gap: 2,
         }}
       >
-        <MarkEmailReadIcon sx={{ fontSize: 80, color: "#2E86C1" }} />
+        <MarkEmailReadIcon sx={{ fontSize: 80, color: "#28a745" }} />
         <Typography variant="h5" fontWeight={600}>
-          Mail adresini kontrol et 📧
+          Hesabını doğrulamak için mailini kontrol et
         </Typography>
         <Typography sx={{ maxWidth: 400, opacity: 0.8 }}>
-          Şifre sıfırlama bağlantısı e-posta adresine gönderildi. 15 dakika
-          içinde bağlantıya tıklayarak şifreni yenileyebilirsin.
+          E-posta adresine bir doğrulama bağlantısı gönderdik. Mailine gelen
+          bağlantıya tıklayarak hesabını aktif hale getirebilirsin.
         </Typography>
         <Button
           onClick={() => navigate("/")}
           sx={{ mt: 3 }}
           variant="contained"
+          color="primary"
         >
-          Girişe Dön
+          Ana Sayfaya Dön
         </Button>
       </Box>
     </Fade>
   );
 }
-
-export default CheckMail;

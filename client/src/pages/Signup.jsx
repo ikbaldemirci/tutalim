@@ -40,10 +40,10 @@ function Signup({ onSwitch }) {
       if (res.data.status === "success") {
         setSnackbar({
           open: true,
-          message: "Kaydınız başarıyla oluşturuldu 🎉",
+          message: "Kayıt başarılı! Mailini kontrol et",
           severity: "success",
         });
-        setTimeout(() => onSwitch(), 1500);
+        setTimeout(() => navigate("/check-mail-verify"), 1500);
       } else {
         setSnackbar({
           open: true,

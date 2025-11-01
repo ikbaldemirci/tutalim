@@ -37,6 +37,11 @@ function Login({ onSwitch }) {
         if (decoded.role === "realtor") navigate("/realtor");
         else if (decoded.role === "owner") navigate("/owner");
       } else {
+        if (res.data.code === "EMAIL_NOT_VERIFIED") {
+          setTimeout(() => {
+            navigate("/check-mail-verify");
+          }, 800);
+        }
         setSnackbar({
           open: true,
           message: res.data.message || "Giriş başarısız",

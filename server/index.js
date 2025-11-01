@@ -19,7 +19,7 @@ const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN || 15);
 const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS || 30);
 
 const verifyToken = require("./middleware/verifyToken");
-const { sendMail } = require("./utils/mailer");
+const { sendMail, verifyMailHtml } = require("./utils/mailer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -106,15 +106,32 @@ app.post("/api/signup", async (req, res) => {
       return res.json({ status: "error", message: "User already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await collection.create({
+
+    const verifyToken = crypto.randomBytes(20).toString("hex");
+    const verifyExpires = Date.now() + 30 * 60 * 1000;
+
+    const newUser = await collection.create({
       name,
       surname,
       mail,
       password: hashedPassword,
       role,
+      verifyToken,
+      verifyExpires,
+      isVerified: false,
     });
 
-    res.json({ status: "success", message: "User created" });
+    const verifyLink = `${process.env.PUBLIC_BASE_URL}/verify/${verifyToken}`;
+    await sendMail({
+      to: mail,
+      subject: "Tutalım | Hesabını Doğrula",
+      html: verifyMailHtml({ name, link: verifyLink }),
+    });
+
+    res.json({
+      status: "success",
+      message: "Kullanıcı oluşturuldu, mail doğrulaması gönderildi.",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ status: "error", message: "Server error" });
@@ -131,6 +148,13 @@ app.post("/api/login", async (req, res) => {
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.json({ status: "fail", message: "Yanlış Şifre" });
+
+  if (!user.isVerified) {
+    return res.json({
+      status: "fail",
+      message: "Hesabınız henüz doğrulanmamış. Lütfen mailinizi kontrol edin.",
+    });
+  }
 
   const accessToken = jwt.sign(
     {
@@ -950,6 +974,7 @@ app.post("/api/forgot-password", async (req, res) => {
       to: mail,
       subject: "Şifre Sıfırlama",
       html: resetPasswordHtml({ name: user.name, link: resetLink }),
+      text: `Hesabını doğrulamak için: ${verifyLink}`,
     });
 
     res.json({
@@ -1049,6 +1074,75 @@ app.get("/api/stats", async (req, res) => {
     res
       .status(500)
       .json({ status: "error", message: "İstatistikler alınamadı" });
+  }
+});
+
+app.get("/api/verify/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const user = await collection.findOne({
+      verifyToken: token,
+      verifyExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .send("<h3>Doğrulama bağlantısı geçersiz veya süresi dolmuş.</h3>");
+    }
+
+    user.isVerified = true;
+    user.verifyToken = null;
+    user.verifyExpires = null;
+    await user.save();
+
+    res.send(`
+      <h2>Hesabınız başarıyla doğrulandı!</h2>
+      <p>Artık giriş yapabilirsiniz.</p>
+      <a href="https://tutalim.com">Tutalım'a Dön</a>
+    `);
+  } catch (err) {
+    console.error("Doğrulama hatası:", err);
+    res.status(500).send("<h3>Sunucu hatası oluştu.</h3>");
+  }
+});
+
+app.post("/api/verify/resend", async (req, res) => {
+  try {
+    const { mail } = req.body;
+    const user = await collection.findOne({ mail });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Kullanıcı bulunamadı" });
+    }
+    if (user.isVerified) {
+      return res.json({
+        status: "success",
+        message: "Hesap zaten doğrulanmış.",
+      });
+    }
+
+    const token = crypto.randomBytes(24).toString("hex");
+    user.verifyToken = token;
+    user.verifyExpires = Date.now() + 30 * 60 * 1000;
+    await user.save();
+
+    const verifyLink = `${PUBLIC_BASE_URL}/verify/${token}`;
+    await sendMail({
+      to: user.mail,
+      subject: "Tutalım — E-posta Doğrulama (Yeniden)",
+      html: verifyEmailHtml({ name: user.name, link: verifyLink }),
+      text: `Doğrulamak için: ${verifyLink}`,
+    });
+
+    res.json({
+      status: "success",
+      message: "Doğrulama e-postası yeniden gönderildi.",
+    });
+  } catch (err) {
+    console.error("resend verify error:", err);
+    res.status(500).json({ status: "error", message: "Server error" });
   }
 });
 

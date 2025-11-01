@@ -18,6 +18,9 @@ const Profile = lazy(() => import("./pages/Profile"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ResetSuccess = lazy(() => import("./pages/ResetSuccess"));
 const CheckMail = lazy(() => import("./pages/CheckMail"));
+const CheckMailVerify = lazy(() => import("./pages/CheckMailVerify"));
+const VerifyResult = lazy(() => import("./pages/VerifyResult"));
+const ResendVerify = lazy(() => import("./pages/ResendVerify"));
 
 const theme = createTheme({
   palette: {
@@ -70,6 +73,16 @@ function App() {
                     />
                     <Route path="/reset-success" element={<ResetSuccess />} />
                     <Route path="/check-mail" element={<CheckMail />} />
+                    <Route
+                      path="/check-mail-verify"
+                      element={<CheckMailVerify />}
+                    />
+                    <Route
+                      path="/verify-result/:token"
+                      element={<VerifyResult />}
+                    />
+                    <Route path="/resend-verify" element={<ResendVerify />} />
+
                     <Route
                       path="/owner"
                       element={
