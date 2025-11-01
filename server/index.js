@@ -144,7 +144,8 @@ app.post("/api/login", async (req, res) => {
   const { mail, password } = req.body;
   const user = await collection.findOne({ mail });
 
-  if (!user) return res.json({ status: "fail", message: "User not found" });
+  if (!user)
+    return res.json({ status: "fail", message: "Kullanıcı bulunamadı" });
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.json({ status: "fail", message: "Yanlış Şifre" });
