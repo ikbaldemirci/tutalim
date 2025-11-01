@@ -108,7 +108,7 @@ app.post("/api/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const verifyToken = crypto.randomBytes(20).toString("hex");
-    const verifyExpires = Date.now() + 30 * 60 * 1000;
+    const verifyExpires = new Date(Date.now() + 30 * 60 * 1000);
 
     const newUser = await collection.create({
       name,
@@ -1125,14 +1125,14 @@ app.post("/api/verify/resend", async (req, res) => {
 
     const token = crypto.randomBytes(24).toString("hex");
     user.verifyToken = token;
-    user.verifyExpires = Date.now() + 30 * 60 * 1000;
+    user.verifyExpires = new Date(Date.now() + 30 * 60 * 1000);
     await user.save();
 
-    const verifyLink = `${PUBLIC_BASE_URL}/verify/${token}`;
+    const verifyLink = `${process.env.PUBLIC_BASE_URL}/verify/${token}`;
     await sendMail({
       to: user.mail,
       subject: "Tutalım — E-posta Doğrulama (Yeniden)",
-      html: verifyEmailHtml({ name: user.name, link: verifyLink }),
+      html: verifyMailHtml({ name: user.name, link: verifyLink }),
       text: `Doğrulamak için: ${verifyLink}`,
     });
 
