@@ -975,7 +975,7 @@ app.post("/api/forgot-password", async (req, res) => {
       to: mail,
       subject: "Şifre Sıfırlama",
       html: resetPasswordHtml({ name: user.name, link: resetLink }),
-      text: `Hesabını doğrulamak için: ${verifyLink}`,
+      text: `Hesabını doğrulamak için: ${resetLink}`,
     });
 
     res.json({
