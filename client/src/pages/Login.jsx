@@ -10,6 +10,7 @@ import {
   Button,
   Box,
   CircularProgress,
+  TextField,
 } from "@mui/material";
 import StyledTextField from "../components/StyledTextField";
 
@@ -158,7 +159,7 @@ function Login({ onSwitch }) {
           <Typography variant="h6" textAlign="center" mb={2}>
             🔒 Şifremi Unuttum
           </Typography>
-          <StyledTextField
+          <TextField
             fullWidth
             label="Kayıtlı E-posta Adresiniz"
             type="email"
