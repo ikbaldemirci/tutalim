@@ -18,6 +18,17 @@ export default function StyledTextField(props) {
         },
         "& .MuiInputLabel-root": { color: "#E0E0E0" },
         "& .MuiInputLabel-root.Mui-focused": { color: "#5DADE2" },
+
+        "& input:-webkit-autofill": {
+          WebkitBoxShadow: "0 0 0 100px rgba(255,255,255,0.1) inset !important",
+          WebkitTextFillColor: "#fff !important",
+          transition: "background-color 9999s ease-in-out 0s !important",
+          caretColor: "#fff",
+        },
+        "& input:-webkit-autofill:focus": {
+          WebkitBoxShadow: "0 0 0 100px rgba(255,255,255,0.1) inset !important",
+          WebkitTextFillColor: "#fff !important",
+        },
       }}
     />
   );
