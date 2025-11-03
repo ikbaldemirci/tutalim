@@ -102,15 +102,36 @@ app.post("/api/signup", async (req, res) => {
   try {
     const { name, surname, mail, password, role } = req.body;
     const existingUser = await collection.findOne({ mail });
-    if (existingUser)
-      return res.json({ status: "error", message: "User already exists" });
+    if (existingUser) {
+      return res.json({
+        status: "error",
+        message: "Bu e-posta zaten kayıtlı.",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Şifre en az 8 karakter olmalıdır.",
+      });
+    }
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]+$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        status: "fail",
+        message:
+          "Şifre en az bir büyük harf, bir küçük harf, bir sayı ve bir özel karakter içermelidir.",
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const verifyToken = crypto.randomBytes(20).toString("hex");
     const verifyExpires = new Date(Date.now() + 30 * 60 * 1000);
 
-    const newUser = await collection.create({
+    await collection.create({
       name,
       surname,
       mail,

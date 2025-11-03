@@ -21,12 +21,14 @@ function Signup({ onSwitch }) {
     password: "",
     role: "realtor",
   });
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -35,12 +37,15 @@ function Signup({ onSwitch }) {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       const res = await api.post("/signup", formData);
+
       if (res.data.status === "success") {
         setSnackbar({
           open: true,
-          message: "Kayıt başarılı! Mailini kontrol et",
+          message: "Kayıt başarılı! Mailini kontrol et.",
           severity: "success",
         });
         setTimeout(() => navigate("/check-mail-verify"), 1500);
@@ -51,12 +56,31 @@ function Signup({ onSwitch }) {
           severity: "error",
         });
       }
-    } catch {
+    } catch (err) {
+      const serverMessage = err.response?.data?.message;
+      let displayMessage = "Sunucu hatası. Lütfen tekrar deneyin.";
+
+      if (
+        serverMessage?.includes("8 karakter") ||
+        serverMessage?.includes("özel karakter") ||
+        serverMessage?.includes("büyük harf") ||
+        serverMessage?.includes("küçük harf") ||
+        serverMessage?.includes("sayı")
+      ) {
+        displayMessage = "Şifreniz yeterince güçlü değil ❌";
+      } else if (serverMessage?.includes("zaten kayıtlı")) {
+        displayMessage = "Bu e-posta adresiyle zaten kayıtlı bir hesap var ⚠️";
+      } else if (serverMessage) {
+        displayMessage = serverMessage;
+      }
+
       setSnackbar({
         open: true,
-        message: "Sunucu hatası. Lütfen tekrar deneyin.",
+        message: displayMessage,
         severity: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,6 +129,7 @@ function Signup({ onSwitch }) {
         required
         fullWidth
       />
+
       <Tooltip
         title={
           <Typography sx={{ fontSize: "0.85rem", p: 0.5 }}>
@@ -124,6 +149,7 @@ function Signup({ onSwitch }) {
           onChange={handleChange}
           required
           fullWidth
+          helperText="En az 8 karakter, 1 büyük, 1 küçük harf, 1 sayı ve 1 özel karakter."
         />
       </Tooltip>
 
@@ -160,11 +186,16 @@ function Signup({ onSwitch }) {
       >
         <MenuItem value="realtor">Emlakçı</MenuItem>
         <MenuItem value="owner">Ev Sahibi</MenuItem>
-        {/* <MenuItem value="user">Kullanıcı</MenuItem> */}
       </TextField>
 
-      <Button variant="contained" color="success" type="submit" fullWidth>
-        Kayıt Ol
+      <Button
+        variant="contained"
+        color="success"
+        type="submit"
+        fullWidth
+        disabled={loading}
+      >
+        {loading ? "Kaydediliyor..." : "Kayıt Ol"}
       </Button>
 
       <Button
