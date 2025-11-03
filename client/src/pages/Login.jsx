@@ -7,11 +7,11 @@ import {
   Portal,
   Dialog,
   Typography,
-  TextField,
   Button,
   Box,
   CircularProgress,
 } from "@mui/material";
+import StyledTextField from "../components/StyledTextField";
 
 function Login({ onSwitch }) {
   const [mail, setMail] = useState("");
@@ -93,7 +93,7 @@ function Login({ onSwitch }) {
         Giriş Yap
       </Typography>
 
-      <TextField
+      <StyledTextField
         label="E-posta"
         type="email"
         variant="outlined"
@@ -102,7 +102,7 @@ function Login({ onSwitch }) {
         onChange={(e) => setMail(e.target.value)}
         required
       />
-      <TextField
+      <StyledTextField
         label="Parola"
         type="password"
         variant="outlined"
@@ -158,7 +158,7 @@ function Login({ onSwitch }) {
           <Typography variant="h6" textAlign="center" mb={2}>
             🔒 Şifremi Unuttum
           </Typography>
-          <TextField
+          <StyledTextField
             fullWidth
             label="Kayıtlı E-posta Adresiniz"
             type="email"

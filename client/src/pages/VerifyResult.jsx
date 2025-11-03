@@ -20,7 +20,7 @@ export default function VerifyResult() {
       try {
         const res = await api.get(`/verify/${token}`);
         if (res.data.status === "success") {
-          setState({ loading: false, ok: true, msg: "Hesabın doğrulandı! 🎉" });
+          setState({ loading: false, ok: true, msg: "Hesabın doğrulandı!" });
           setTimeout(() => navigate("/"), 2500);
         } else {
           setState({

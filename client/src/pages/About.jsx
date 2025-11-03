@@ -46,7 +46,7 @@ const steps = [
   },
   {
     icon: <DoneAllIcon fontSize="large" color="primary" />,
-    title: "Anlaşma Tamamlanır 🎉",
+    title: "Anlaşma Tamamlanır",
     desc: "Taraflar anlaşmaya vardığında sistem süreci sonlandırır. Hızlı, güvenli ve şeffaf bir deneyim!",
   },
 ];
@@ -269,7 +269,7 @@ function About() {
                 fontWeight={600}
                 mb={4}
               >
-                Tutalım'da Gerçek Zamanlı Büyüme 🚀
+                Tutalım'da Gerçek Zamanlı Büyüme
               </Typography>
 
               <Grid container columns={12} spacing={4} justifyContent="center">
@@ -337,7 +337,7 @@ function About() {
                 fontWeight={600}
                 mb={1}
               >
-                Dijital gayrimenkul dünyasına adım atın 🌐
+                Dijital gayrimenkul dünyasına adım atın
               </Typography>
               <Typography
                 variant="body1"

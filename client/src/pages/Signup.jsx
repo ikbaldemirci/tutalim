@@ -12,6 +12,7 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
+import StyledTextField from "../components/StyledTextField";
 
 function Signup({ onSwitch }) {
   const [formData, setFormData] = useState({
@@ -104,7 +105,7 @@ function Signup({ onSwitch }) {
         Kayıt Ol
       </Typography>
 
-      <TextField
+      <StyledTextField
         label="İsim"
         name="name"
         value={formData.name}
@@ -112,7 +113,7 @@ function Signup({ onSwitch }) {
         required
         fullWidth
       />
-      <TextField
+      <StyledTextField
         label="Soyisim"
         name="surname"
         value={formData.surname}
@@ -120,7 +121,7 @@ function Signup({ onSwitch }) {
         required
         fullWidth
       />
-      <TextField
+      <StyledTextField
         label="E-posta"
         name="mail"
         type="email"
@@ -141,7 +142,7 @@ function Signup({ onSwitch }) {
         placement="top-start"
         arrow
       >
-        <TextField
+        <StyledTextField
           label="Parola"
           name="password"
           type="password"
@@ -149,7 +150,6 @@ function Signup({ onSwitch }) {
           onChange={handleChange}
           required
           fullWidth
-          helperText="En az 8 karakter, 1 büyük, 1 küçük harf, 1 sayı ve 1 özel karakter."
         />
       </Tooltip>
 
@@ -176,7 +176,7 @@ function Signup({ onSwitch }) {
         </Typography>
       )}
 
-      <TextField
+      <StyledTextField
         select
         label="Rol"
         name="role"
@@ -186,7 +186,7 @@ function Signup({ onSwitch }) {
       >
         <MenuItem value="realtor">Emlakçı</MenuItem>
         <MenuItem value="owner">Ev Sahibi</MenuItem>
-      </TextField>
+      </StyledTextField>
 
       <Button
         variant="contained"
