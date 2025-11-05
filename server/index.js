@@ -156,6 +156,8 @@ app.post("/api/signup", async (req, res) => {
       to: mail,
       subject: "Tutalım | Hesabını Doğrula",
       html: verifyMailHtml({ name, link: verifyLink }),
+      userId: targetUser._id,
+      propertyId: property._id,
     });
 
     res.json({
@@ -880,6 +882,8 @@ app.post("/api/assignments", verifyToken, async (req, res) => {
         propertyLocation: property.location,
         link: `${process.env.PUBLIC_BASE_URL}/owner`,
       }),
+      userId: targetUser._id,
+      propertyId: property._id,
     });
 
     res.json({
@@ -964,6 +968,8 @@ app.post("/api/assignments/:id/accept", verifyToken, async (req, res) => {
         propertyLocation: property.location,
         link: `${process.env.PUBLIC_BASE_URL}/realtor`,
       }),
+      userId: fromUser._id,
+      propertyId: property._id,
     });
 
     const populated = await Property.findById(property._id)
@@ -1010,6 +1016,8 @@ app.post("/api/assignments/:id/reject", verifyToken, async (req, res) => {
             propertyLocation: property ? property.location : "",
             link: `${process.env.PUBLIC_BASE_URL}/realtor`,
           }),
+          userId: fromUser._id,
+          propertyId: property._id,
         });
       }
     } catch (mailErr) {
@@ -1047,6 +1055,7 @@ app.post("/api/forgot-password", async (req, res) => {
       subject: "Tutalım | Şifre Sıfırlama",
       html: resetPasswordHtml({ name: user.name, link: resetLink }),
       text: `Hesabını doğrulamak için: ${resetLink}`,
+      userId: user._id,
     });
 
     res.json({
@@ -1206,6 +1215,7 @@ app.post("/api/verify/resend", async (req, res) => {
       subject: "Tutalım | E-posta Doğrulama (Yeniden)",
       html: verifyMailHtml({ name: user.name, link: verifyLink }),
       text: `Doğrulamak için: ${verifyLink}`,
+      userId: user._id,
     });
 
     res.json({
@@ -1213,7 +1223,6 @@ app.post("/api/verify/resend", async (req, res) => {
       message: "Doğrulama e-postası yeniden gönderildi.",
     });
   } catch (err) {
-    console.error("resend verify error:", err);
     res.status(500).json({ status: "error", message: "Server error" });
   }
 });
