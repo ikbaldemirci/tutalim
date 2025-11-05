@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const cron = require("node-cron");
 const bcrypt = require("bcrypt");
 const collection = require("./config");
 const app = express();
@@ -20,6 +21,7 @@ const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS || 30);
 
 const verifyToken = require("./middleware/verifyToken");
 const Notification = require("./models/Notification");
+const Reminder = require("./models/Reminder");
 
 const {
   sendMail,
@@ -28,6 +30,7 @@ const {
   assignmentInviteHtml,
   assignmentAcceptedHtml,
   assignmentRejectedHtml,
+  reminderMailHtml,
 } = require("./utils/mailer");
 
 const storage = multer.diskStorage({
@@ -1249,6 +1252,150 @@ app.get("/api/notifications/:userId", verifyToken, async (req, res) => {
       status: "error",
       message: "Bildirim geçmişi alınamadı.",
     });
+  }
+});
+
+app.post("/api/reminders", verifyToken, async (req, res) => {
+  try {
+    const { propertyId, message, remindAt } = req.body;
+
+    if (!propertyId || !message || !remindAt) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Eksik alanlar mevcut.",
+      });
+    }
+
+    const reminder = await Reminder.create({
+      userId: req.user.id,
+      propertyId,
+      message,
+      remindAt,
+    });
+
+    res.json({ status: "success", reminder });
+  } catch (err) {
+    console.error("Reminder create error:", err);
+    res
+      .status(500)
+      .json({ status: "error", message: "Hatırlatıcı eklenemedi." });
+  }
+});
+
+app.get("/api/reminders/:userId", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (req.user.id !== userId) {
+      return res.status(403).json({
+        status: "fail",
+        message: "Bu hatırlatıcıları göremezsiniz.",
+      });
+    }
+
+    const list = await Reminder.find({ userId })
+      .sort({ remindAt: 1 })
+      .limit(30)
+      .populate("propertyId", "location rentDate endDate");
+
+    res.json({ status: "success", reminders: list });
+  } catch (err) {
+    console.error("Reminder fetch error:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Hatırlatıcılar alınamadı.",
+    });
+  }
+});
+
+app.put("/api/reminders/:id/complete", verifyToken, async (req, res) => {
+  try {
+    const reminder = await Reminder.findById(req.params.id);
+    if (!reminder)
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Hatırlatıcı bulunamadı." });
+
+    if (reminder.userId.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        status: "fail",
+        message: "Bu hatırlatıcı size ait değil.",
+      });
+    }
+
+    reminder.isDone = true;
+    await reminder.save();
+
+    res.json({
+      status: "success",
+      message: "Hatırlatıcı tamamlandı olarak işaretlendi.",
+    });
+  } catch (err) {
+    console.error("Reminder complete error:", err);
+    res.status(500).json({
+      status: "error",
+      message: "İşlem başarısız.",
+    });
+  }
+});
+
+app.delete("/api/reminders/:id", verifyToken, async (req, res) => {
+  try {
+    const reminder = await Reminder.findById(req.params.id);
+    if (!reminder)
+      return res
+        .status(404)
+        .json({ status: "fail", message: "Hatırlatıcı bulunamadı." });
+
+    if (reminder.userId.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        status: "fail",
+        message: "Bu hatırlatıcı size ait değil.",
+      });
+    }
+
+    await reminder.deleteOne();
+    res.json({ status: "success", message: "Hatırlatıcı silindi." });
+  } catch (err) {
+    console.error("Reminder delete error:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Silme işlemi başarısız.",
+    });
+  }
+});
+
+cron.schedule("*/5 * * * *", async () => {
+  console.log("Hatırlatıcı kontrolü başlatıldı...");
+
+  try {
+    const now = new Date();
+    const reminders = await Reminder.find({
+      remindAt: { $lte: now },
+      isDone: false,
+    }).populate("userId", "name mail");
+
+    for (const r of reminders) {
+      await sendMail({
+        to: r.userId.mail,
+        subject: "Tutalım | Hatırlatıcınızın Zamanı Geldi",
+        html: reminderMailHtml({
+          name: r.userId.name,
+          message: r.message,
+          remindAt: r.remindAt,
+        }),
+        userId: r.userId._id,
+        propertyId: r.propertyId,
+      });
+
+      r.isDone = true;
+      await r.save();
+      console.log(`Hatırlatıcı mail gönderildi: ${r.userId.mail}`);
+    }
+
+    console.log(`Hatırlatıcı kontrolü tamamlandı (${reminders.length} kayıt)`);
+  } catch (err) {
+    console.error("Cron reminder kontrol hatası:", err);
   }
 });
 
