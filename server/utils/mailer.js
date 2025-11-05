@@ -146,7 +146,7 @@ function assignmentAcceptedHtml({ toName, propertyLocation, link }) {
       <h2>Davetin Onaylandı</h2>
       <p>Merhaba,</p>
       <p><strong>${toName}</strong> davetinizi onayladı.</p>
-      <p>Artık <b>${propertyLocation}</b> konumundaki mülk portföyünüze eklendi.</p>
+      <p>Artık <b>${propertyLocation}</b> konumundaki mülk için gönderdiğiniz davet onaylandı.</p>
       <p style="margin:24px 0">
         <a href="${link}" style="background:#28a745;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;display:inline-block">
           Portföyümü Gör
