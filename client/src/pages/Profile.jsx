@@ -175,7 +175,6 @@ function Profile() {
           </Typography>
 
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {/* Ad */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <TextField
                 label="Ad"
@@ -302,6 +301,45 @@ function Profile() {
           </Box>
         </Paper>
       </Box>
+
+      <Divider sx={{ my: 3 }} />
+
+      <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
+        Bildirim Geçmişim
+      </Typography>
+
+      <Button
+        variant="outlined"
+        onClick={async () => {
+          try {
+            const res = await axios.get(
+              `https://tutalim.com/api/notifications/${decoded.id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+            if (res.data.status === "success") {
+              console.log("Mail geçmişi:", res.data.notifications);
+              setSnackbar({
+                open: true,
+                message: `Toplam ${res.data.notifications.length} mail geçmişi bulundu 📬`,
+                severity: "info",
+              });
+            }
+          } catch (err) {
+            console.error("Mail geçmişi hatası:", err);
+            setSnackbar({
+              open: true,
+              message: "Mail geçmişi alınamadı.",
+              severity: "error",
+            });
+          }
+        }}
+      >
+        Mail Geçmişini Görüntüle
+      </Button>
 
       <Snackbar
         open={snackbar.open}

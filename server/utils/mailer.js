@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const Notification = require("../models/Notification");
 
 const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, SMTP_FROM } =
   process.env;
@@ -10,16 +11,68 @@ const transporter = nodemailer.createTransport({
   auth: { user: SMTP_USER, pass: SMTP_PASS },
 });
 
-async function sendMail({ to, subject, html, text }) {
-  const info = await transporter.sendMail({
-    from: SMTP_FROM,
-    to,
-    subject,
-    text,
-    html,
-  });
-  console.log("E-posta gönderildi:", info.messageId);
-  return info;
+async function sendMail({
+  to,
+  subject,
+  html,
+  text,
+  userId = null,
+  propertyId = null,
+}) {
+  try {
+    const info = await transporter.sendMail({
+      from: SMTP_FROM,
+      to,
+      subject,
+      text,
+      html,
+    });
+
+    setImmediate(async () => {
+      try {
+        await Notification.create({
+          to,
+          subject,
+          type: detectMailType(subject),
+          status: "sent",
+          userId,
+          propertyId,
+        });
+      } catch (logErr) {
+        console.error("Mail log kaydı başarısız:", logErr.message);
+      }
+    });
+
+    return info;
+  } catch (err) {
+    setImmediate(async () => {
+      try {
+        await Notification.create({
+          to,
+          subject,
+          type: detectMailType(subject),
+          status: "failed",
+          errorMessage: err.message,
+          userId,
+          propertyId,
+        });
+      } catch (logErr) {
+        console.error("Hatalı mail log kaydı başarısız:", logErr.message);
+      }
+    });
+
+    throw err;
+  }
+}
+
+function detectMailType(subject = "") {
+  const s = subject.toLowerCase();
+  if (s.includes("davet reddedildi")) return "reject";
+  if (s.includes("davet onaylandı")) return "accept";
+  if (s.includes("mülk daveti")) return "invite";
+  if (s.includes("şifre")) return "reset";
+  if (s.includes("doğrula") || s.includes("e-posta")) return "verify";
+  return "other";
 }
 
 function resetPasswordHtml({ name, link }) {
@@ -118,7 +171,7 @@ function assignmentRejectedHtml({ toName, propertyLocation, link }) {
       }</b> konumundaki mülk için gönderdiğiniz davet reddedildi.</p>
       <p style="margin:24px 0">
         <a href="${link}" style="background:#dc3545;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;display:inline-block">
-          Davetleri Gör
+          Portföyümü Gör
         </a>
       </p>
       <hr style="margin:24px 0;border:none;border-top:1px solid #eee" />

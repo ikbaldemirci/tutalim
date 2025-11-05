@@ -19,6 +19,8 @@ const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN || 15);
 const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS || 30);
 
 const verifyToken = require("./middleware/verifyToken");
+const Notification = require("./models/Notification");
+
 const {
   sendMail,
   resetPasswordHtml,
@@ -1011,11 +1013,11 @@ app.post("/api/assignments/:id/reject", verifyToken, async (req, res) => {
         });
       }
     } catch (mailErr) {
-      console.error("Reject notification mail error:", mailErr);
+      console.error("Mail gönderim hatası:", mailErr);
     }
     res.json({ status: "success", message: "Davet reddedildi." });
   } catch (err) {
-    console.error("Reject assignment error:", err);
+    console.error("Reddetme hatası:", err);
     res.status(500).json({ status: "error", message: "Sunucu hatası" });
   }
 });
@@ -1213,6 +1215,31 @@ app.post("/api/verify/resend", async (req, res) => {
   } catch (err) {
     console.error("resend verify error:", err);
     res.status(500).json({ status: "error", message: "Server error" });
+  }
+});
+
+app.get("/api/notifications/:userId", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (req.user.id !== userId) {
+      return res.status(403).json({
+        status: "fail",
+        message: "Kendi bildirim geçmişinizi görüntüleyebilirsiniz.",
+      });
+    }
+
+    const list = await Notification.find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(30);
+
+    res.json({ status: "success", notifications: list });
+  } catch (err) {
+    console.error("Bildirim geçmişi hatası:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Bildirim geçmişi alınamadı.",
+    });
   }
 });
 
