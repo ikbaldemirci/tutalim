@@ -64,4 +64,73 @@ function verifyMailHtml({ name, link }) {
     </div>`;
 }
 
-module.exports = { sendMail, resetPasswordHtml, verifyMailHtml };
+function assignmentInviteHtml({ fromName, propertyLocation, link }) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px;border:1px solid #eee;border-radius:12px">
+      <div style="text-align:center;margin-bottom:16px">
+        <img src="https://tutalim.com/images/tutalim.webp" alt="Tutalim" style="max-width:160px;height:auto" />
+      </div>
+      <h2>Yeni Mülk Daveti</h2>
+      <p>Merhaba,</p>
+      <p><strong>${fromName}</strong> sizi <b>${propertyLocation}</b> konumundaki mülke atamak istiyor.</p>
+      <p>Lütfen aşağıdaki butona tıklayarak bekleyen davetlerinizi görüntüleyin:</p>
+      <p style="margin:24px 0">
+        <a href="${link}" style="background:#2E86C1;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;display:inline-block">
+          Davetleri Gör
+        </a>
+      </p>
+      <hr style="margin:24px 0;border:none;border-top:1px solid #eee" />
+      <p style="color:#6b7280;font-size:12px">Bu e-posta otomatik gönderilmiştir, yanıtlamayın.</p>
+    </div>`;
+}
+
+function assignmentAcceptedHtml({ toName, propertyLocation, link }) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px;border:1px solid #eee;border-radius:12px">
+      <div style="text-align:center;margin-bottom:16px">
+        <img src="https://tutalim.com/images/tutalim.webp" alt="Tutalim" style="max-width:160px;height:auto" />
+      </div>
+      <h2>Davetin Onaylandı</h2>
+      <p>Merhaba,</p>
+      <p><strong>${toName}</strong> davetinizi onayladı.</p>
+      <p>Artık <b>${propertyLocation}</b> konumundaki mülk portföyünüze eklendi.</p>
+      <p style="margin:24px 0">
+        <a href="${link}" style="background:#28a745;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;display:inline-block">
+          Portföyümü Gör
+        </a>
+      </p>
+      <hr style="margin:24px 0;border:none;border-top:1px solid #eee" />
+      <p style="color:#6b7280;font-size:12px">Bu e-posta otomatik gönderilmiştir, yanıtlamayın.</p>
+    </div>`;
+}
+
+function assignmentRejectedHtml({ toName, propertyLocation, link }) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px;border:1px solid #eee;border-radius:12px">
+      <div style="text-align:center;margin-bottom:16px">
+        <img src="https://tutalim.com/images/tutalim.webp" alt="Tutalim" style="max-width:160px;height:auto" />
+      </div>
+      <h2>Davet Onaylanmadı</h2>
+      <p>Merhaba,</p>
+      <p><strong>${toName}</strong> davetinizi onaylamadı.</p>
+      <p><b>${
+        propertyLocation || ""
+      }</b> konumundaki mülk için gönderdiğiniz davet reddedildi.</p>
+      <p style="margin:24px 0">
+        <a href="${link}" style="background:#dc3545;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;display:inline-block">
+          Davetleri Gör
+        </a>
+      </p>
+      <hr style="margin:24px 0;border:none;border-top:1px solid #eee" />
+      <p style="color:#6b7280;font-size:12px">Bu e-posta otomatik gönderilmiştir, yanıtlamayın.</p>
+    </div>`;
+}
+
+module.exports = {
+  sendMail,
+  resetPasswordHtml,
+  verifyMailHtml,
+  assignmentInviteHtml,
+  assignmentAcceptedHtml,
+  assignmentRejectedHtml,
+};

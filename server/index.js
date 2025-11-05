@@ -19,7 +19,14 @@ const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN || 15);
 const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS || 30);
 
 const verifyToken = require("./middleware/verifyToken");
-const { sendMail, verifyMailHtml } = require("./utils/mailer");
+const {
+  sendMail,
+  resetPasswordHtml,
+  verifyMailHtml,
+  assignmentInviteHtml,
+  assignmentAcceptedHtml,
+  assignmentRejectedHtml,
+} = require("./utils/mailer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -862,6 +869,17 @@ app.post("/api/assignments", verifyToken, async (req, res) => {
       role,
       status: "pending",
     });
+
+    await sendMail({
+      to: targetUser.mail,
+      subject: "Tutalım | Yeni Mülk Daveti",
+      html: assignmentInviteHtml({
+        fromName: `${req.user.name} ${req.user.surname}`,
+        propertyLocation: property.location,
+        link: `${process.env.PUBLIC_BASE_URL}/owner`,
+      }),
+    });
+
     res.json({
       status: "success",
       message: "Davet gönderildi. Onay bekleniyor.",
@@ -934,6 +952,18 @@ app.post("/api/assignments/:id/accept", verifyToken, async (req, res) => {
     invite.status = "accepted";
     await invite.save();
 
+    const fromUser = await collection.findById(invite.fromUser);
+
+    await sendMail({
+      to: fromUser.mail,
+      subject: "Tutalım | Davet Onaylandı",
+      html: assignmentAcceptedHtml({
+        toName: `${req.user.name} ${req.user.surname}`,
+        propertyLocation: property.location,
+        link: `${process.env.PUBLIC_BASE_URL}/realtor`,
+      }),
+    });
+
     const populated = await Property.findById(property._id)
       .populate("realtor", "name mail")
       .populate("owner", "name mail");
@@ -964,6 +994,25 @@ app.post("/api/assignments/:id/reject", verifyToken, async (req, res) => {
     }
     invite.status = "rejected";
     await invite.save();
+
+    try {
+      const property = await Property.findById(invite.property);
+      const fromUser = await collection.findById(invite.fromUser);
+
+      if (fromUser?.mail) {
+        await sendMail({
+          to: fromUser.mail,
+          subject: "Tutalım | Davet Reddedildi",
+          html: assignmentRejectedHtml({
+            toName: `${req.user.name} ${req.user.surname}`,
+            propertyLocation: property ? property.location : "",
+            link: `${process.env.PUBLIC_BASE_URL}/realtor`,
+          }),
+        });
+      }
+    } catch (mailErr) {
+      console.error("Reject notification mail error:", mailErr);
+    }
     res.json({ status: "success", message: "Davet reddedildi." });
   } catch (err) {
     console.error("Reject assignment error:", err);
@@ -991,10 +1040,9 @@ app.post("/api/forgot-password", async (req, res) => {
 
     const resetLink = `https://tutalim.com/reset-password/${resetToken}`;
 
-    const { sendMail, resetPasswordHtml } = require("./utils/mailer");
     await sendMail({
       to: mail,
-      subject: "Şifre Sıfırlama",
+      subject: "Tutalım | Şifre Sıfırlama",
       html: resetPasswordHtml({ name: user.name, link: resetLink }),
       text: `Hesabını doğrulamak için: ${resetLink}`,
     });
@@ -1153,7 +1201,7 @@ app.post("/api/verify/resend", async (req, res) => {
     const verifyLink = `${process.env.PUBLIC_BASE_URL}/verify/${token}`;
     await sendMail({
       to: user.mail,
-      subject: "Tutalım — E-posta Doğrulama (Yeniden)",
+      subject: "Tutalım | E-posta Doğrulama (Yeniden)",
       html: verifyMailHtml({ name: user.name, link: verifyLink }),
       text: `Doğrulamak için: ${verifyLink}`,
     });
