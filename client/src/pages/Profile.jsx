@@ -166,14 +166,8 @@ function Profile() {
       );
       if (res.data.status === "success") {
         setMailHistory(res.data.notifications || []);
-        setSnackbar({
-          open: true,
-          message: `Toplam ${res.data.notifications.length} mail bulundu 📬`,
-          severity: "info",
-        });
       }
     } catch (err) {
-      console.error("Mail geçmişi hatası:", err);
       setSnackbar({
         open: true,
         message: "Mail geçmişi alınamadı.",
@@ -197,7 +191,10 @@ function Profile() {
   };
 
   useEffect(() => {
-    if (decoded) handleFetchReminders();
+    if (decoded) {
+      handleFetchReminders();
+      handleFetchNotifications();
+    }
   }, [decoded]);
 
   const handleAddReminder = async () => {
@@ -383,14 +380,6 @@ function Profile() {
           <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
             Bildirim Geçmişim
           </Typography>
-          <Button
-            variant="outlined"
-            onClick={handleFetchNotifications}
-            sx={{ mb: 2 }}
-          >
-            Mail Geçmişini Görüntüle
-          </Button>
-
           <Box
             sx={{
               maxHeight: 300,
