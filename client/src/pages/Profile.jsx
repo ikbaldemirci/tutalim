@@ -265,7 +265,7 @@ function Profile() {
   return (
     <>
       <Navbar />
-      <Box sx={{ pb: 6 }}>
+      <Box sx={{ pb: 0 }}>
         <WelcomeHeader
           name={`${decoded?.name || ""} ${decoded?.surname || ""}`}
         />
@@ -275,11 +275,11 @@ function Profile() {
             maxWidth: 900,
             mx: "auto",
             mt: 4,
+            mb: 6,
             borderRadius: 4,
             boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
             backgroundColor: "#fff",
             overflow: "visible",
-            pb: 3,
           }}
         >
           <Tabs
@@ -405,11 +405,8 @@ function Profile() {
 
                 <Box
                   sx={{
-                    maxHeight:
-                      reminders.length > 5
-                        ? { xs: "60vh", md: "55vh" }
-                        : "none",
-                    overflowY: reminders.length > 5 ? "auto" : "unset",
+                    maxHeight: reminders.length > 5 ? 400 : "none",
+                    overflowY: reminders.length > 5 ? "auto" : "visible",
                     pr: 1,
                     borderRadius: 2,
                     backgroundColor: "transparent",
@@ -461,11 +458,8 @@ function Profile() {
             {tab === 2 && (
               <Box
                 sx={{
-                  maxHeight:
-                    mailHistory.length > 5
-                      ? { xs: "60vh", md: "55vh" }
-                      : "none",
-                  overflowY: mailHistory.length > 5 ? "auto" : "unset",
+                  maxHeight: mailHistory.length > 5 ? 400 : "none",
+                  overflowY: mailHistory.length > 5 ? "auto" : "visible",
                   pr: 1,
                   borderRadius: 2,
                   backgroundColor: "transparent",
