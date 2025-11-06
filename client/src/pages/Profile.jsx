@@ -22,6 +22,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import HistoryIcon from "@mui/icons-material/History";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 axios.interceptors.response.use(
   (res) => res,
@@ -265,7 +267,7 @@ function Profile() {
   return (
     <>
       <Navbar />
-      <Box sx={{ pb: 0 }}>
+      <Box>
         <WelcomeHeader
           name={`${decoded?.name || ""} ${decoded?.surname || ""}`}
         />
@@ -279,19 +281,36 @@ function Profile() {
             borderRadius: 4,
             boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
             backgroundColor: "#fff",
-            overflow: "visible",
+            overflow: "hidden",
+            minHeight: { xs: "70vh", md: "65vh" },
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Tabs
             value={tab}
             onChange={(e, v) => setTab(v)}
-            variant="fullWidth"
+            centered
             textColor="primary"
             indicatorColor="primary"
+            sx={{
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "1rem",
+                color: "#555",
+              },
+              "& .Mui-selected": { color: "#1976d2" },
+              "& .MuiTabs-indicator": { height: 3, borderRadius: 2 },
+            }}
           >
-            <Tab label="Profil" />
-            <Tab label="Hatırlatıcılarım" />
-            <Tab label="Geçmiş" />
+            <Tab icon={<PersonPinIcon />} iconPosition="start" label="Profil" />
+            <Tab
+              icon={<NotificationsIcon />}
+              iconPosition="start"
+              label="Hatırlatıcılarım"
+            />
+            <Tab icon={<HistoryIcon />} iconPosition="start" label="Geçmiş" />
           </Tabs>
 
           <Box sx={{ p: 3 }}>
@@ -405,11 +424,10 @@ function Profile() {
 
                 <Box
                   sx={{
-                    maxHeight: reminders.length > 5 ? 400 : "none",
+                    flex: 1,
                     overflowY: reminders.length > 5 ? "auto" : "visible",
                     pr: 1,
-                    borderRadius: 2,
-                    backgroundColor: "transparent",
+                    transition: "all 0.3s ease",
                   }}
                 >
                   {reminders.length > 0 ? (
@@ -458,11 +476,10 @@ function Profile() {
             {tab === 2 && (
               <Box
                 sx={{
-                  maxHeight: mailHistory.length > 5 ? 400 : "none",
+                  flex: 1,
                   overflowY: mailHistory.length > 5 ? "auto" : "visible",
                   pr: 1,
-                  borderRadius: 2,
-                  backgroundColor: "transparent",
+                  transition: "all 0.3s ease",
                 }}
               >
                 <Typography
