@@ -12,10 +12,12 @@ import {
   Alert,
   Divider,
   Modal,
+  Tabs,
+  Tab,
+  IconButton,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
 import WelcomeHeader from "../components/WelcomeHeader";
-import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -73,10 +75,13 @@ function Profile() {
   const [reminders, setReminders] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [newReminder, setNewReminder] = useState({ message: "", remindAt: "" });
+  const [tab, setTab] = useState(0);
 
+  const handleChangeTab = (_, newValue) => setTab(newValue);
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  // Profil Güncelleme
   const handleProfileUpdate = async () => {
     try {
       const res = await axios.put(
@@ -114,6 +119,7 @@ function Profile() {
     setIsEditing((prev) => ({ ...prev, [field]: false }));
   };
 
+  // Şifre Değiştirme
   const handlePasswordChange = async () => {
     if (!form.currentPassword || !form.newPassword)
       return setSnackbar({
@@ -156,6 +162,7 @@ function Profile() {
     }
   };
 
+  // Bildirim geçmişi
   const handleFetchNotifications = async () => {
     try {
       const res = await axios.get(
@@ -164,9 +171,8 @@ function Profile() {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
-      if (res.data.status === "success") {
+      if (res.data.status === "success")
         setMailHistory(res.data.notifications || []);
-      }
     } catch (err) {
       setSnackbar({
         open: true,
@@ -176,6 +182,7 @@ function Profile() {
     }
   };
 
+  // Hatırlatıcılar
   const handleFetchReminders = async () => {
     try {
       const res = await axios.get(
@@ -205,8 +212,7 @@ function Profile() {
         severity: "warning",
       });
 
-    const selectedTime = newReminder.remindAt;
-    const fixedDate = `${selectedTime}:00+03:00`;
+    const fixedDate = `${newReminder.remindAt}:00+03:00`;
 
     try {
       const res = await axios.post(
@@ -277,260 +283,299 @@ function Profile() {
           sx={{
             maxWidth: 850,
             mx: "auto",
-            p: 4,
-            borderRadius: 3,
             mt: 4,
+            borderRadius: 3,
             boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
           }}
         >
-          {/* 🔹 Bildirim Geçmişi */}
-          <Typography variant="h6" fontWeight={600} color="primary" mb={1}>
-            Bildirim Geçmişim
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Box
+          <Tabs
+            value={tab}
+            onChange={handleChangeTab}
+            textColor="primary"
+            indicatorColor="primary"
+            centered
             sx={{
-              maxHeight: 220,
-              overflowY: "auto",
-              borderRadius: 2,
-              border: "1px solid #e0e0e0",
-              p: 1,
-              mb: 4,
-              bgcolor: "#fafafa",
+              borderBottom: "1px solid #ddd",
+              "& .MuiTab-root": { fontWeight: 600 },
             }}
           >
-            {mailHistory.length > 0 ? (
-              mailHistory.slice(0, 5).map((mail, i) => (
-                <Paper
-                  key={i}
+            <Tab label="Bildirimler" />
+            <Tab label="Hatırlatıcılar" />
+            <Tab label="Profil" />
+          </Tabs>
+
+          <Box sx={{ p: 3 }}>
+            {/* 📧 Bildirimler */}
+            {tab === 0 && (
+              <>
+                <Typography
+                  variant="h6"
+                  mb={2}
+                  color="primary"
+                  fontWeight={600}
+                >
+                  Bildirim Geçmişim
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Box
                   sx={{
-                    p: 1.5,
-                    mb: 1,
-                    background: "#fff",
-                    borderLeft: "4px solid #2E86C1",
+                    maxHeight: 280,
+                    overflowY: "auto",
+                    borderRadius: 2,
+                    border: "1px solid #e0e0e0",
+                    p: 1,
+                    bgcolor: "#fafafa",
                   }}
                 >
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    {mail.subject}
+                  {mailHistory?.length > 0 ? (
+                    mailHistory.slice(0, 5).map((mail, i) => (
+                      <Paper
+                        key={i}
+                        sx={{
+                          p: 1.5,
+                          mb: 1,
+                          background: "#fff",
+                          borderLeft: "4px solid #2E86C1",
+                        }}
+                      >
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          {mail.subject}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {new Date(mail.createdAt).toLocaleString("tr-TR")}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {mail.to}
+                        </Typography>
+                      </Paper>
+                    ))
+                  ) : (
+                    <Typography color="text.secondary" sx={{ p: 1 }}>
+                      Henüz mail geçmişi bulunmuyor.
+                    </Typography>
+                  )}
+                </Box>
+              </>
+            )}
+
+            {/* ⏰ Hatırlatıcılar */}
+            {tab === 1 && (
+              <>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 2,
+                  }}
+                >
+                  <Typography variant="h6" color="primary" fontWeight={600}>
+                    Hatırlatıcılarım
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {new Date(mail.createdAt).toLocaleString("tr-TR")}
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => setOpenModal(true)}
+                  >
+                    + Yeni
+                  </Button>
+                </Box>
+                <Divider sx={{ mb: 2 }} />
+                <Box
+                  sx={{
+                    maxHeight: 280,
+                    overflowY: "auto",
+                    borderRadius: 2,
+                    border: "1px solid #e0e0e0",
+                    p: 1,
+                    bgcolor: "#fafafa",
+                  }}
+                >
+                  {reminders?.length > 0 ? (
+                    reminders.slice(0, 5).map((r) => (
+                      <Paper
+                        key={r._id}
+                        sx={{
+                          p: 1.5,
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          background: r.isDone ? "#e8f5e9" : "#fff",
+                          borderLeft: r.isDone
+                            ? "4px solid #28B463"
+                            : "4px solid #2E86C1",
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="subtitle1" fontWeight={600}>
+                            {r.message}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {new Date(r.remindAt).toLocaleString("tr-TR")}
+                          </Typography>
+                        </Box>
+                        <IconButton
+                          aria-label="hatırlatıcıyı sil"
+                          onClick={() => handleDeleteReminder(r._id)}
+                          sx={{ color: "#dc3545" }}
+                        >
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
+                      </Paper>
+                    ))
+                  ) : (
+                    <Typography color="text.secondary" sx={{ p: 1 }}>
+                      Henüz hatırlatıcı yok.
+                    </Typography>
+                  )}
+                </Box>
+              </>
+            )}
+
+            {/* 👤 Profil Bilgileri */}
+            {tab === 2 && (
+              <>
+                <Typography
+                  variant="h6"
+                  mb={2}
+                  color="primary"
+                  fontWeight={600}
+                >
+                  Profil Bilgilerim
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {["name", "surname"].map((field) => (
+                    <Box
+                      key={field}
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      <TextField
+                        label={field === "name" ? "Ad" : "Soyad"}
+                        name={field}
+                        value={form[field]}
+                        onChange={handleChange}
+                        fullWidth
+                        InputProps={{ readOnly: !isEditing[field] }}
+                      />
+                      {isEditing[field] ? (
+                        <>
+                          <IconButton
+                            color="success"
+                            onClick={handleProfileUpdate}
+                          >
+                            <CheckIcon />
+                          </IconButton>
+                          <IconButton
+                            color="error"
+                            onClick={() => handleCancel(field)}
+                          >
+                            <CancelIcon />
+                          </IconButton>
+                        </>
+                      ) : (
+                        <IconButton
+                          color="primary"
+                          onClick={() =>
+                            setIsEditing((prev) => ({ ...prev, [field]: true }))
+                          }
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                  ))}
+
+                  <TextField
+                    label="E-posta"
+                    name="mail"
+                    value={form.mail}
+                    fullWidth
+                    InputProps={{
+                      readOnly: true,
+                      sx: { backgroundColor: "#f5f6fa", borderRadius: 1 },
+                    }}
+                    sx={{ mt: 1 }}
+                  />
+
+                  <Divider sx={{ my: 2 }} />
+
+                  <Typography variant="subtitle1" fontWeight={500}>
+                    Şifre Değiştir
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {mail.to}
-                  </Typography>
-                </Paper>
-              ))
-            ) : (
-              <Typography color="text.secondary" sx={{ p: 1 }}>
-                Henüz mail geçmişi bulunmuyor.
-              </Typography>
+                  <TextField
+                    label="Mevcut Şifre"
+                    type="password"
+                    name="currentPassword"
+                    value={form.currentPassword}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Yeni Şifre"
+                    type="password"
+                    name="newPassword"
+                    value={form.newPassword}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 1 }}
+                  />
+                  <Button variant="contained" onClick={handlePasswordChange}>
+                    Şifreyi Değiştir
+                  </Button>
+                </Box>
+              </>
             )}
           </Box>
+        </Paper>
 
-          {/* 🔹 Hatırlatıcılarım */}
+        {/* ➕ Hatırlatıcı Ekle Modal */}
+        <Modal open={openModal} onClose={() => setOpenModal(false)}>
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 1,
+              p: 3,
+              bgcolor: "background.paper",
+              maxWidth: 400,
+              mx: "auto",
+              mt: "20vh",
+              borderRadius: 2,
             }}
           >
-            <Typography variant="h6" fontWeight={600} color="primary">
-              Hatırlatıcılarım
+            <Typography variant="h6" mb={2}>
+              Yeni Hatırlatıcı Ekle
             </Typography>
+            <TextField
+              label="Mesaj"
+              fullWidth
+              sx={{ mb: 2 }}
+              value={newReminder.message}
+              onChange={(e) =>
+                setNewReminder({ ...newReminder, message: e.target.value })
+              }
+            />
+            <TextField
+              label="Tarih"
+              type="datetime-local"
+              fullWidth
+              sx={{ mb: 2 }}
+              InputLabelProps={{ shrink: true }}
+              value={newReminder.remindAt}
+              onChange={(e) =>
+                setNewReminder({ ...newReminder, remindAt: e.target.value })
+              }
+            />
             <Button
               variant="contained"
               color="success"
-              onClick={() => setOpenModal(true)}
+              fullWidth
+              onClick={handleAddReminder}
             >
-              + Yeni
+              Ekle
             </Button>
           </Box>
-          <Divider sx={{ mb: 2 }} />
-
-          <Box
-            sx={{
-              maxHeight: 220,
-              overflowY: "auto",
-              borderRadius: 2,
-              border: "1px solid #e0e0e0",
-              p: 1,
-              mb: 4,
-              bgcolor: "#fafafa",
-            }}
-          >
-            {reminders.length > 0 ? (
-              reminders.slice(0, 5).map((r) => (
-                <Paper
-                  key={r._id}
-                  sx={{
-                    p: 1.5,
-                    mb: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    background: r.isDone ? "#e8f5e9" : "#fff",
-                    borderLeft: r.isDone
-                      ? "4px solid #28B463"
-                      : "4px solid #2E86C1",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight={600}>
-                      {r.message}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {new Date(r.remindAt).toLocaleString("tr-TR")}
-                    </Typography>
-                  </Box>
-                  <IconButton
-                    aria-label="hatırlatıcıyı sil"
-                    onClick={() => handleDeleteReminder(r._id)}
-                    sx={{ color: "#dc3545" }}
-                  >
-                    <DeleteOutlineOutlinedIcon />
-                  </IconButton>
-                </Paper>
-              ))
-            ) : (
-              <Typography color="text.secondary" sx={{ p: 1 }}>
-                Henüz hatırlatıcı yok.
-              </Typography>
-            )}
-          </Box>
-
-          {/* 🔹 Profil Bilgilerim */}
-          <Typography variant="h6" fontWeight={600} color="primary" mb={1}>
-            Profil Bilgilerim
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {["name", "surname"].map((field) => (
-              <Box
-                key={field}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                <TextField
-                  label={field === "name" ? "Ad" : "Soyad"}
-                  name={field}
-                  value={form[field]}
-                  onChange={handleChange}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditing[field] }}
-                />
-                {isEditing[field] ? (
-                  <>
-                    <IconButton color="success" onClick={handleProfileUpdate}>
-                      <CheckIcon />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleCancel(field)}
-                    >
-                      <CancelIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  <IconButton
-                    color="primary"
-                    onClick={() =>
-                      setIsEditing((prev) => ({ ...prev, [field]: true }))
-                    }
-                  >
-                    <EditIcon />
-                  </IconButton>
-                )}
-              </Box>
-            ))}
-
-            <TextField
-              label="E-posta"
-              name="mail"
-              value={form.mail}
-              fullWidth
-              InputProps={{
-                readOnly: true,
-                sx: { backgroundColor: "#f5f6fa", borderRadius: 1 },
-              }}
-              sx={{ mt: 1 }}
-            />
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="subtitle1" fontWeight={500}>
-              Şifre Değiştir
-            </Typography>
-            <TextField
-              label="Mevcut Şifre"
-              type="password"
-              name="currentPassword"
-              value={form.currentPassword}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              label="Yeni Şifre"
-              type="password"
-              name="newPassword"
-              value={form.newPassword}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-            <Button variant="contained" onClick={handlePasswordChange}>
-              Şifreyi Değiştir
-            </Button>
-          </Box>
-        </Paper>
+        </Modal>
       </Box>
-
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box
-          sx={{
-            p: 3,
-            bgcolor: "background.paper",
-            maxWidth: 400,
-            mx: "auto",
-            mt: "20vh",
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            Yeni Hatırlatıcı Ekle
-          </Typography>
-          <TextField
-            label="Mesaj"
-            fullWidth
-            sx={{ mb: 2 }}
-            value={newReminder.message}
-            onChange={(e) =>
-              setNewReminder({ ...newReminder, message: e.target.value })
-            }
-          />
-          <TextField
-            label="Tarih"
-            type="datetime-local"
-            fullWidth
-            sx={{ mb: 2 }}
-            InputLabelProps={{ shrink: true }}
-            value={newReminder.remindAt}
-            onChange={(e) =>
-              setNewReminder({ ...newReminder, remindAt: e.target.value })
-            }
-          />
-          <Button
-            variant="contained"
-            color="success"
-            fullWidth
-            onClick={handleAddReminder}
-          >
-            Ekle
-          </Button>
-        </Box>
-      </Modal>
 
       <Snackbar
         open={snackbar.open}
