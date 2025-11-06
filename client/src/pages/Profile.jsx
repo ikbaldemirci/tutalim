@@ -13,12 +13,13 @@ import {
   Divider,
   Modal,
   IconButton,
+  EditIcon,
+  CheckIcon,
+  CancelIcon,
+  DeleteOutlineOutlinedIcon,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
 import WelcomeHeader from "../components/WelcomeHeader";
-import EditIcon from "@mui/icons-material/Edit";
-import CheckIcon from "@mui/icons-material/Check";
-import CancelIcon from "@mui/icons-material/Cancel";
 
 axios.interceptors.response.use(
   (res) => res,
@@ -243,6 +244,30 @@ function Profile() {
     }
   };
 
+  const handleDeleteReminder = async (id) => {
+    const ok = window.confirm("Bu hatırlatıcıyı silmek istiyor musun?");
+    if (!ok) return;
+
+    try {
+      await axios.delete(`https://tutalim.com/api/reminders/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setReminders((prev) => prev.filter((r) => r._id !== id));
+      setSnackbar({
+        open: true,
+        message: "Hatırlatıcı silindi",
+        severity: "success",
+      });
+    } catch (err) {
+      console.error("Hatırlatıcı silme hatası:", err);
+      setSnackbar({
+        open: true,
+        message: "Hatırlatıcı silinemedi.",
+        severity: "error",
+      });
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -434,18 +459,31 @@ function Profile() {
                   sx={{
                     p: 1.5,
                     mb: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 2,
                     background: r.isDone ? "#e8f5e9" : "#f8f9fa",
                     borderLeft: r.isDone
                       ? "4px solid #28B463"
                       : "4px solid #2E86C1",
                   }}
                 >
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    {r.message}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {new Date(r.remindAt).toLocaleString("tr-TR")}
-                  </Typography>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      {r.message}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {new Date(r.remindAt).toLocaleString("tr-TR")}
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    aria-label="hatırlatıcıyı sil"
+                    onClick={() => handleDeleteReminder(r._id)}
+                    sx={{ color: "#dc3545" }}
+                  >
+                    <DeleteOutlineOutlinedIcon />
+                  </IconButton>
                 </Paper>
               ))
             ) : (
