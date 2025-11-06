@@ -278,6 +278,8 @@ function Profile() {
             borderRadius: 4,
             boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
             backgroundColor: "#fff",
+            overflow: "visible",
+            pb: 3,
           }}
         >
           <Tabs
@@ -293,7 +295,6 @@ function Profile() {
           </Tabs>
 
           <Box sx={{ p: 3 }}>
-            {/* PROFİL */}
             {tab === 0 && (
               <>
                 <Typography
@@ -387,7 +388,6 @@ function Profile() {
               </>
             )}
 
-            {/* HATIRLATICILARIM */}
             {tab === 1 && (
               <Box>
                 <Box display="flex" justifyContent="space-between" mb={2}>
@@ -408,9 +408,11 @@ function Profile() {
                     maxHeight:
                       reminders.length > 5
                         ? { xs: "60vh", md: "55vh" }
-                        : "auto",
-                    overflowY: reminders.length > 5 ? "auto" : "visible",
+                        : "none",
+                    overflowY: reminders.length > 5 ? "auto" : "unset",
                     pr: 1,
+                    borderRadius: 2,
+                    backgroundColor: "transparent",
                   }}
                 >
                   {reminders.length > 0 ? (
@@ -456,16 +458,17 @@ function Profile() {
               </Box>
             )}
 
-            {/* GEÇMİŞ */}
             {tab === 2 && (
               <Box
                 sx={{
                   maxHeight:
                     mailHistory.length > 5
                       ? { xs: "60vh", md: "55vh" }
-                      : "auto",
-                  overflowY: mailHistory.length > 5 ? "auto" : "visible",
+                      : "none",
+                  overflowY: mailHistory.length > 5 ? "auto" : "unset",
                   pr: 1,
+                  borderRadius: 2,
+                  backgroundColor: "transparent",
                 }}
               >
                 <Typography
@@ -507,7 +510,6 @@ function Profile() {
         </Paper>
       </Box>
 
-      {/* Yeni Hatırlatıcı Modal */}
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Box
           sx={{
