@@ -12,7 +12,6 @@ import {
   Alert,
   Divider,
   Modal,
-  Stack,
   IconButton,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
@@ -21,7 +20,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-// 🧠 Axios Interceptor (Token yenileme)
 axios.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -68,14 +66,13 @@ function Profile() {
     message: "",
     severity: "success",
   });
-  const [isEditing, setIsEditing] = useState({ name: false, surname: false });
 
-  // Hatırlatıcı state
+  const [isEditing, setIsEditing] = useState({ name: false, surname: false });
+  const [mailHistory, setMailHistory] = useState([]);
   const [reminders, setReminders] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [newReminder, setNewReminder] = useState({ message: "", remindAt: "" });
 
-  // Profil update
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -116,7 +113,6 @@ function Profile() {
     setIsEditing((prev) => ({ ...prev, [field]: false }));
   };
 
-  // Şifre değişimi
   const handlePasswordChange = async () => {
     if (!form.currentPassword || !form.newPassword)
       return setSnackbar({
@@ -159,7 +155,6 @@ function Profile() {
     }
   };
 
-  // Mail geçmişi
   const handleFetchNotifications = async () => {
     try {
       const res = await axios.get(
@@ -169,7 +164,7 @@ function Profile() {
         }
       );
       if (res.data.status === "success") {
-        console.log("Mail geçmişi:", res.data.notifications);
+        setMailHistory(res.data.notifications || []);
         setSnackbar({
           open: true,
           message: `Toplam ${res.data.notifications.length} mail bulundu 📬`,
@@ -186,7 +181,6 @@ function Profile() {
     }
   };
 
-  // Hatırlatıcı çek
   const handleFetchReminders = async () => {
     try {
       const res = await axios.get(
@@ -195,25 +189,16 @@ function Profile() {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
-      if (res.data.status === "success") {
-        setReminders(res.data.reminders);
-        setSnackbar({
-          open: true,
-          message: `Toplam ${res.data.reminders.length} hatırlatıcı bulundu ⏰`,
-          severity: "info",
-        });
-      }
+      if (res.data.status === "success") setReminders(res.data.reminders);
     } catch (err) {
       console.error("Hatırlatıcılar alınamadı:", err);
-      setSnackbar({
-        open: true,
-        message: "Hatırlatıcılar alınamadı.",
-        severity: "error",
-      });
     }
   };
 
-  // Hatırlatıcı ekle (zaman farkı düzeltilmiş)
+  useEffect(() => {
+    if (decoded) handleFetchReminders();
+  }, [decoded]);
+
   const handleAddReminder = async () => {
     if (!newReminder.message || !newReminder.remindAt)
       return setSnackbar({
@@ -266,7 +251,6 @@ function Profile() {
           name={`${decoded?.name || ""} ${decoded?.surname || ""}`}
         />
 
-        {/* PROFİL */}
         <Paper
           elevation={3}
           sx={{
@@ -282,7 +266,6 @@ function Profile() {
             Profil Bilgilerim
           </Typography>
 
-          {/* Ad Soyad düzenleme */}
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {["name", "surname"].map((field) => (
               <Box
@@ -322,7 +305,6 @@ function Profile() {
               </Box>
             ))}
 
-            {/* E-Posta */}
             <TextField
               label="E-posta"
               name="mail"
@@ -337,7 +319,6 @@ function Profile() {
 
             <Divider sx={{ my: 2 }} />
 
-            {/* Şifre */}
             <Typography variant="subtitle1" fontWeight={500}>
               Şifre Değiştir
             </Typography>
@@ -364,7 +345,6 @@ function Profile() {
           </Box>
         </Paper>
 
-        {/* GEÇMİŞLER */}
         <Paper
           sx={{
             maxWidth: 800,
@@ -378,58 +358,105 @@ function Profile() {
           <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
             Bildirim Geçmişim
           </Typography>
-          <Button variant="outlined" onClick={handleFetchNotifications}>
+          <Button
+            variant="outlined"
+            onClick={handleFetchNotifications}
+            sx={{ mb: 2 }}
+          >
             Mail Geçmişini Görüntüle
           </Button>
+
+          <Box
+            sx={{
+              maxHeight: 300,
+              overflowY: "auto",
+              borderRadius: 2,
+              border: "1px solid #e0e0e0",
+              p: 1,
+              mb: 3,
+            }}
+          >
+            {mailHistory && mailHistory.length > 0 ? (
+              mailHistory.slice(0, 5).map((mail, i) => (
+                <Paper
+                  key={i}
+                  sx={{
+                    p: 1.5,
+                    mb: 1,
+                    background: "#f8f9fa",
+                    borderLeft: "4px solid #2E86C1",
+                  }}
+                >
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    {mail.subject}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {new Date(mail.createdAt).toLocaleString("tr-TR")}
+                  </Typography>
+                  <Typography variant="body2">{mail.to}</Typography>
+                </Paper>
+              ))
+            ) : (
+              <Typography color="text.secondary" sx={{ p: 1 }}>
+                Henüz mail geçmişi bulunmuyor.
+              </Typography>
+            )}
+          </Box>
 
           <Divider sx={{ my: 3 }} />
 
           <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
             Hatırlatıcılarım
           </Typography>
-          <Stack direction="row" spacing={2} mb={2}>
-            <Button variant="outlined" onClick={handleFetchReminders}>
-              Hatırlatıcıları Getir
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => setOpenModal(true)}
-            >
-              + Yeni Hatırlatıcı
-            </Button>
-          </Stack>
 
-          {reminders.length > 0 ? (
-            reminders.map((r) => (
-              <Paper
-                key={r._id}
-                sx={{
-                  mb: 1,
-                  p: 1.5,
-                  background: r.isDone ? "#e8f5e9" : "#f8f9fa",
-                  borderLeft: r.isDone
-                    ? "4px solid #28B463"
-                    : "4px solid #2E86C1",
-                }}
-              >
-                <Typography variant="subtitle1" fontWeight={600}>
-                  {r.message}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {new Date(r.remindAt).toLocaleString("tr-TR")}
-                </Typography>
-              </Paper>
-            ))
-          ) : (
-            <Typography color="text.secondary">
-              Henüz hatırlatıcı yok.
-            </Typography>
-          )}
+          <Button
+            variant="contained"
+            color="success"
+            sx={{ mb: 2 }}
+            onClick={() => setOpenModal(true)}
+          >
+            + Yeni Hatırlatıcı
+          </Button>
+
+          <Box
+            sx={{
+              maxHeight: 300,
+              overflowY: "auto",
+              borderRadius: 2,
+              border: "1px solid #e0e0e0",
+              p: 1,
+            }}
+          >
+            {reminders && reminders.length > 0 ? (
+              reminders.slice(0, 5).map((r) => (
+                <Paper
+                  key={r._id}
+                  sx={{
+                    p: 1.5,
+                    mb: 1,
+                    background: r.isDone ? "#e8f5e9" : "#f8f9fa",
+                    borderLeft: r.isDone
+                      ? "4px solid #28B463"
+                      : "4px solid #2E86C1",
+                  }}
+                >
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    {r.message}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {new Date(r.remindAt).toLocaleString("tr-TR")}
+                  </Typography>
+                </Paper>
+              ))
+            ) : (
+              <Typography color="text.secondary" sx={{ p: 1 }}>
+                Henüz hatırlatıcı yok.
+              </Typography>
+            )}
+          </Box>
         </Paper>
       </Box>
 
-      {/* Yeni Hatırlatıcı Modal */}
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Box
           sx={{
@@ -475,7 +502,6 @@ function Profile() {
         </Box>
       </Modal>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
