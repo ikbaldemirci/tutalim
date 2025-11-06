@@ -274,100 +274,6 @@ function Profile() {
         />
 
         <Paper
-          elevation={3}
-          sx={{
-            maxWidth: 600,
-            mx: "auto",
-            my: 4,
-            p: 4,
-            borderRadius: 3,
-            boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
-          }}
-        >
-          <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
-            Profil Bilgilerim
-          </Typography>
-
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {["name", "surname"].map((field) => (
-              <Box
-                key={field}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                <TextField
-                  label={field === "name" ? "Ad" : "Soyad"}
-                  name={field}
-                  value={form[field]}
-                  onChange={handleChange}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditing[field] }}
-                />
-                {isEditing[field] ? (
-                  <>
-                    <IconButton color="success" onClick={handleProfileUpdate}>
-                      <CheckIcon />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleCancel(field)}
-                    >
-                      <CancelIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  <IconButton
-                    color="primary"
-                    onClick={() =>
-                      setIsEditing((prev) => ({ ...prev, [field]: true }))
-                    }
-                  >
-                    <EditIcon />
-                  </IconButton>
-                )}
-              </Box>
-            ))}
-
-            <TextField
-              label="E-posta"
-              name="mail"
-              value={form.mail}
-              fullWidth
-              InputProps={{
-                readOnly: true,
-                sx: { backgroundColor: "#f5f6fa", borderRadius: 1 },
-              }}
-              sx={{ mt: 1 }}
-            />
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="subtitle1" fontWeight={500}>
-              Şifre Değiştir
-            </Typography>
-            <TextField
-              label="Mevcut Şifre"
-              type="password"
-              name="currentPassword"
-              value={form.currentPassword}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              label="Yeni Şifre"
-              type="password"
-              name="newPassword"
-              value={form.newPassword}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-            <Button variant="contained" onClick={handlePasswordChange}>
-              Şifreyi Değiştir
-            </Button>
-          </Box>
-        </Paper>
-
-        <Paper
           sx={{
             maxWidth: 800,
             mx: "auto",
@@ -480,6 +386,100 @@ function Profile() {
                 Henüz hatırlatıcı yok.
               </Typography>
             )}
+          </Box>
+        </Paper>
+
+        <Paper
+          elevation={3}
+          sx={{
+            maxWidth: 600,
+            mx: "auto",
+            my: 4,
+            p: 4,
+            borderRadius: 3,
+            boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+          }}
+        >
+          <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
+            Profil Bilgilerim
+          </Typography>
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {["name", "surname"].map((field) => (
+              <Box
+                key={field}
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <TextField
+                  label={field === "name" ? "Ad" : "Soyad"}
+                  name={field}
+                  value={form[field]}
+                  onChange={handleChange}
+                  fullWidth
+                  InputProps={{ readOnly: !isEditing[field] }}
+                />
+                {isEditing[field] ? (
+                  <>
+                    <IconButton color="success" onClick={handleProfileUpdate}>
+                      <CheckIcon />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleCancel(field)}
+                    >
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                ) : (
+                  <IconButton
+                    color="primary"
+                    onClick={() =>
+                      setIsEditing((prev) => ({ ...prev, [field]: true }))
+                    }
+                  >
+                    <EditIcon />
+                  </IconButton>
+                )}
+              </Box>
+            ))}
+
+            <TextField
+              label="E-posta"
+              name="mail"
+              value={form.mail}
+              fullWidth
+              InputProps={{
+                readOnly: true,
+                sx: { backgroundColor: "#f5f6fa", borderRadius: 1 },
+              }}
+              sx={{ mt: 1 }}
+            />
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="subtitle1" fontWeight={500}>
+              Şifre Değiştir
+            </Typography>
+            <TextField
+              label="Mevcut Şifre"
+              type="password"
+              name="currentPassword"
+              value={form.currentPassword}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="Yeni Şifre"
+              type="password"
+              name="newPassword"
+              value={form.newPassword}
+              onChange={handleChange}
+              fullWidth
+              sx={{ mb: 1 }}
+            />
+            <Button variant="contained" onClick={handlePasswordChange}>
+              Şifreyi Değiştir
+            </Button>
           </Box>
         </Paper>
       </Box>
