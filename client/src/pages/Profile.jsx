@@ -12,10 +12,12 @@ import {
   Alert,
   Divider,
   Modal,
+  Tabs,
+  Tab,
+  IconButton,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
 import WelcomeHeader from "../components/WelcomeHeader";
-import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -53,6 +55,8 @@ function Profile() {
   const token = localStorage.getItem("token");
   const [decoded, setDecoded] = useState(token ? jwtDecode(token) : null);
   const navigate = useNavigate();
+
+  const [tab, setTab] = useState(0);
 
   const [form, setForm] = useState({
     name: decoded?.name || "",
@@ -167,7 +171,7 @@ function Profile() {
       if (res.data.status === "success") {
         setMailHistory(res.data.notifications || []);
       }
-    } catch (err) {
+    } catch {
       setSnackbar({
         open: true,
         message: "Mail geçmişi alınamadı.",
@@ -205,9 +209,7 @@ function Profile() {
         severity: "warning",
       });
 
-    const selectedTime = newReminder.remindAt;
-    const fixedDate = `${selectedTime}:00+03:00`;
-
+    const fixedDate = `${newReminder.remindAt}:00+03:00`;
     try {
       const res = await axios.post(
         `https://tutalim.com/api/reminders`,
@@ -232,7 +234,6 @@ function Profile() {
         });
       }
     } catch (err) {
-      console.error("Hatırlatıcı ekleme hatası:", err);
       setSnackbar({
         open: true,
         message: "Hatırlatıcı eklenemedi.",
@@ -255,8 +256,7 @@ function Profile() {
         message: "Hatırlatıcı silindi",
         severity: "success",
       });
-    } catch (err) {
-      console.error("Hatırlatıcı silme hatası:", err);
+    } catch {
       setSnackbar({
         open: true,
         message: "Hatırlatıcı silinemedi.",
@@ -275,211 +275,221 @@ function Profile() {
 
         <Paper
           sx={{
-            maxWidth: 800,
+            maxWidth: 900,
             mx: "auto",
-            p: 3,
-            borderRadius: 3,
-            mt: 3,
-            boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
-          }}
-        >
-          <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
-            Bildirim Geçmişim
-          </Typography>
-          <Box
-            sx={{
-              maxHeight: 300,
-              overflowY: "auto",
-              borderRadius: 2,
-              border: "1px solid #e0e0e0",
-              p: 1,
-              mb: 3,
-            }}
-          >
-            {mailHistory && mailHistory.length > 0 ? (
-              mailHistory.slice(0, 5).map((mail, i) => (
-                <Paper
-                  key={i}
-                  sx={{
-                    p: 1.5,
-                    mb: 1,
-                    background: "#f8f9fa",
-                    borderLeft: "4px solid #2E86C1",
-                  }}
-                >
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    {mail.subject}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {new Date(mail.createdAt).toLocaleString("tr-TR")}
-                  </Typography>
-                  <Typography variant="body2">{mail.to}</Typography>
-                </Paper>
-              ))
-            ) : (
-              <Typography color="text.secondary" sx={{ p: 1 }}>
-                Henüz mail geçmişi bulunmuyor.
-              </Typography>
-            )}
-          </Box>
-
-          <Divider sx={{ my: 3 }} />
-
-          <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
-            Hatırlatıcılarım
-          </Typography>
-
-          <Button
-            variant="contained"
-            color="success"
-            sx={{ mb: 2 }}
-            onClick={() => setOpenModal(true)}
-          >
-            + Yeni Hatırlatıcı
-          </Button>
-
-          <Box
-            sx={{
-              maxHeight: 300,
-              overflowY: "auto",
-              borderRadius: 2,
-              border: "1px solid #e0e0e0",
-              p: 1,
-            }}
-          >
-            {reminders && reminders.length > 0 ? (
-              reminders.slice(0, 5).map((r) => (
-                <Paper
-                  key={r._id}
-                  sx={{
-                    p: 1.5,
-                    mb: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 2,
-                    background: r.isDone ? "#e8f5e9" : "#f8f9fa",
-                    borderLeft: r.isDone
-                      ? "4px solid #28B463"
-                      : "4px solid #2E86C1",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight={600}>
-                      {r.message}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {new Date(r.remindAt).toLocaleString("tr-TR")}
-                    </Typography>
-                  </Box>
-                  <IconButton
-                    aria-label="hatırlatıcıyı sil"
-                    onClick={() => handleDeleteReminder(r._id)}
-                    sx={{ color: "#dc3545" }}
-                  >
-                    <DeleteOutlineOutlinedIcon />
-                  </IconButton>
-                </Paper>
-              ))
-            ) : (
-              <Typography color="text.secondary" sx={{ p: 1 }}>
-                Henüz hatırlatıcı yok.
-              </Typography>
-            )}
-          </Box>
-        </Paper>
-
-        <Paper
-          elevation={3}
-          sx={{
-            maxWidth: 600,
-            mx: "auto",
-            my: 4,
-            p: 4,
+            mt: 4,
             borderRadius: 3,
             boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
           }}
         >
-          <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
-            Profil Bilgilerim
-          </Typography>
+          <Tabs
+            value={tab}
+            onChange={(e, v) => setTab(v)}
+            variant="fullWidth"
+            textColor="primary"
+            indicatorColor="primary"
+          >
+            <Tab label="Profil" />
+            <Tab label="Hatırlatıcılarım" />
+            <Tab label="Geçmiş" />
+          </Tabs>
 
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {["name", "surname"].map((field) => (
-              <Box
-                key={field}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                <TextField
-                  label={field === "name" ? "Ad" : "Soyad"}
-                  name={field}
-                  value={form[field]}
-                  onChange={handleChange}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditing[field] }}
-                />
-                {isEditing[field] ? (
-                  <>
-                    <IconButton color="success" onClick={handleProfileUpdate}>
-                      <CheckIcon />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleCancel(field)}
+          <Box
+            sx={{
+              p: 3,
+              minHeight: { xs: "60vh", md: "55vh" },
+              maxHeight: { xs: "60vh", md: "55vh" },
+              overflowY: "auto",
+            }}
+          >
+            {tab === 0 && (
+              <>
+                <Typography
+                  variant="h6"
+                  fontWeight={600}
+                  color="primary"
+                  mb={2}
+                >
+                  Profil Bilgilerim
+                </Typography>
+
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {["name", "surname"].map((field) => (
+                    <Box
+                      key={field}
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
                     >
-                      <CancelIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  <IconButton
-                    color="primary"
-                    onClick={() =>
-                      setIsEditing((prev) => ({ ...prev, [field]: true }))
-                    }
+                      <TextField
+                        label={field === "name" ? "Ad" : "Soyad"}
+                        name={field}
+                        value={form[field]}
+                        onChange={handleChange}
+                        fullWidth
+                        InputProps={{ readOnly: !isEditing[field] }}
+                      />
+                      {isEditing[field] ? (
+                        <>
+                          <IconButton
+                            color="success"
+                            onClick={handleProfileUpdate}
+                          >
+                            <CheckIcon />
+                          </IconButton>
+                          <IconButton
+                            color="error"
+                            onClick={() => handleCancel(field)}
+                          >
+                            <CancelIcon />
+                          </IconButton>
+                        </>
+                      ) : (
+                        <IconButton
+                          color="primary"
+                          onClick={() =>
+                            setIsEditing((prev) => ({ ...prev, [field]: true }))
+                          }
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                  ))}
+
+                  <TextField
+                    label="E-posta"
+                    name="mail"
+                    value={form.mail}
+                    fullWidth
+                    InputProps={{
+                      readOnly: true,
+                      sx: { backgroundColor: "#f5f6fa", borderRadius: 1 },
+                    }}
+                    sx={{ mt: 1 }}
+                  />
+
+                  <Divider sx={{ my: 2 }} />
+
+                  <Typography variant="subtitle1" fontWeight={500}>
+                    Şifre Değiştir
+                  </Typography>
+                  <TextField
+                    label="Mevcut Şifre"
+                    type="password"
+                    name="currentPassword"
+                    value={form.currentPassword}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Yeni Şifre"
+                    type="password"
+                    name="newPassword"
+                    value={form.newPassword}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{ mb: 1 }}
+                  />
+                  <Button variant="contained" onClick={handlePasswordChange}>
+                    Şifreyi Değiştir
+                  </Button>
+                </Box>
+              </>
+            )}
+
+            {tab === 1 && (
+              <>
+                <Box display="flex" justifyContent="space-between" mb={2}>
+                  <Typography variant="h6" fontWeight={600} color="primary">
+                    Hatırlatıcılarım
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => setOpenModal(true)}
                   >
-                    <EditIcon />
-                  </IconButton>
+                    + Yeni Hatırlatıcı
+                  </Button>
+                </Box>
+
+                {reminders.length > 0 ? (
+                  reminders.slice(0, 5).map((r) => (
+                    <Paper
+                      key={r._id}
+                      sx={{
+                        p: 1.5,
+                        mb: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 2,
+                        background: r.isDone ? "#e8f5e9" : "#f8f9fa",
+                        borderLeft: r.isDone
+                          ? "4px solid #28B463"
+                          : "4px solid #2E86C1",
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          {r.message}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {new Date(r.remindAt).toLocaleString("tr-TR")}
+                        </Typography>
+                      </Box>
+                      <IconButton
+                        aria-label="hatırlatıcıyı sil"
+                        onClick={() => handleDeleteReminder(r._id)}
+                        sx={{ color: "#dc3545" }}
+                      >
+                        <DeleteOutlineOutlinedIcon />
+                      </IconButton>
+                    </Paper>
+                  ))
+                ) : (
+                  <Typography color="text.secondary">
+                    Henüz hatırlatıcı yok.
+                  </Typography>
                 )}
-              </Box>
-            ))}
+              </>
+            )}
 
-            <TextField
-              label="E-posta"
-              name="mail"
-              value={form.mail}
-              fullWidth
-              InputProps={{
-                readOnly: true,
-                sx: { backgroundColor: "#f5f6fa", borderRadius: 1 },
-              }}
-              sx={{ mt: 1 }}
-            />
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="subtitle1" fontWeight={500}>
-              Şifre Değiştir
-            </Typography>
-            <TextField
-              label="Mevcut Şifre"
-              type="password"
-              name="currentPassword"
-              value={form.currentPassword}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              label="Yeni Şifre"
-              type="password"
-              name="newPassword"
-              value={form.newPassword}
-              onChange={handleChange}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-            <Button variant="contained" onClick={handlePasswordChange}>
-              Şifreyi Değiştir
-            </Button>
+            {tab === 2 && (
+              <>
+                <Typography
+                  variant="h6"
+                  fontWeight={600}
+                  color="primary"
+                  mb={2}
+                >
+                  Bildirim Geçmişim
+                </Typography>
+                {mailHistory.length > 0 ? (
+                  mailHistory.slice(0, 5).map((mail, i) => (
+                    <Paper
+                      key={i}
+                      sx={{
+                        p: 1.5,
+                        mb: 1,
+                        background: "#f8f9fa",
+                        borderLeft: "4px solid #2E86C1",
+                      }}
+                    >
+                      <Typography variant="subtitle1" fontWeight={600}>
+                        {mail.subject}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {new Date(mail.createdAt).toLocaleString("tr-TR")}
+                      </Typography>
+                      <Typography variant="body2">{mail.to}</Typography>
+                    </Paper>
+                  ))
+                ) : (
+                  <Typography color="text.secondary">
+                    Henüz mail geçmişi bulunmuyor.
+                  </Typography>
+                )}
+              </>
+            )}
           </Box>
         </Paper>
       </Box>
