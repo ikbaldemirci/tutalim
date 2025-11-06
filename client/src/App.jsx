@@ -57,7 +57,7 @@ function App() {
         </Fade>
       ) : (
         <Fade in timeout={700}>
-          <div>
+          <main>
             <ThemeProvider theme={theme}>
               <CssBaseline />
               <BrowserRouter>
@@ -108,7 +108,7 @@ function App() {
                 </Suspense>
               </BrowserRouter>
             </ThemeProvider>
-          </div>
+          </main>
         </Fade>
       )}
     </>
