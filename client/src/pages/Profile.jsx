@@ -12,14 +12,14 @@ import {
   Alert,
   Divider,
   Modal,
-  IconButton,
-  EditIcon,
-  CheckIcon,
-  CancelIcon,
-  DeleteOutlineOutlinedIcon,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
 import WelcomeHeader from "../components/WelcomeHeader";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import CheckIcon from "@mui/icons-material/Check";
+import CancelIcon from "@mui/icons-material/Cancel";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 axios.interceptors.response.use(
   (res) => res,
