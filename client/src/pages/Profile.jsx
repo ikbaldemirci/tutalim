@@ -104,7 +104,6 @@ function Profile() {
         });
       }
     } catch (err) {
-      console.error("Profil güncelleme hatası:", err);
       setSnackbar({
         open: true,
         message: "Profil güncellenemedi.",
@@ -150,8 +149,7 @@ function Profile() {
           navigate("/");
         }, 2500);
       }
-    } catch (err) {
-      console.error("Şifre değişim hatası:", err);
+    } catch {
       setSnackbar({
         open: true,
         message: "Şifre değiştirilemedi.",
@@ -233,7 +231,7 @@ function Profile() {
           severity: "success",
         });
       }
-    } catch (err) {
+    } catch {
       setSnackbar({
         open: true,
         message: "Hatırlatıcı eklenemedi.",
@@ -268,7 +266,7 @@ function Profile() {
   return (
     <>
       <Navbar />
-      <Box sx={{ pb: 4 }}>
+      <Box sx={{ pb: 6 }}>
         <WelcomeHeader
           name={`${decoded?.name || ""} ${decoded?.surname || ""}`}
         />
@@ -278,8 +276,10 @@ function Profile() {
             maxWidth: 900,
             mx: "auto",
             mt: 4,
-            borderRadius: 3,
+            borderRadius: 4,
             boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+            overflow: "hidden",
+            backgroundColor: "#fff",
           }}
         >
           <Tabs
@@ -294,14 +294,7 @@ function Profile() {
             <Tab label="Geçmiş" />
           </Tabs>
 
-          <Box
-            sx={{
-              p: 3,
-              minHeight: { xs: "60vh", md: "55vh" },
-              maxHeight: { xs: "60vh", md: "55vh" },
-              overflowY: "auto",
-            }}
-          >
+          <Box sx={{ p: 3 }}>
             {tab === 0 && (
               <>
                 <Typography
@@ -312,7 +305,6 @@ function Profile() {
                 >
                   Profil Bilgilerim
                 </Typography>
-
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   {["name", "surname"].map((field) => (
                     <Box
@@ -397,7 +389,13 @@ function Profile() {
             )}
 
             {tab === 1 && (
-              <>
+              <Box
+                sx={{
+                  maxHeight: { xs: "60vh", md: "55vh" },
+                  overflowY: "auto",
+                  pr: 1,
+                }}
+              >
                 <Box display="flex" justifyContent="space-between" mb={2}>
                   <Typography variant="h6" fontWeight={600} color="primary">
                     Hatırlatıcılarım
@@ -450,11 +448,17 @@ function Profile() {
                     Henüz hatırlatıcı yok.
                   </Typography>
                 )}
-              </>
+              </Box>
             )}
 
             {tab === 2 && (
-              <>
+              <Box
+                sx={{
+                  maxHeight: { xs: "60vh", md: "55vh" },
+                  overflowY: "auto",
+                  pr: 1,
+                }}
+              >
                 <Typography
                   variant="h6"
                   fontWeight={600}
@@ -488,12 +492,13 @@ function Profile() {
                     Henüz mail geçmişi bulunmuyor.
                   </Typography>
                 )}
-              </>
+              </Box>
             )}
           </Box>
         </Paper>
       </Box>
 
+      {/* Yeni Hatırlatıcı Modal */}
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Box
           sx={{
