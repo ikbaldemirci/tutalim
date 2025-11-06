@@ -282,8 +282,8 @@ function Profile() {
             borderRadius: 4,
             boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
             backgroundColor: "#fff",
-            overflow: "hidden",
-            minHeight: { xs: "70vh", md: "65vh" },
+            height: "auto",
+            overflow: "visible",
             display: "flex",
             flexDirection: "column",
           }}
@@ -358,7 +358,10 @@ function Profile() {
                         <IconButton
                           color="primary"
                           onClick={() =>
-                            setIsEditing((prev) => ({ ...prev, [field]: true }))
+                            setIsEditing((prev) => ({
+                              ...prev,
+                              [field]: true,
+                            }))
                           }
                         >
                           <EditIcon />
@@ -425,7 +428,7 @@ function Profile() {
 
                 <Box
                   sx={{
-                    flex: 1,
+                    maxHeight: reminders.length > 5 ? "55vh" : "none",
                     overflowY: reminders.length > 5 ? "auto" : "visible",
                     pr: 1,
                     transition: "all 0.3s ease",
@@ -477,7 +480,7 @@ function Profile() {
             {tab === 2 && (
               <Box
                 sx={{
-                  flex: 1,
+                  maxHeight: mailHistory.length > 5 ? "55vh" : "none",
                   overflowY: mailHistory.length > 5 ? "auto" : "visible",
                   pr: 1,
                   transition: "all 0.3s ease",
@@ -520,6 +523,8 @@ function Profile() {
             )}
           </Box>
         </Paper>
+
+        <Box sx={{ height: 80 }} />
       </Box>
 
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
