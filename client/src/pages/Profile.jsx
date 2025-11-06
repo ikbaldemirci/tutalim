@@ -57,7 +57,6 @@ function Profile() {
   const navigate = useNavigate();
 
   const [tab, setTab] = useState(0);
-
   const [form, setForm] = useState({
     name: decoded?.name || "",
     surname: decoded?.surname || "",
@@ -278,7 +277,6 @@ function Profile() {
             mt: 4,
             borderRadius: 4,
             boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
-            overflow: "hidden",
             backgroundColor: "#fff",
           }}
         >
@@ -295,6 +293,7 @@ function Profile() {
           </Tabs>
 
           <Box sx={{ p: 3 }}>
+            {/* PROFİL */}
             {tab === 0 && (
               <>
                 <Typography
@@ -388,14 +387,9 @@ function Profile() {
               </>
             )}
 
+            {/* HATIRLATICILARIM */}
             {tab === 1 && (
-              <Box
-                sx={{
-                  maxHeight: { xs: "60vh", md: "55vh" },
-                  overflowY: "auto",
-                  pr: 1,
-                }}
-              >
+              <Box>
                 <Box display="flex" justifyContent="space-between" mb={2}>
                   <Typography variant="h6" fontWeight={600} color="primary">
                     Hatırlatıcılarım
@@ -409,53 +403,68 @@ function Profile() {
                   </Button>
                 </Box>
 
-                {reminders.length > 0 ? (
-                  reminders.slice(0, 5).map((r) => (
-                    <Paper
-                      key={r._id}
-                      sx={{
-                        p: 1.5,
-                        mb: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: 2,
-                        background: r.isDone ? "#e8f5e9" : "#f8f9fa",
-                        borderLeft: r.isDone
-                          ? "4px solid #28B463"
-                          : "4px solid #2E86C1",
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="subtitle1" fontWeight={600}>
-                          {r.message}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {new Date(r.remindAt).toLocaleString("tr-TR")}
-                        </Typography>
-                      </Box>
-                      <IconButton
-                        aria-label="hatırlatıcıyı sil"
-                        onClick={() => handleDeleteReminder(r._id)}
-                        sx={{ color: "#dc3545" }}
+                <Box
+                  sx={{
+                    maxHeight:
+                      reminders.length > 5
+                        ? { xs: "60vh", md: "55vh" }
+                        : "auto",
+                    overflowY: reminders.length > 5 ? "auto" : "visible",
+                    pr: 1,
+                  }}
+                >
+                  {reminders.length > 0 ? (
+                    reminders.map((r) => (
+                      <Paper
+                        key={r._id}
+                        sx={{
+                          p: 1.5,
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 2,
+                          background: r.isDone ? "#e8f5e9" : "#f8f9fa",
+                          borderLeft: r.isDone
+                            ? "4px solid #28B463"
+                            : "4px solid #2E86C1",
+                        }}
                       >
-                        <DeleteOutlineOutlinedIcon />
-                      </IconButton>
-                    </Paper>
-                  ))
-                ) : (
-                  <Typography color="text.secondary">
-                    Henüz hatırlatıcı yok.
-                  </Typography>
-                )}
+                        <Box>
+                          <Typography variant="subtitle1" fontWeight={600}>
+                            {r.message}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {new Date(r.remindAt).toLocaleString("tr-TR")}
+                          </Typography>
+                        </Box>
+                        <IconButton
+                          aria-label="hatırlatıcıyı sil"
+                          onClick={() => handleDeleteReminder(r._id)}
+                          sx={{ color: "#dc3545" }}
+                        >
+                          <DeleteOutlineOutlinedIcon />
+                        </IconButton>
+                      </Paper>
+                    ))
+                  ) : (
+                    <Typography color="text.secondary">
+                      Henüz hatırlatıcı yok.
+                    </Typography>
+                  )}
+                </Box>
               </Box>
             )}
 
+            {/* GEÇMİŞ */}
             {tab === 2 && (
               <Box
                 sx={{
-                  maxHeight: { xs: "60vh", md: "55vh" },
-                  overflowY: "auto",
+                  maxHeight:
+                    mailHistory.length > 5
+                      ? { xs: "60vh", md: "55vh" }
+                      : "auto",
+                  overflowY: mailHistory.length > 5 ? "auto" : "visible",
                   pr: 1,
                 }}
               >
@@ -468,7 +477,7 @@ function Profile() {
                   Bildirim Geçmişim
                 </Typography>
                 {mailHistory.length > 0 ? (
-                  mailHistory.slice(0, 5).map((mail, i) => (
+                  mailHistory.map((mail, i) => (
                     <Paper
                       key={i}
                       sx={{
