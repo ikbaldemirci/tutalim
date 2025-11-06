@@ -222,18 +222,16 @@ function Profile() {
         severity: "warning",
       });
 
-    const localDate = new Date(newReminder.remindAt);
-    const fixedDate = new Date(
-      localDate.getTime() - localDate.getTimezoneOffset() * 60000
-    );
+    const selectedTime = newReminder.remindAt;
+    const fixedDate = `${selectedTime}:00+03:00`;
 
     try {
       const res = await axios.post(
         `https://tutalim.com/api/reminders`,
         {
-          propertyId: "67365dbcf0b06e42eb6ff123", // test
+          propertyId: "67365dbcf0b06e42eb6ff123",
           message: newReminder.message,
-          remindAt: fixedDate.toISOString(),
+          remindAt: fixedDate,
         },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
