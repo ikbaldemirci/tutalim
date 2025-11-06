@@ -11,6 +11,8 @@ import {
   Snackbar,
   Alert,
   Divider,
+  Modal,
+  Stack,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
 import WelcomeHeader from "../components/WelcomeHeader";
@@ -42,6 +44,10 @@ function Profile() {
     name: false,
     surname: false,
   });
+
+  const [reminders, setReminders] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [newReminder, setNewReminder] = useState({ message: "", remindAt: "" });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -151,6 +157,78 @@ function Profile() {
     }
   };
 
+  const handleFetchReminders = async () => {
+    try {
+      const res = await axios.get(
+        `https://tutalim.com/api/reminders/${decoded.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (res.data.status === "success") {
+        setReminders(res.data.reminders);
+        setSnackbar({
+          open: true,
+          message: `Toplam ${res.data.reminders.length} hatırlatıcı bulundu`,
+          severity: "info",
+        });
+      }
+    } catch (err) {
+      console.error("Hatırlatıcılar alınamadı:", err);
+      setSnackbar({
+        open: true,
+        message: "Hatırlatıcılar alınamadı.",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleAddReminder = async () => {
+    if (!newReminder.message || !newReminder.remindAt) {
+      setSnackbar({
+        open: true,
+        message: "Mesaj ve tarih alanı zorunludur.",
+        severity: "warning",
+      });
+      return;
+    }
+    try {
+      const res = await axios.post(
+        `https://tutalim.com/api/reminders`,
+        {
+          propertyId: "67365dbcf0b06e42eb6ff123",
+          message: newReminder.message,
+          remindAt: newReminder.remindAt,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (res.data.status === "success") {
+        setReminders((prev) => [res.data.reminder, ...prev]);
+        setOpenModal(false);
+        setNewReminder({ message: "", remindAt: "" });
+        setSnackbar({
+          open: true,
+          message: "Hatırlatıcı eklendi",
+          severity: "success",
+        });
+      }
+    } catch (err) {
+      console.error("Hatırlatıcı ekleme hatası:", err);
+      setSnackbar({
+        open: true,
+        message: "Hatırlatıcı eklenemedi.",
+        severity: "error",
+      });
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -250,10 +328,7 @@ function Profile() {
                 fullWidth
                 InputProps={{
                   readOnly: true,
-                  sx: {
-                    backgroundColor: "#f5f6fa",
-                    borderRadius: 1,
-                  },
+                  sx: { backgroundColor: "#f5f6fa", borderRadius: 1 },
                 }}
               />
               <IconButton color="primary" disabled>
@@ -303,7 +378,6 @@ function Profile() {
       </Box>
 
       <Divider sx={{ my: 3 }} />
-
       <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
         Bildirim Geçmişim
       </Typography>
@@ -340,6 +414,101 @@ function Profile() {
       >
         Mail Geçmişini Görüntüle
       </Button>
+
+      <Divider sx={{ my: 4 }} />
+      <Typography variant="h6" fontWeight={600} color="primary" mb={2}>
+        Hatırlatıcılarım
+      </Typography>
+
+      <Stack direction="row" spacing={2} mb={2}>
+        <Button variant="outlined" onClick={handleFetchReminders}>
+          Hatırlatıcıları Getir
+        </Button>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => setOpenModal(true)}
+        >
+          + Yeni Hatırlatıcı
+        </Button>
+      </Stack>
+
+      {reminders.length > 0 ? (
+        reminders.map((r) => (
+          <Paper
+            key={r._id}
+            sx={{
+              mb: 1,
+              p: 1.5,
+              maxWidth: 600,
+              mx: "auto",
+              background: r.isDone ? "#e8f5e9" : "#fafafa",
+              borderLeft: r.isDone ? "4px solid #28B463" : "4px solid #2E86C1",
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={600}>
+              {r.message}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {new Date(r.remindAt).toLocaleString("tr-TR")}
+            </Typography>
+            {r.isDone && (
+              <Typography variant="caption" color="green">
+                Tamamlandı
+              </Typography>
+            )}
+          </Paper>
+        ))
+      ) : (
+        <Typography color="text.secondary" sx={{ ml: 1 }}>
+          Henüz hatırlatıcı oluşturmadınız.
+        </Typography>
+      )}
+
+      <Modal open={openModal} onClose={() => setOpenModal(false)}>
+        <Box
+          sx={{
+            p: 3,
+            bgcolor: "background.paper",
+            maxWidth: 400,
+            mx: "auto",
+            mt: "20vh",
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" mb={2}>
+            Yeni Hatırlatıcı Ekle
+          </Typography>
+          <TextField
+            label="Mesaj"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={newReminder.message}
+            onChange={(e) =>
+              setNewReminder({ ...newReminder, message: e.target.value })
+            }
+          />
+          <TextField
+            label="Tarih"
+            type="datetime-local"
+            fullWidth
+            sx={{ mb: 2 }}
+            InputLabelProps={{ shrink: true }}
+            value={newReminder.remindAt}
+            onChange={(e) =>
+              setNewReminder({ ...newReminder, remindAt: e.target.value })
+            }
+          />
+          <Button
+            variant="contained"
+            color="success"
+            fullWidth
+            onClick={handleAddReminder}
+          >
+            Ekle
+          </Button>
+        </Box>
+      </Modal>
 
       <Snackbar
         open={snackbar.open}
