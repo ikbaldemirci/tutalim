@@ -93,7 +93,7 @@ function Home() {
         <Fade in timeout={800}>
           <Box
             sx={{
-              flex: 1,
+              flex: { xs: "unset", md: 1 },
               maxWidth: 640,
               textAlign: { xs: "center", md: "left" },
               px: { xs: 2, md: 5 },
