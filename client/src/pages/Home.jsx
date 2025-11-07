@@ -36,7 +36,6 @@ function Home() {
     }, 200);
   };
 
-  // 🎬 Video kontrolü
   useEffect(() => {
     const video = document.getElementById("background-video");
     if (video) {

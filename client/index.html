@@ -12,7 +12,6 @@
 
     <link rel="icon" type="image/png" href="/images/tutalimson.png" />
 
-    <!-- ✅ Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -33,7 +32,6 @@
       />
     </noscript>
 
-    <!-- ✅ Main CSS preload + async -->
     <link rel="preload" as="style" href="/assets/index-BCVhZ_Z9.css" />
     <link
       rel="stylesheet"
@@ -45,7 +43,6 @@
       <link rel="stylesheet" href="/assets/index-BCVhZ_Z9.css" />
     </noscript>
 
-    <!-- ✅ Boxicons async -->
     <link
       rel="preload"
       as="style"
@@ -94,7 +91,6 @@
         flex-direction: column;
       }
 
-      /* 🎬 Global video stili */
       #background-video {
         position: fixed;
         top: 0;
@@ -103,14 +99,13 @@
         height: 100%;
         object-fit: cover;
         z-index: 0;
-        background-color: #000;
+        background-color: transparent;
         pointer-events: none;
-        display: none; /* Başta gizli */
+        display: none;
       }
     </style>
   </head>
   <body>
-    <!-- 🎬 Global video (sadece Home'da aktif olacak) -->
     <video
       id="background-video"
       autoplay
