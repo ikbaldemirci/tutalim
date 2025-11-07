@@ -51,7 +51,7 @@ function Home() {
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         poster="/images/video-placeholder.jpg"
         style={{
           position: "fixed",
@@ -60,9 +60,11 @@ function Home() {
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          zIndex: -2,
-          pointerEvents: "none",
+          zIndex: -1,
           backgroundColor: "#000",
+        }}
+        onCanPlay={(e) => {
+          e.target.play().catch(() => {});
         }}
       >
         <source src="/videos/video_1.mp4" type="video/mp4" />
@@ -76,8 +78,8 @@ function Home() {
           left: 0,
           width: "100%",
           height: "100%",
-          zIndex: -1,
-          background: "transparent",
+          zIndex: 0,
+          background: "rgba(0,0,0,0.4)",
           pointerEvents: "none",
         }}
       />
@@ -98,7 +100,6 @@ function Home() {
           zIndex: 1,
         }}
       >
-        {/* Sol taraf */}
         <Fade in timeout={800}>
           <Box
             sx={{
@@ -109,7 +110,6 @@ function Home() {
               color: "#fff",
             }}
           >
-            {/* Ana başlık */}
             <Typography
               variant="h3"
               fontWeight="bold"
@@ -124,7 +124,6 @@ function Home() {
               Tutalım.com
             </Typography>
 
-            {/* Slogan kutusu */}
             <Box
               sx={{
                 display: "inline-block",
