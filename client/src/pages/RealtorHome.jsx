@@ -150,9 +150,9 @@ function RealtorHome() {
   return (
     <>
       <Navbar />
-      <WelcomeHeader name={decoded?.name} />
+      {/* <WelcomeHeader name={decoded?.name} /> */}
+      <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
 
-      {/* Pending invitations */}
       <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
         {!loadingInvites && invites.length > 0 && (
           <Box
