@@ -79,8 +79,8 @@ function OwnerHome() {
       {/* <WelcomeHeader name={decoded?.name || "Kullanıcı"} /> */}
       <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
 
-      <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
-        {!loadingInvites && invites.length > 0 && (
+      {!loadingInvites && invites.length > 0 && (
+        <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
           <Box
             sx={{
               p: 2,
@@ -139,8 +139,8 @@ function OwnerHome() {
               </Box>
             ))}
           </Box>
-        )}
-      </Box>
+        </Box>
+      )}
 
       {loading ? (
         <Box

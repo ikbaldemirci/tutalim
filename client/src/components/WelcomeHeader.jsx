@@ -62,7 +62,7 @@ function WelcomeHeader({ name, totalCount = 0 }) {
             alignItems: "center",
             gap: { xs: 1.5, sm: 2.5 },
             flexWrap: "wrap",
-            justifyContent: { xs: "flex-start", sm: "flex-end" },
+            justifyContent: { xs: "center", sm: "flex-end" },
             width: { xs: "100%", sm: "auto" },
           }}
         >
