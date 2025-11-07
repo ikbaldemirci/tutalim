@@ -2,7 +2,7 @@ import { Paper, Typography, Box, Fade } from "@mui/material";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 
-function WelcomeHeader({ name, totalCount = 0 }) {
+function WelcomeHeader({ name, totalCount = 0, show = true }) {
   const today = new Date().toLocaleDateString("tr-TR", {
     weekday: "long",
     day: "numeric",
@@ -89,30 +89,32 @@ function WelcomeHeader({ name, totalCount = 0 }) {
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              backgroundColor: "#2E86C1",
-              color: "#fff",
-              px: 2,
-              py: 0.7,
-              borderRadius: 2,
-              fontWeight: 600,
-              boxShadow: "0 2px 6px rgba(46,134,193,0.3)",
-              transition: "filter 0.2s ease",
-              "&:hover": { filter: "brightness(1.1)" },
-            }}
-          >
-            <HomeWorkOutlinedIcon sx={{ fontSize: 20 }} />
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 600, fontSize: { xs: "0.9rem", sm: "1rem" } }}
+          {show && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                backgroundColor: "#2E86C1",
+                color: "#fff",
+                px: 2,
+                py: 0.7,
+                borderRadius: 2,
+                fontWeight: 600,
+                boxShadow: "0 2px 6px rgba(46,134,193,0.3)",
+                transition: "filter 0.2s ease",
+                "&:hover": { filter: "brightness(1.1)" },
+              }}
             >
-              {totalCount} İlan
-            </Typography>
-          </Box>
+              <HomeWorkOutlinedIcon sx={{ fontSize: 20 }} />
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 600, fontSize: { xs: "0.9rem", sm: "1rem" } }}
+              >
+                {totalCount} İlan
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Paper>
     </Fade>

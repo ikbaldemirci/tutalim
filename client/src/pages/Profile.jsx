@@ -270,6 +270,7 @@ function Profile() {
       <Navbar />
       <WelcomeHeader
         name={`${decoded?.name || ""} ${decoded?.surname || ""}`}
+        show={false}
       />
       <Box>
         <Paper
