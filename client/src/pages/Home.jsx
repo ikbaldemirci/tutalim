@@ -36,6 +36,22 @@ function Home() {
     }, 200);
   };
 
+  // 🎬 Video kontrolü
+  useEffect(() => {
+    const video = document.getElementById("background-video");
+    if (video) {
+      video.style.display = "block";
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    }
+    return () => {
+      if (video) {
+        video.pause();
+        video.style.display = "none";
+      }
+    };
+  }, []);
+
   return (
     <Box
       sx={{
@@ -46,31 +62,6 @@ function Home() {
         overflowY: "auto",
       }}
     >
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        poster="/images/video-placeholder.jpg"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          zIndex: -1,
-          backgroundColor: "#000",
-        }}
-        onCanPlay={(e) => {
-          e.target.play().catch(() => {});
-        }}
-      >
-        <source src="/videos/video_1.mp4" type="video/mp4" />
-        Tarayıcınız video etiketini desteklemiyor.
-      </video>
-
       <Box
         sx={{
           position: "absolute",
@@ -180,8 +171,6 @@ function Home() {
                   backdropFilter: "blur(15px)",
                   borderLeft: "5px solid #2E86C1",
                   boxShadow: "0 0 20px rgba(46,134,193,0.4)",
-                  maxHeight: "none",
-                  overflowY: "visible",
                 }}
               >
                 {isLogin ? (

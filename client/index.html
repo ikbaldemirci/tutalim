@@ -93,9 +93,36 @@
         display: flex;
         flex-direction: column;
       }
+
+      /* 🎬 Global video stili */
+      #background-video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        background-color: #000;
+        pointer-events: none;
+        display: none; /* Başta gizli */
+      }
     </style>
   </head>
   <body>
+    <!-- 🎬 Global video (sadece Home'da aktif olacak) -->
+    <video
+      id="background-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+      poster="/images/video-placeholder.jpg"
+    >
+      <source src="/videos/video_1.mp4" type="video/mp4" />
+    </video>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
