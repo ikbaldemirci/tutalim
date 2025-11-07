@@ -51,7 +51,7 @@ function Home() {
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         poster="/images/video-placeholder.jpg"
         style={{
           position: "fixed",
@@ -62,6 +62,7 @@ function Home() {
           objectFit: "cover",
           zIndex: -2,
           pointerEvents: "none",
+          backgroundColor: "#000",
         }}
       >
         <source src="/videos/video_1.mp4" type="video/mp4" />
