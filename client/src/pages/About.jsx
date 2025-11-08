@@ -105,7 +105,7 @@ function About() {
         }}
       >
         <LazyMotion features={domAnimation}>
-          <Container sx={{ textAlign: "center", py: 8 }}>
+          <Container sx={{ textAlign: "center", py: { xs: 4, sm: 6, md: 8 } }}>
             <m.div
               initial={{ opacity: 0, y: -40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -132,6 +132,7 @@ function About() {
                   lineHeight: 1.6,
                 }}
               >
+                <strong>"Dizginleri elinde tutmak"</strong> <br />
                 Tutalım.com, ev sahipleri ile profesyonel emlakçıları modern,
                 güvenli ve şeffaf bir platformda buluşturan dijital bir
                 sistemdir. Aşağıda, bu sürecin adımlarını adım adım
