@@ -159,8 +159,6 @@ app.post("/api/signup", async (req, res) => {
       to: mail,
       subject: "Tutalım | Hesabını Doğrula",
       html: verifyMailHtml({ name, link: verifyLink }),
-      userId: targetUser._id,
-      propertyId: property._id,
     });
 
     res.json({
