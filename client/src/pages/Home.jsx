@@ -131,7 +131,7 @@ function Home() {
                 Ev sahipleri ve emlakçılar için akıllı bağlantılar.
               </Typography>
               <Typography fontWeight="bold">
-                Tutalım.com ile gayrimenkul dünyasını yeniden keşfedin.
+                Tutalım ile dizginleri elinde tut!
               </Typography>
             </Box>
 
