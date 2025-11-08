@@ -16,13 +16,11 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import HomeWorkIcon from "@mui/icons-material/HomeWork";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
-import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const steps = [
@@ -32,7 +30,7 @@ const steps = [
     desc: "Emlakçılar, portföylerine yeni gayrimenkuller ekleyerek ilan oluşturur. Tüm bilgiler güvenli bir şekilde sisteme kaydedilir.",
   },
   {
-    icon: <AssignmentTurnedInIcon fontSize="large" color="primary" />,
+    icon: <PersonSearchIcon fontSize="large" color="primary" />,
     title: "Kayıt Ev Sahibine Atanır",
     desc: "Oluşturulan ilan, ilgili ev sahibine atanır ve her iki taraf da süreci kendi panelinden görüntüleyebilir.",
   },
