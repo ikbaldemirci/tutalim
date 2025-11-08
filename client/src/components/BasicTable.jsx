@@ -637,6 +637,8 @@ export default function BasicTable({
                               display: "flex",
                               alignItems: "center",
                               gap: "0.4rem",
+                              flexWrap: "wrap",
+                              width: "100%",
                             }}
                           >
                             <TextField
