@@ -105,7 +105,8 @@ function About() {
         }}
       >
         <LazyMotion features={domAnimation}>
-          <Container sx={{ textAlign: "center", py: { xs: 4, sm: 6, md: 8 } }}>
+          {/* <Container sx={{ textAlign: "center", py: { xs: 4, sm: 6, md: 8 } }}> */}
+          <Container sx={{ textAlign: "center", py: 8 }}>
             <m.div
               initial={{ opacity: 0, y: -40 }}
               animate={{ opacity: 1, y: 0 }}
