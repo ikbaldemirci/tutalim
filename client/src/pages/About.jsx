@@ -22,22 +22,24 @@ import DoneAllIcon from "@mui/icons-material/DoneAll";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const steps = [
   {
     icon: <HomeWorkIcon fontSize="large" color="primary" />,
-    title: "Ev Sahibi İlan Oluşturur",
-    desc: "Ev sahipleri, portföylerine yeni gayrimenkuller ekleyerek ilanlarını sisteme kaydeder. Tüm detaylar güvenle saklanır.",
+    title: "Emlakçı İlan Oluşturur",
+    desc: "Emlakçılar, portföylerine yeni gayrimenkuller ekleyerek ilan oluşturur. Tüm bilgiler güvenli bir şekilde sisteme kaydedilir.",
   },
   {
-    icon: <PersonSearchIcon fontSize="large" color="primary" />,
-    title: "Emlakçı Başvurur",
-    desc: "Emlakçılar sisteme giriş yaparak yeni ilanlar ekler, fiyat, tarih ve konum bilgilerini yönetir.",
+    icon: <AssignmentTurnedInIcon fontSize="large" color="primary" />,
+    title: "Kayıt Ev Sahibine Atanır",
+    desc: "Oluşturulan ilan, ilgili ev sahibine atanır ve her iki taraf da süreci kendi panelinden görüntüleyebilir.",
   },
   {
-    icon: <CompareArrowsIcon fontSize="large" color="primary" />,
-    title: "Eşleşme Süreci",
-    desc: "Tutalım algoritması, ilanları eşleştirir ve en uygun eşleşmeleri kullanıcıya sunar.",
+    icon: <VisibilityIcon fontSize="large" color="primary" />,
+    title: "Taraflar Süreci Takip Eder",
+    desc: "Emlakçı ve ev sahibi, ilan detaylarını görüntüleyip kendilerine uygun aksiyonlar alabilir; düzenleme, onay veya geri bildirim sağlayabilir.",
   },
   {
     icon: <ChatBubbleOutlineIcon fontSize="large" color="primary" />,
@@ -46,8 +48,8 @@ const steps = [
   },
   {
     icon: <DoneAllIcon fontSize="large" color="primary" />,
-    title: "Anlaşma Tamamlanır",
-    desc: "Taraflar anlaşmaya vardığında sistem süreci sonlandırır. Hızlı, güvenli ve şeffaf bir deneyim!",
+    title: "Süreç Tamamlanır",
+    desc: "Anlaşma sağlandığında süreç tamamlanır. Kullanıcılar, kendileri için hatırlatıcılar oluşturarak ve yeni aksiyonlar alarak işlemlerini sürdürebilir.",
   },
 ];
 
