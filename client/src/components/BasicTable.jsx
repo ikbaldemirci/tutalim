@@ -643,7 +643,7 @@ export default function BasicTable({
                           >
                             <TextField
                               size="small"
-                              placeholder="Ev Sahibi Mail"
+                              placeholder="Mail"
                               value={ownerInput[row._id] || ""}
                               onChange={(e) =>
                                 setOwnerInput({
@@ -732,6 +732,8 @@ export default function BasicTable({
                               display: "flex",
                               alignItems: "center",
                               gap: "0.4rem",
+                              flexWrap: "wrap",
+                              width: "100%",
                             }}
                           >
                             <TextField
