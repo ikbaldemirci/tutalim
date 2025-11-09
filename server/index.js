@@ -1364,8 +1364,6 @@ app.delete("/api/reminders/:id", verifyToken, async (req, res) => {
   }
 });
 
-const { contactMailHtml } = require("./utils/mailer");
-
 app.post("/api/contact", async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
