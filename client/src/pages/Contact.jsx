@@ -113,7 +113,6 @@ export default function Contact() {
 
           <Box
             sx={{
-              py: 4,
               px: { xs: 1, sm: 3 },
               display: "flex",
               justifyContent: "center",
@@ -123,8 +122,7 @@ export default function Contact() {
             <Paper
               elevation={4}
               sx={{
-                px: { xs: 3, sm: 5 },
-                pb: 0,
+                p: { xs: 3, sm: 5 },
                 maxWidth: 600,
                 mx: "auto",
                 borderRadius: 3,
