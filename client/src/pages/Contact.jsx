@@ -6,7 +6,6 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import TextType from "../components/TextType";
 import ContactForm from "../components/ContactForm";
-import DecryptedText from "../components/DecryptedText";
 import "../components/style/DecryptedText.css";
 
 export default function Contact() {
@@ -124,7 +123,8 @@ export default function Contact() {
             <Paper
               elevation={4}
               sx={{
-                p: { xs: 3, sm: 5 },
+                px: { xs: 3, sm: 5 },
+                pb: 0,
                 maxWidth: 600,
                 mx: "auto",
                 borderRadius: 3,
