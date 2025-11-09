@@ -122,13 +122,13 @@ function About() {
                 gutterBottom
               >
                 <TextType
-                  text={["Tutalım'a hoş geldin", "Tutalım Nasıl çalışır?"]}
+                  text={["Tutalım'a hoş geldin!", "Tutalım Nasıl çalışır?"]}
                   typingSpeed={70}
                   deletingSpeed={40}
                   pauseDuration={1500}
                   showCursor={true}
                   cursorCharacter="|"
-                  textColors={["#2E86C1", "#1A5276"]}
+                  textColors={["#2E86C1"]}
                   loop={true}
                 />
               </Typography>
