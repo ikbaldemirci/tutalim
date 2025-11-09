@@ -1376,11 +1376,10 @@ app.post("/api/contact", async (req, res) => {
     }
 
     await sendMail({
-      to: process.env.CONTACT_RECEIVER_EMAIL,
+      to: process.env.CONTACT_RECEIVER,
       subject: `Tutalım | Yeni İletişim Talebi: ${subject || "Genel"}`,
       html: contactMailHtml({ name, email, subject, message }),
       text: message,
-      replyTo: email,
     });
 
     res.json({
