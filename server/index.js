@@ -1377,9 +1377,12 @@ app.post("/api/contact", async (req, res) => {
 
     await sendMail({
       to: process.env.CONTACT_RECEIVER,
-      subject: `Tutalım | Yeni İletişim Talebi: ${subject || "Genel"}`,
+      subject: `Tutalım | Yeni İletişim Talebi: ${
+        subject || "Genel"
+      } – ${name}`,
       html: contactMailHtml({ name, email, subject, message }),
       text: message,
+      replyTo: email,
     });
 
     res.json({
