@@ -129,6 +129,8 @@ async function sendMail({
 }
 
 function detectMailType(subject = "") {
+  console.log("✉️  sendMail triggered:", to, subject);
+
   const s = subject.toLowerCase();
   if (s.includes("davet reddedildi")) return "reject";
   if (s.includes("davet onaylandı")) return "accept";
