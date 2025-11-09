@@ -5,7 +5,6 @@ import Login from "./Login";
 import Signup from "./Signup";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import DecryptedText from "../components/DecryptedText";
 
 function Home() {
   const [isLogin, setIsLogin] = useState(true);
@@ -133,16 +132,7 @@ function Home() {
               </Typography>
 
               <Typography fontWeight="bold">
-                <DecryptedText
-                  text="Tutalım ile dizginleri elinde tut!"
-                  speed={60}
-                  maxIterations={20}
-                  animateOn="view"
-                  revealDirection="center"
-                  parentClassName="all-letters"
-                  className="revealed"
-                  encryptedClassName="encrypted"
-                />
+                Tutalım ile dizginleri elinde tut!
               </Typography>
             </Box>
 
