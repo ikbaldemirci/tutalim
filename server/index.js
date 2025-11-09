@@ -31,6 +31,7 @@ const {
   assignmentAcceptedHtml,
   assignmentRejectedHtml,
   reminderMailHtml,
+  contactMailHtml,
 } = require("./utils/mailer");
 
 const storage = multer.diskStorage({
@@ -1359,6 +1360,37 @@ app.delete("/api/reminders/:id", verifyToken, async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Silme işlemi başarısız.",
+    });
+  }
+});
+
+app.post("/api/contact", async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({
+        status: "error",
+        message: "Lütfen tüm zorunlu alanları doldurun.",
+      });
+    }
+
+    await sendMail({
+      to: process.env.CONTACT_RECEIVER,
+      subject: `Tutalım | Yeni İletişim Talebi: ${subject || "Genel"}`,
+      html: contactMailHtml({ name, email, subject, message }),
+      text: message,
+    });
+
+    res.json({
+      status: "success",
+      message: "Mesajınız başarıyla gönderildi.",
+    });
+  } catch (err) {
+    console.error("İletişim formu hatası:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Sunucu hatası, mesaj gönderilemedi.",
     });
   }
 });
