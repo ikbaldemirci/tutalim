@@ -1364,6 +1364,8 @@ app.delete("/api/reminders/:id", verifyToken, async (req, res) => {
   }
 });
 
+const { contactMailHtml } = require("./utils/mailer");
+
 app.post("/api/contact", async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
@@ -1376,10 +1378,8 @@ app.post("/api/contact", async (req, res) => {
     }
 
     await sendMail({
-      to: process.env.CONTACT_RECEIVER,
-      subject: `Tutalım | Yeni İletişim Talebi: ${
-        subject || "Genel"
-      } – ${name}`,
+      to: process.env.CONTACT_RECEIVER_EMAIL,
+      subject: `Tutalım | Yeni İletişim Talebi: ${subject || "Genel"}`,
       html: contactMailHtml({ name, email, subject, message }),
       text: message,
     });
