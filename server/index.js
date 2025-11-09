@@ -1380,6 +1380,7 @@ app.post("/api/contact", async (req, res) => {
       subject: `Tutalım | Yeni İletişim Talebi: ${subject || "Genel"}`,
       html: contactMailHtml({ name, email, subject, message }),
       text: message,
+      replyTo: email,
     });
 
     res.json({

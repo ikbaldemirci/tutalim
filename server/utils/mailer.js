@@ -1,8 +1,15 @@
 const nodemailer = require("nodemailer");
 const Notification = require("../models/Notification");
 
-const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, SMTP_FROM } =
-  process.env;
+const {
+  SMTP_HOST,
+  SMTP_PORT,
+  SMTP_SECURE,
+  SMTP_USER,
+  SMTP_PASS,
+  SMTP_FROM,
+  CONTACT_RECEIVER,
+} = process.env;
 
 const transporter = nodemailer.createTransport({
   host: SMTP_HOST,
@@ -11,11 +18,66 @@ const transporter = nodemailer.createTransport({
   auth: { user: SMTP_USER, pass: SMTP_PASS },
 });
 
+// async function sendMail({
+//   to,
+//   subject,
+//   html,
+//   text,
+//   userId = null,
+//   propertyId = null,
+// }) {
+//   try {
+//     const info = await transporter.sendMail({
+//       from: SMTP_FROM,
+//       to,
+//       subject,
+//       text,
+//       html,
+//     });
+
+//     setImmediate(async () => {
+//       try {
+//         await Notification.create({
+//           to,
+//           subject,
+//           type: detectMailType(subject),
+//           status: "sent",
+//           userId,
+//           propertyId,
+//         });
+//       } catch (logErr) {
+//         console.error("Mail log kaydı başarısız:", logErr.message);
+//       }
+//     });
+
+//     return info;
+//   } catch (err) {
+//     setImmediate(async () => {
+//       try {
+//         await Notification.create({
+//           to,
+//           subject,
+//           type: detectMailType(subject),
+//           status: "failed",
+//           errorMessage: err.message,
+//           userId,
+//           propertyId,
+//         });
+//       } catch (logErr) {
+//         console.error("Hatalı mail log kaydı başarısız:", logErr.message);
+//       }
+//     });
+
+//     throw err;
+//   }
+// }
+
 async function sendMail({
   to,
   subject,
   html,
   text,
+  replyTo = null,
   userId = null,
   propertyId = null,
 }) {
@@ -26,6 +88,15 @@ async function sendMail({
       subject,
       text,
       html,
+      replyTo,
+      messageId: `<tutalim-${Date.now()}@tutalim.com>`,
+      headers: {
+        "X-App-Name": "Tutalim",
+        "X-App-Version": "1.0.0",
+        "X-Mail-Generated-By": "mailer.js",
+        "X-Form-Source": "Tutalim-System",
+        ...(replyTo ? { "X-Reply-To": replyTo } : {}),
+      },
     });
 
     setImmediate(async () => {
@@ -60,7 +131,6 @@ async function sendMail({
         console.error("Hatalı mail log kaydı başarısız:", logErr.message);
       }
     });
-
     throw err;
   }
 }
