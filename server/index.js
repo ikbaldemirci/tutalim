@@ -1368,6 +1368,9 @@ app.post("/api/contact", async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
 
+    console.log("📬 CONTACT_RECEIVER:", process.env.CONTACT_RECEIVER);
+    console.log("📦 Tüm env:", Object.keys(process.env));
+
     if (!name || !email || !message) {
       return res.status(400).json({
         status: "error",
