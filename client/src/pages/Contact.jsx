@@ -75,7 +75,7 @@ export default function Contact() {
               >
                 <Typography
                   component="a"
-                  href="tel:+905554443322"
+                  href="tel:+905068337985"
                   sx={{
                     color: "#2E86C1",
                     fontWeight: 600,
