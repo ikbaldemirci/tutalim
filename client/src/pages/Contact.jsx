@@ -41,10 +41,7 @@ export default function Contact() {
                 gutterBottom
               >
                 <TextType
-                  text={[
-                    "Bizimle İletişimi Sıkı Tutun",
-                    "Tutalım Ekibi Her Zaman Ulaşılabilir!",
-                  ]}
+                  text={["Bizimle İletişimi Sıkı Tutun"]}
                   typingSpeed={70}
                   pauseDuration={1500}
                   showCursor={true}
