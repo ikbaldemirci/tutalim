@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import "./styles/DecryptedText.css";
+import "./style/DecryptedText.css";
 
 const styles = {
   wrapper: {
