@@ -7,6 +7,7 @@ import {
   Snackbar,
   Alert,
   Box,
+  Typography,
 } from "@mui/material";
 
 export default function ContactForm() {
@@ -16,24 +17,64 @@ export default function ContactForm() {
     subject: "",
     message: "",
   });
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "info",
   });
 
+  const maxChars = 500;
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "message" && value.length > maxChars) return;
+    setForm({ ...form, [name]: value });
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (form.name.trim().length < 3) {
+      setSnackbar({
+        open: true,
+        message: "Lütfen en az 3 karakterlik bir ad-soyad girin",
+        severity: "warning",
+      });
+      return;
+    }
+
+    if (!validateEmail(form.email)) {
+      setSnackbar({
+        open: true,
+        message: "Geçerli bir e-posta adresi girin",
+        severity: "warning",
+      });
+      return;
+    }
+
+    if (!form.message.trim()) {
+      setSnackbar({
+        open: true,
+        message: "Mesaj alanı boş bırakılamaz",
+        severity: "warning",
+      });
+      return;
+    }
+
     try {
       const res = await axios.post("https://tutalim.com/api/contact", form);
+
       if (res.data?.status === "success") {
         setSnackbar({
           open: true,
-          message: "Mesajınız başarıyla gönderildi 🎉",
+          message: "Mesajınız başarıyla gönderildi",
           severity: "success",
         });
         setForm({ name: "", email: "", subject: "", message: "" });
@@ -43,7 +84,7 @@ export default function ContactForm() {
     } catch {
       setSnackbar({
         open: true,
-        message: "Bir hata oluştu. Lütfen tekrar deneyin ❌",
+        message: "Bir hata oluştu. Lütfen tekrar deneyin",
         severity: "error",
       });
     }
@@ -59,7 +100,9 @@ export default function ContactForm() {
         onChange={handleChange}
         sx={{ mb: 2 }}
         required
+        inputProps={{ minLength: 3 }}
       />
+
       <TextField
         fullWidth
         label="E-posta"
@@ -70,6 +113,7 @@ export default function ContactForm() {
         sx={{ mb: 2 }}
         required
       />
+
       <TextField
         fullWidth
         select
@@ -84,17 +128,35 @@ export default function ContactForm() {
         <MenuItem value="Teknik Problem">Teknik Problem</MenuItem>
         <MenuItem value="Genel Bilgi">Genel Bilgi</MenuItem>
       </TextField>
-      <TextField
-        fullWidth
-        multiline
-        rows={4}
-        label="Mesajınız"
-        name="message"
-        value={form.message}
-        onChange={handleChange}
-        sx={{ mb: 3 }}
-        required
-      />
+
+      <Box sx={{ position: "relative", mb: 3 }}>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          label="Mesajınız"
+          name="message"
+          value={form.message}
+          onChange={handleChange}
+          inputProps={{ maxLength: maxChars }}
+          required
+        />
+        <Typography
+          variant="caption"
+          sx={{
+            position: "absolute",
+            bottom: 4,
+            right: 12,
+            color:
+              form.message.length >= maxChars * 0.9
+                ? "error.main"
+                : "text.secondary",
+          }}
+        >
+          {form.message.length}/{maxChars}
+        </Typography>
+      </Box>
+
       <Button
         fullWidth
         variant="contained"
@@ -111,7 +173,7 @@ export default function ContactForm() {
           },
         }}
       >
-        Mesajı Gönder 🚀
+        Mesajı Gönder
       </Button>
 
       <Snackbar
