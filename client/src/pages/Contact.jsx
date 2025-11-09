@@ -46,6 +46,9 @@ export default function Contact() {
                   pauseDuration={1500}
                   showCursor={true}
                   cursorCharacter="|"
+                  loop={true}
+                  deletingSpeed={40}
+                  textColors={["#2E86C1"]}
                 />
               </Typography>
               <Typography
