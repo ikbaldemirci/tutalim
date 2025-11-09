@@ -58,9 +58,9 @@ function Navbar({ onLogout, bg }) {
   const handleLogout = async () => {
     try {
       const res = await api.post("/logout", {}, { withCredentials: true });
-      console.log("🟢 Logout response:", res.data);
+      console.log("Logout response:", res.data);
     } catch (err) {
-      console.error("🔴 Logout hatası:", err);
+      console.error("Logout error:", err);
     } finally {
       localStorage.removeItem("token");
       if (onLogout) onLogout();
@@ -152,6 +152,19 @@ function Navbar({ onLogout, bg }) {
                 })}
               >
                 Hakkında
+              </NavLink>
+            </li>
+            <li className="nav-item mx-2 mb-2 mb-lg-0">
+              <NavLink
+                to="/contact"
+                className="nav-link text-white fw-semibold"
+                onClick={closeMobileMenu}
+                style={({ isActive }) => ({
+                  borderBottom: isActive ? "2px solid white" : "none",
+                  paddingBottom: 2,
+                })}
+              >
+                İletişim
               </NavLink>
             </li>
 

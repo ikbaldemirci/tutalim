@@ -151,7 +151,7 @@ function About() {
             </m.div>
           </Container>
 
-          <Container sx={{ pb: 8 }}>
+          <Container sx={{ pb: 4 }}>
             <Box
               sx={{
                 position: "relative",
