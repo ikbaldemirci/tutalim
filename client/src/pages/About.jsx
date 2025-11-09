@@ -22,6 +22,7 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import TextType from "../components/TextType";
 
 const steps = [
   {
@@ -137,6 +138,24 @@ function About() {
                 güvenli ve şeffaf bir platformda buluşturan dijital bir
                 sistemdir. Aşağıda, bu sürecin adımlarını adım adım
                 görebilirsiniz.
+              </Typography>
+              <Typography
+                variant="h2"
+                component="h1"
+                fontWeight={700}
+                color="primary"
+                gutterBottom
+              >
+                <TextType
+                  text={["Dizginleri elinde tut.", "Tutalım'a hoş geldin 👋"]}
+                  typingSpeed={70}
+                  deletingSpeed={40}
+                  pauseDuration={1500}
+                  showCursor={true}
+                  cursorCharacter="|"
+                  textColors={["#2E86C1", "#1A5276"]}
+                  loop={true}
+                />
               </Typography>
             </m.div>
           </Container>
