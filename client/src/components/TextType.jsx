@@ -8,7 +8,7 @@ import {
   useCallback,
 } from "react";
 import { gsap } from "gsap";
-import "./TextType.css";
+import "./styles/TextType.css";
 
 const TextType = ({
   text,

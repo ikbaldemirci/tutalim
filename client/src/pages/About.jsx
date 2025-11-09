@@ -121,7 +121,16 @@ function About() {
                 color="primary"
                 gutterBottom
               >
-                Tutalım Nasıl Çalışır?
+                <TextType
+                  text={["Tutalım'a hoş geldin", "Tutalım Nasıl çalışır?"]}
+                  typingSpeed={70}
+                  deletingSpeed={40}
+                  pauseDuration={1500}
+                  showCursor={true}
+                  cursorCharacter="|"
+                  textColors={["#2E86C1", "#1A5276"]}
+                  loop={true}
+                />
               </Typography>
               <Typography
                 variant="subtitle1"
@@ -138,24 +147,6 @@ function About() {
                 güvenli ve şeffaf bir platformda buluşturan dijital bir
                 sistemdir. Aşağıda, bu sürecin adımlarını adım adım
                 görebilirsiniz.
-              </Typography>
-              <Typography
-                variant="h2"
-                component="h1"
-                fontWeight={700}
-                color="primary"
-                gutterBottom
-              >
-                <TextType
-                  text={["Dizginleri elinde tut.", "Tutalım'a hoş geldin 👋"]}
-                  typingSpeed={70}
-                  deletingSpeed={40}
-                  pauseDuration={1500}
-                  showCursor={true}
-                  cursorCharacter="|"
-                  textColors={["#2E86C1", "#1A5276"]}
-                  loop={true}
-                />
               </Typography>
             </m.div>
           </Container>

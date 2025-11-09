@@ -1,0 +1,14 @@
+.encrypted {
+  color: #9ecff5;
+  transition: color 0.2s ease;
+}
+
+.revealed {
+  color: #ffffff;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.all-letters {
+  display: inline-block;
+}

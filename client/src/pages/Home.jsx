@@ -5,6 +5,7 @@ import Login from "./Login";
 import Signup from "./Signup";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import DecryptedText from "../components/DecryptedText";
 
 function Home() {
   const [isLogin, setIsLogin] = useState(true);
@@ -130,8 +131,18 @@ function Home() {
               <Typography sx={{ mb: 0.5 }}>
                 Ev sahipleri ve emlakçılar için akıllı bağlantılar.
               </Typography>
+
               <Typography fontWeight="bold">
-                Tutalım ile dizginleri elinde tut!
+                <DecryptedText
+                  text="Tutalım ile dizginleri elinde tut!"
+                  speed={60}
+                  maxIterations={20}
+                  animateOn="view"
+                  revealDirection="center"
+                  parentClassName="all-letters"
+                  className="revealed"
+                  encryptedClassName="encrypted"
+                />
               </Typography>
             </Box>
 
