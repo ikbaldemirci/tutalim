@@ -25,7 +25,7 @@ export default function Contact() {
         }}
       >
         <LazyMotion features={domAnimation}>
-          <Container sx={{ textAlign: "center", py: { xs: 4, sm: 6, md: 8 } }}>
+          <Container sx={{ textAlign: "center", py: { xs: 2, sm: 4, md: 6 } }}>
             <m.div
               initial={{ opacity: 0, y: -40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -68,31 +68,46 @@ export default function Contact() {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 1,
+                  gap: 1.2,
                   alignItems: "center",
-                  color: "#2E86C1",
-                  fontWeight: 600,
-                  fontSize: "1.1rem",
+                  mt: 2,
                 }}
               >
-                <DecryptedText
-                  text="+90 555 444 33 22"
-                  speed={45}
-                  maxIterations={15}
-                  animateOn="both"
-                  revealDirection="center"
-                  className="revealed"
-                  encryptedClassName="encrypted"
-                />
-                <DecryptedText
-                  text="info@tutalim.com"
-                  speed={50}
-                  maxIterations={18}
-                  animateOn="both"
-                  revealDirection="center"
-                  className="revealed"
-                  encryptedClassName="encrypted"
-                />
+                <Typography
+                  component="a"
+                  href="tel:+905554443322"
+                  sx={{
+                    color: "#2E86C1",
+                    fontWeight: 600,
+                    fontSize: "1.15rem",
+                    textDecoration: "none",
+                    transition: "color 0.3s ease",
+                    "&:hover": {
+                      color: "#1F618D",
+                      textDecoration: "underline",
+                    },
+                  }}
+                >
+                  +90 506 833 7985
+                </Typography>
+
+                <Typography
+                  component="a"
+                  href="mailto:info@tutalim.com"
+                  sx={{
+                    color: "#2E86C1",
+                    fontWeight: 600,
+                    fontSize: "1.05rem",
+                    textDecoration: "none",
+                    transition: "color 0.3s ease",
+                    "&:hover": {
+                      color: "#1F618D",
+                      textDecoration: "underline",
+                    },
+                  }}
+                >
+                  info@tutalim.com
+                </Typography>
               </Box>
             </m.div>
           </Container>
