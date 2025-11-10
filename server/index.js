@@ -53,7 +53,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ limit: "25mb", extended: true }));
 app.options("*", cors());
 app.use("/uploads", express.static("uploads"));
 
