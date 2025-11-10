@@ -321,6 +321,16 @@ export default function BasicTable({
   const handleUploadContract = async (id, file) => {
     if (!file) return;
 
+    const maxSize = 25 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setSnackbar({
+        open: true,
+        message: "Dosya boyutu 25 MB’den fazla olamaz",
+        severity: "error",
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append("contract", file);
     setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
@@ -339,14 +349,12 @@ export default function BasicTable({
 
       if (res.data?.status === "success") {
         onUpdate(res.data.property);
-        setLoadingState((prev) => ({ ...prev, [id]: null }));
         setSnackbar({
           open: true,
-          message: res.data.message,
+          message: res.data.message || "Sözleşme başarıyla yüklendi",
           severity: "success",
         });
       } else {
-        setLoadingState((prev) => ({ ...prev, [id]: null }));
         setSnackbar({
           open: true,
           message: res.data?.message || "Sözleşme yüklenemedi",
@@ -356,22 +364,37 @@ export default function BasicTable({
     } catch (error) {
       console.error("Upload error:", error);
 
-      const backendMessage =
-        error.response?.data?.message || "Sözleşme yüklenemedi";
+      const status = error.response?.status;
+      let errorMessage = "Sözleşme yüklenemedi";
 
-      setLoadingState((prev) => ({ ...prev, [id]: null }));
+      if (status === 413) {
+        errorMessage = "Dosya boyutu 25 MB’den fazla olamaz";
+      } else if (status === 403) {
+        errorMessage = "Bu mülke dosya yükleme yetkiniz yok";
+      } else if (status === 404) {
+        errorMessage = "Mülk bulunamadı";
+      } else if (status === 500) {
+        errorMessage = "Sunucu hatası (sözleşme yükleme)";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
       setSnackbar({
         open: true,
-        message: backendMessage,
+        message: errorMessage,
         severity: "error",
       });
+    } finally {
+      setLoadingState((prev) => ({ ...prev, [id]: null }));
     }
   };
 
   const handleDeleteContract = async (id) => {
     if (!window.confirm("Bu sözleşmeyi silmek istediğinize emin misiniz?"))
       return;
+
     setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
+
     try {
       const res = await axios.delete(
         `https://tutalim.com/api/properties/${id}/contract`,
@@ -379,28 +402,64 @@ export default function BasicTable({
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
+
       if (res.data.status === "success") {
         onUpdate(res.data.property);
-        setLoadingState((prev) => ({ ...prev, [id]: null }));
         setSnackbar({
           open: true,
-          message: "Sözleşme silindi",
+          message: res.data.message || "Sözleşme silindi",
           severity: "info",
         });
+      } else {
+        setSnackbar({
+          open: true,
+          message: res.data?.message || "Sözleşme silinemedi",
+          severity: "error",
+        });
       }
-    } catch {
-      setLoadingState((prev) => ({ ...prev, [id]: null }));
+    } catch (error) {
+      console.error("Delete contract error:", error);
+
+      const status = error.response?.status;
+      let errorMessage = "Sözleşme silinemedi";
+
+      if (status === 403) {
+        errorMessage = "Bu mülkteki sözleşmeyi silme yetkiniz yok";
+      } else if (status === 404) {
+        errorMessage = "Mülk bulunamadı";
+      } else if (status === 500) {
+        errorMessage = "Sunucu hatası (sözleşme silme)";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
       setSnackbar({
         open: true,
-        message: "Sözleşme silinemedi",
+        message: errorMessage,
         severity: "error",
       });
+    } finally {
+      setLoadingState((prev) => ({ ...prev, [id]: null }));
     }
   };
 
   const handleNotes = async (id, isAutoSave = false) => {
     try {
       const payload = { notes: notesDraft[id] ?? "" };
+
+      const noteSizeInBytes = new Blob([JSON.stringify(payload)]).size;
+      const maxSize = 25 * 1024 * 1024;
+
+      if (noteSizeInBytes > maxSize) {
+        if (!isAutoSave) {
+          setSnackbar({
+            open: true,
+            message: "Dosya boyutu 25 MB’den fazla olamaz",
+            severity: "error",
+          });
+        }
+        return;
+      }
 
       const res = await api.put(`/properties/${id}/notes`, payload);
 
@@ -410,7 +469,7 @@ export default function BasicTable({
         if (!isAutoSave) {
           setSnackbar({
             open: true,
-            message: "Not başarıyla kaydedildi",
+            message: res.data.message || "Not başarıyla kaydedildi",
             severity: "success",
           });
           closeNotes();
@@ -419,12 +478,25 @@ export default function BasicTable({
     } catch (err) {
       console.error("Not kaydetme hatası:", err);
 
+      let errorMessage = "Not kaydedilemedi. Lütfen tekrar deneyin";
+      const status = err.response?.status;
+
+      if (status === 413) {
+        errorMessage = "Dosya boyutu 25 MB’den fazla olamaz";
+      } else if (status === 403) {
+        errorMessage = "Bu mülke not ekleme yetkiniz yok";
+      } else if (status === 404) {
+        errorMessage = "Mülk bulunamadı";
+      } else if (status === 500) {
+        errorMessage = "Sunucu hatası (not yükleme)";
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      }
+
       if (!isAutoSave) {
         setSnackbar({
           open: true,
-          message:
-            err.response?.data?.message ||
-            "Not kaydedilemedi. Lütfen tekrar deneyin",
+          message: errorMessage,
           severity: "error",
         });
       }

@@ -849,20 +849,6 @@ app.post("/api/logout", async (req, res) => {
   }
 });
 
-// app.put("/api/properties/:id/notes", verifyToken, async (req, res) => {
-//   try {
-//     const { notes } = req.body;
-//     const property = await Property.findByIdAndUpdate(
-//       req.params.id,
-//       { notes },
-//       { new: true }
-//     );
-//     res.json({ status: "success", property });
-//   } catch (err) {
-//     res.status(500).json({ status: "error", message: "Not kaydedilemedi" });
-//   }
-// });
-
 app.put(
   "/api/properties/:id/notes",
   verifyToken,
