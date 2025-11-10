@@ -56,9 +56,9 @@ function Navbar({ onLogout, bg }) {
     toggler.addEventListener("click", handleTogglerClick);
 
     const enableOutsideClose = () =>
-      window.addEventListener("click", handleOutsideClick, true);
+      document.addEventListener("click", handleOutsideClick, true);
     const disableOutsideClose = () =>
-      window.removeEventListener("click", handleOutsideClick, true);
+      document.removeEventListener("click", handleOutsideClick, true);
 
     navEl.addEventListener("shown.bs.collapse", enableOutsideClose);
     navEl.addEventListener("hidden.bs.collapse", disableOutsideClose);
