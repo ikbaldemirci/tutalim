@@ -34,6 +34,22 @@ function Navbar({ onLogout, bg }) {
       toggle: false,
     });
 
+    const onOutsidePointer = (e) => {
+      const clickedInsideCollapse = e.target.closest("#mainNavbar");
+      const clickedOnToggler = e.target.closest(".navbar-toggler");
+      const isOpen = navEl.classList.contains("show");
+
+      if (isOpen && !clickedInsideCollapse && !clickedOnToggler) {
+        collapse.hide();
+      }
+    };
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape" && navEl.classList.contains("show")) {
+        collapse.hide();
+      }
+    };
+
     const toggler = document.querySelector(".navbar-toggler");
     const onTogglerClick = () => {
       if (navEl.classList.contains("show")) collapse.hide();
@@ -41,40 +57,21 @@ function Navbar({ onLogout, bg }) {
     };
     toggler?.addEventListener("click", onTogglerClick);
 
-    const onOutsidePointer = (e) => {
-      const insideCollapse = e.target.closest("#mainNavbar");
-      const onToggler = e.target.closest(".navbar-toggler");
-      if (navEl.classList.contains("show") && !insideCollapse && !onToggler) {
-        collapse.hide();
-      }
-    };
-
-    const enableOutsideClose = () => {
-      setTimeout(() => {
-        window.addEventListener("pointerdown", onOutsidePointer, true);
-      }, 0);
-    };
-    const disableOutsideClose = () => {
-      window.removeEventListener("pointerdown", onOutsidePointer, true);
-    };
-
-    navEl.addEventListener("shown.bs.collapse", enableOutsideClose);
-    navEl.addEventListener("hidden.bs.collapse", disableOutsideClose);
+    window.addEventListener("pointerdown", onOutsidePointer, true);
+    window.addEventListener("keydown", onKeyDown, true);
 
     return () => {
-      navEl.removeEventListener("shown.bs.collapse", enableOutsideClose);
-      navEl.removeEventListener("hidden.bs.collapse", disableOutsideClose);
-      disableOutsideClose();
       toggler?.removeEventListener("click", onTogglerClick);
+      window.removeEventListener("pointerdown", onOutsidePointer, true);
+      window.removeEventListener("keydown", onKeyDown, true);
     };
   }, []);
 
   const closeMobileMenu = () => {
     const el = document.getElementById("mainNavbar");
-    if (el && el.classList.contains("show")) {
-      const collapse = bootstrap.Collapse.getOrCreateInstance(el);
-      collapse.hide();
-    }
+    if (!el) return;
+    const c = bootstrap.Collapse.getOrCreateInstance(el, { toggle: false });
+    if (el.classList.contains("show")) c.hide();
   };
 
   const handleLogout = async () => {
