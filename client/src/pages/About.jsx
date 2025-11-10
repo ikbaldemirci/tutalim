@@ -60,8 +60,6 @@ function About() {
     userCount: 0,
     matchCount: 0,
   });
-  const [visible, setVisible] = useState(false);
-  const countUpRef = useRef(null);
 
   useEffect(() => {
     let ignore = false;
@@ -308,42 +306,46 @@ function About() {
                     label: "Başarılı Eşleşme",
                     value: stats.matchCount,
                   },
-                ].map((stat, i) => (
-                  <Grid size={{ xs: 12, sm: 4 }} key={i} textAlign="center">
-                    <m.div
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ type: "spring", stiffness: 250 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      style={{ willChange: "transform, opacity" }}
-                      onViewportEnter={() => countUpRef.current?.start()}
-                    >
-                      {stat.icon}
-                      <Typography
-                        variant="h4"
-                        fontWeight={700}
-                        color="primary"
-                        sx={{ my: 1 }}
+                ].map((stat, i) => {
+                  const countUpRef = useRef(null);
+
+                  return (
+                    <Grid size={{ xs: 12, sm: 4 }} key={i} textAlign="center">
+                      <m.div
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ type: "spring", stiffness: 250 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        style={{ willChange: "transform, opacity" }}
+                        onViewportEnter={() => countUpRef.current?.start()}
                       >
-                        <CountUp
-                          start={0}
-                          end={stat.value}
-                          duration={2.5}
-                          ref={countUpRef}
-                          preserveValue={true}
+                        {stat.icon}
+                        <Typography
+                          variant="h4"
+                          fontWeight={700}
+                          color="primary"
+                          sx={{ my: 1 }}
                         >
-                          {({ countUpRef: internalRef, start }) => {
-                            countUpRef.current = { start };
-                            return <span ref={internalRef} />;
-                          }}
-                        </CountUp>
-                        +
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: "#555" }}>
-                        {stat.label}
-                      </Typography>
-                    </m.div>
-                  </Grid>
-                ))}
+                          <CountUp
+                            start={0}
+                            end={stat.value}
+                            duration={2.5}
+                            ref={countUpRef}
+                            preserveValue={true}
+                          >
+                            {({ countUpRef: internalRef, start }) => {
+                              countUpRef.current = { start };
+                              return <span ref={internalRef} />;
+                            }}
+                          </CountUp>
+                          +
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: "#555" }}>
+                          {stat.label}
+                        </Typography>
+                      </m.div>
+                    </Grid>
+                  );
+                })}
               </Grid>
             </m.div>
 
