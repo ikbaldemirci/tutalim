@@ -50,7 +50,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage, limits: { fileSize: 25 * 1024 * 1024 } });
+const upload = multer({ storage });
 
 app.use(cookieParser());
 app.use(express.json());
@@ -496,42 +496,102 @@ app.delete("/api/properties/:id", verifyToken, async (req, res) => {
   }
 });
 
+// app.post(
+//   "/api/properties/:id/contract",
+//   verifyToken,
+//   (req, res, next) => {
+//     upload.single("contract")(req, res, (err) => {
+//       if (err) {
+//         console.error("Upload error:", err); // 👈 konsola tam hata mesajını da loglayalım
+
+//         // 1️⃣ Multer resmi hata kodu
+//         if (err.code === "LIMIT_FILE_SIZE") {
+//           return res.status(400).json({
+//             status: "fail",
+//             message: "Dosya boyutu 25MB'den fazla olamaz 🚫",
+//           });
+//         }
+
+//         // 2️⃣ Bazı sistemlerde generic text gelir
+//         if (
+//           err.message &&
+//           err.message.toLowerCase().includes("file too large")
+//         ) {
+//           return res.status(400).json({
+//             status: "fail",
+//             message: "Dosya boyutu 25MB'den fazla olamaz 🚫",
+//           });
+//         }
+
+//         // 3️⃣ Diğer tüm hatalar
+//         return res.status(400).json({
+//           status: "fail",
+//           message: "Dosya yüklenirken bir hata oluştu.",
+//         });
+//       }
+//       next();
+//     });
+//   },
+//   async (req, res) => {
+//     try {
+//       const propertyId = req.params.id;
+//       const userId = req.user.id;
+//       const userRole = req.user.role;
+
+//       const property = await Property.findById(propertyId);
+//       if (!property) {
+//         return res
+//           .status(404)
+//           .json({ status: "fail", message: "Mülk bulunamadı" });
+//       }
+
+//       const isAuthorized =
+//         (userRole === "realtor" &&
+//           property.realtor?.toString() === userId.toString()) ||
+//         (userRole === "owner" &&
+//           property.owner?.toString() === userId.toString());
+
+//       if (!isAuthorized) {
+//         return res.status(403).json({
+//           status: "fail",
+//           message:
+//             "Bu mülke sözleşme yükleme yetkiniz yok. Sadece kendi mülkleriniz için işlem yapabilirsiniz.",
+//         });
+//       }
+
+//       if (!req.file) {
+//         return res.status(400).json({
+//           status: "fail",
+//           message: "Herhangi bir dosya yüklenmedi.",
+//         });
+//       }
+
+//       property.contractFile = req.file.path;
+//       await property.save();
+
+//       const updated = await Property.findById(propertyId)
+//         .populate("realtor", "name mail")
+//         .populate("owner", "name mail");
+
+//       res.json({
+//         status: "success",
+//         message: "Sözleşme başarıyla yüklendi 📄",
+//         property: updated,
+//       });
+//     } catch (err) {
+//       console.error("Contract upload error:", err);
+//       res.status(500).json({
+//         status: "error",
+//         message: "Sunucu hatası (sözleşme yükleme)",
+//       });
+//     }
+//   }
+// );
+
 app.post(
   "/api/properties/:id/contract",
   verifyToken,
-  (req, res, next) => {
-    upload.single("contract")(req, res, (err) => {
-      if (err) {
-        console.error("Upload error:", err); // 👈 konsola tam hata mesajını da loglayalım
-
-        // 1️⃣ Multer resmi hata kodu
-        if (err.code === "LIMIT_FILE_SIZE") {
-          return res.status(400).json({
-            status: "fail",
-            message: "Dosya boyutu 25MB'den fazla olamaz 🚫",
-          });
-        }
-
-        // 2️⃣ Bazı sistemlerde generic text gelir
-        if (
-          err.message &&
-          err.message.toLowerCase().includes("file too large")
-        ) {
-          return res.status(400).json({
-            status: "fail",
-            message: "Dosya boyutu 25MB'den fazla olamaz 🚫",
-          });
-        }
-
-        // 3️⃣ Diğer tüm hatalar
-        return res.status(400).json({
-          status: "fail",
-          message: "Dosya yüklenirken bir hata oluştu.",
-        });
-      }
-      next();
-    });
-  },
+  upload.single("contract"),
   async (req, res) => {
     try {
       const propertyId = req.params.id;
@@ -559,13 +619,6 @@ app.post(
         });
       }
 
-      if (!req.file) {
-        return res.status(400).json({
-          status: "fail",
-          message: "Herhangi bir dosya yüklenmedi.",
-        });
-      }
-
       property.contractFile = req.file.path;
       await property.save();
 
@@ -587,7 +640,6 @@ app.post(
     }
   }
 );
-
 app.delete("/api/properties/:id/contract", verifyToken, async (req, res) => {
   try {
     const propertyId = req.params.id;
