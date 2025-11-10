@@ -60,6 +60,7 @@ function About() {
     userCount: 0,
     matchCount: 0,
   });
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -313,6 +314,7 @@ function About() {
                       transition={{ type: "spring", stiffness: 250 }}
                       viewport={{ once: true, amount: 0.3 }}
                       style={{ willChange: "transform, opacity" }}
+                      onViewportEnter={() => setVisible(true)}
                     >
                       {stat.icon}
                       <Typography
@@ -321,13 +323,7 @@ function About() {
                         color="primary"
                         sx={{ my: 1 }}
                       >
-                        <CountUp
-                          end={stat.value}
-                          duration={2.5}
-                          enableScrollSpy
-                          scrollSpyOnce
-                        />
-                        +
+                        <CountUp end={stat.value} duration={2.5} />+
                       </Typography>
                       <Typography variant="body1" sx={{ color: "#555" }}>
                         {stat.label}
