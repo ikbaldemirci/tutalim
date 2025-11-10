@@ -26,36 +26,43 @@ function Navbar({ onLogout, bg }) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    import("bootstrap/dist/js/bootstrap.bundle.min.js").then(() => {
-      const handleOutsideClick = (event) => {
-        const navbar = document.getElementById("mainNavbar");
-        const toggler = document.querySelector(".navbar-toggler");
+    const navEl = document.getElementById("mainNavbar");
+    if (!navEl) return;
 
-        if (
-          navbar &&
-          navbar.classList.contains("show") &&
-          !navbar.contains(event.target) &&
-          !toggler.contains(event.target)
-        ) {
-          try {
-            let collapse = window.bootstrap?.Collapse.getInstance(navbar);
+    const getCollapse = () =>
+      window.bootstrap
+        ? window.bootstrap.Collapse.getOrCreateInstance(navEl, {
+            toggle: false,
+          })
+        : null;
 
-            if (!collapse) {
-              collapse = new window.bootstrap.Collapse(navbar, {
-                toggle: false,
-              });
-            }
+    const onDocClick = (e) => {
+      const toggler = document.querySelector(".navbar-toggler");
+      if (
+        navEl.classList.contains("show") &&
+        !navEl.contains(e.target) &&
+        !toggler.contains(e.target)
+      ) {
+        const c = getCollapse();
+        c && c.hide();
+      }
+    };
+    const onShown = () => {
+      document.addEventListener("click", onDocClick, { capture: true });
+    };
 
-            collapse.hide();
-          } catch (err) {
-            console.error("Navbar collapse error:", err);
-          }
-        }
-      };
+    const onHidden = () => {
+      document.removeEventListener("click", onDocClick, { capture: true });
+    };
 
-      document.addEventListener("click", handleOutsideClick);
-      return () => document.removeEventListener("click", handleOutsideClick);
-    });
+    navEl.addEventListener("shown.bs.collapse", onShown);
+    navEl.addEventListener("hidden.bs.collapse", onHidden);
+
+    return () => {
+      navEl.removeEventListener("shown.bs.collapse", onShown);
+      navEl.removeEventListener("hidden.bs.collapse", onHidden);
+      document.removeEventListener("click", onDocClick, { capture: true });
+    };
   }, []);
 
   const closeMobileMenu = () => {
