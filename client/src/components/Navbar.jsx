@@ -34,23 +34,29 @@ function Navbar({ onLogout, bg }) {
       toggle: false,
     });
 
-    const handleOutsideClick = (e) => {
-      const toggler = document.querySelector(".navbar-toggler");
-      if (
-        navEl.classList.contains("show") &&
-        !navEl.contains(e.target) &&
-        !toggler.contains(e.target)
-      ) {
+    const toggler = document.querySelector(".navbar-toggler");
+    const onTogglerClick = () => {
+      if (navEl.classList.contains("show")) collapse.hide();
+      else collapse.show();
+    };
+    toggler?.addEventListener("click", onTogglerClick);
+
+    const onOutsidePointer = (e) => {
+      const insideCollapse = e.target.closest("#mainNavbar");
+      const onToggler = e.target.closest(".navbar-toggler");
+      if (navEl.classList.contains("show") && !insideCollapse && !onToggler) {
         collapse.hide();
       }
     };
 
-    const enableOutsideClose = () =>
+    const enableOutsideClose = () => {
       setTimeout(() => {
-        document.addEventListener("click", handleOutsideClick, true);
+        window.addEventListener("pointerdown", onOutsidePointer, true);
       }, 0);
-    const disableOutsideClose = () =>
-      document.removeEventListener("click", handleOutsideClick, true);
+    };
+    const disableOutsideClose = () => {
+      window.removeEventListener("pointerdown", onOutsidePointer, true);
+    };
 
     navEl.addEventListener("shown.bs.collapse", enableOutsideClose);
     navEl.addEventListener("hidden.bs.collapse", disableOutsideClose);
@@ -59,6 +65,7 @@ function Navbar({ onLogout, bg }) {
       navEl.removeEventListener("shown.bs.collapse", enableOutsideClose);
       navEl.removeEventListener("hidden.bs.collapse", disableOutsideClose);
       disableOutsideClose();
+      toggler?.removeEventListener("click", onTogglerClick);
     };
   }, []);
 
