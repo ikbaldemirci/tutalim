@@ -502,12 +502,28 @@ app.post(
   (req, res, next) => {
     upload.single("contract")(req, res, (err) => {
       if (err) {
+        console.error("Upload error:", err); // 👈 konsola tam hata mesajını da loglayalım
+
+        // 1️⃣ Multer resmi hata kodu
         if (err.code === "LIMIT_FILE_SIZE") {
           return res.status(400).json({
             status: "fail",
-            message: "Dosya boyutu 25MB'den fazla olamaz",
+            message: "Dosya boyutu 25MB'den fazla olamaz 🚫",
           });
         }
+
+        // 2️⃣ Bazı sistemlerde generic text gelir
+        if (
+          err.message &&
+          err.message.toLowerCase().includes("file too large")
+        ) {
+          return res.status(400).json({
+            status: "fail",
+            message: "Dosya boyutu 25MB'den fazla olamaz 🚫",
+          });
+        }
+
+        // 3️⃣ Diğer tüm hatalar
         return res.status(400).json({
           status: "fail",
           message: "Dosya yüklenirken bir hata oluştu.",
@@ -540,6 +556,13 @@ app.post(
           status: "fail",
           message:
             "Bu mülke sözleşme yükleme yetkiniz yok. Sadece kendi mülkleriniz için işlem yapabilirsiniz.",
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Herhangi bir dosya yüklenmedi.",
         });
       }
 
