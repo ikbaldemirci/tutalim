@@ -815,7 +815,20 @@ export default function BasicTable({
                           accept="application/pdf,image/*"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) handleUploadContract(row._id, file);
+                            if (!file) return;
+
+                            const maxSize = 25 * 1024 * 1024;
+                            if (file.size > maxSize) {
+                              setSnackbar({
+                                open: true,
+                                message: "Dosya boyutu 25 MB’den fazla olamaz",
+                                severity: "error",
+                              });
+                              e.target.value = null;
+                              return;
+                            }
+
+                            handleUploadContract(row._id, file);
                             e.target.value = null;
                           }}
                         />
