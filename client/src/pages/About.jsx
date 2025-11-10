@@ -321,7 +321,13 @@ function About() {
                         color="primary"
                         sx={{ my: 1 }}
                       >
-                        <CountUp end={stat.value} duration={2.5} />+
+                        <CountUp
+                          end={stat.value}
+                          duration={2.5}
+                          enableScrollSpy
+                          scrollSpyOnce
+                        />
+                        +
                       </Typography>
                       <Typography variant="body1" sx={{ color: "#555" }}>
                         {stat.label}
