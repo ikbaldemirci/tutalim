@@ -862,7 +862,7 @@ app.post("/api/logout", async (req, res) => {
 //   }
 // });
 
-app.post(
+app.put(
   "/api/properties/:id/notes",
   verifyToken,
   upload.single("noteImage"),
