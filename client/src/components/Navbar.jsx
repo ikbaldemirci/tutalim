@@ -26,26 +26,21 @@ function Navbar({ onLogout, bg }) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    let ticking = false;
+    const handleOutsideClick = (event) => {
+      const navbar = document.getElementById("mainNavbar");
+      const toggler = document.querySelector(".navbar-toggler");
 
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const y = window.scrollY;
-          const total =
-            document.documentElement.scrollHeight - window.innerHeight;
-
-          setScrolled(y > 8);
-          setScrollProgress(total > 0 ? (y / total) * 100 : 0);
-
-          ticking = false;
-        });
-        ticking = true;
+      if (
+        navbar?.classList.contains("show") &&
+        !navbar.contains(event.target) &&
+        !toggler.contains(event.target)
+      ) {
+        navbar.classList.remove("show");
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
   }, []);
 
   const closeMobileMenu = () => {
@@ -120,6 +115,11 @@ function Navbar({ onLogout, bg }) {
           aria-expanded="false"
           aria-label="Toggle navigation"
           style={{ border: "none" }}
+          onClick={() => {
+            const el = document.getElementById("mainNavbar");
+            if (el.classList.contains("show")) el.classList.remove("show");
+            else el.classList.add("show");
+          }}
         >
           <span className="navbar-toggler-icon" />
         </button>
