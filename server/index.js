@@ -499,39 +499,7 @@ app.delete("/api/properties/:id", verifyToken, async (req, res) => {
 // app.post(
 //   "/api/properties/:id/contract",
 //   verifyToken,
-//   (req, res, next) => {
-//     upload.single("contract")(req, res, (err) => {
-//       if (err) {
-//         console.error("Upload error:", err); // 👈 konsola tam hata mesajını da loglayalım
-
-//         // 1️⃣ Multer resmi hata kodu
-//         if (err.code === "LIMIT_FILE_SIZE") {
-//           return res.status(400).json({
-//             status: "fail",
-//             message: "Dosya boyutu 25MB'den fazla olamaz 🚫",
-//           });
-//         }
-
-//         // 2️⃣ Bazı sistemlerde generic text gelir
-//         if (
-//           err.message &&
-//           err.message.toLowerCase().includes("file too large")
-//         ) {
-//           return res.status(400).json({
-//             status: "fail",
-//             message: "Dosya boyutu 25MB'den fazla olamaz 🚫",
-//           });
-//         }
-
-//         // 3️⃣ Diğer tüm hatalar
-//         return res.status(400).json({
-//           status: "fail",
-//           message: "Dosya yüklenirken bir hata oluştu.",
-//         });
-//       }
-//       next();
-//     });
-//   },
+//   upload.single("contract"),
 //   async (req, res) => {
 //     try {
 //       const propertyId = req.params.id;
@@ -552,17 +520,16 @@ app.delete("/api/properties/:id", verifyToken, async (req, res) => {
 //           property.owner?.toString() === userId.toString());
 
 //       if (!isAuthorized) {
+//         if (!property.realtor) {
+//           return res.status(400).json({
+//             status: "fail",
+//             message: "Bu işlem için önce bir emlakçı atayın",
+//           });
+//         }
 //         return res.status(403).json({
 //           status: "fail",
 //           message:
 //             "Bu mülke sözleşme yükleme yetkiniz yok. Sadece kendi mülkleriniz için işlem yapabilirsiniz.",
-//         });
-//       }
-
-//       if (!req.file) {
-//         return res.status(400).json({
-//           status: "fail",
-//           message: "Herhangi bir dosya yüklenmedi.",
 //         });
 //       }
 
@@ -594,41 +561,31 @@ app.post(
   upload.single("contract"),
   async (req, res) => {
     try {
-      const propertyId = req.params.id;
-      const userId = req.user.id;
-      const userRole = req.user.role;
-
-      const property = await Property.findById(propertyId);
-      if (!property) {
+      const property = await Property.findById(req.params.id);
+      if (!property)
         return res
           .status(404)
           .json({ status: "fail", message: "Mülk bulunamadı" });
-      }
 
-      const isAuthorized =
-        (userRole === "realtor" &&
-          property.realtor?.toString() === userId.toString()) ||
-        (userRole === "owner" &&
-          property.owner?.toString() === userId.toString());
-
-      if (!isAuthorized) {
-        if (!property.realtor) {
-          return res.status(400).json({
-            status: "fail",
-            message: "Bu işlem için önce bir emlakçı atayın",
-          });
-        }
+      // 🔐 sadece kendi mülküne yükleme yapabilsin
+      if (property.owner?.toString() !== req.user.id.toString()) {
         return res.status(403).json({
           status: "fail",
-          message:
-            "Bu mülke sözleşme yükleme yetkiniz yok. Sadece kendi mülkleriniz için işlem yapabilirsiniz.",
+          message: "Sadece kendi mülklerinize dosya yükleyebilirsiniz.",
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Lütfen bir sözleşme dosyası seçin.",
         });
       }
 
       property.contractFile = req.file.path;
-      await property.save();
+      await property.save({ validateBeforeSave: false });
 
-      const updated = await Property.findById(propertyId)
+      const updated = await Property.findById(req.params.id)
         .populate("realtor", "name mail")
         .populate("owner", "name mail");
 
@@ -646,6 +603,7 @@ app.post(
     }
   }
 );
+
 app.delete("/api/properties/:id/contract", verifyToken, async (req, res) => {
   try {
     const propertyId = req.params.id;
@@ -890,19 +848,60 @@ app.post("/api/logout", async (req, res) => {
   }
 });
 
-app.put("/api/properties/:id/notes", verifyToken, async (req, res) => {
-  try {
-    const { notes } = req.body;
-    const property = await Property.findByIdAndUpdate(
-      req.params.id,
-      { notes },
-      { new: true }
-    );
-    res.json({ status: "success", property });
-  } catch (err) {
-    res.status(500).json({ status: "error", message: "Not kaydedilemedi" });
+// app.put("/api/properties/:id/notes", verifyToken, async (req, res) => {
+//   try {
+//     const { notes } = req.body;
+//     const property = await Property.findByIdAndUpdate(
+//       req.params.id,
+//       { notes },
+//       { new: true }
+//     );
+//     res.json({ status: "success", property });
+//   } catch (err) {
+//     res.status(500).json({ status: "error", message: "Not kaydedilemedi" });
+//   }
+// });
+
+app.post(
+  "/api/properties/:id/notes",
+  verifyToken,
+  upload.single("noteImage"),
+  async (req, res) => {
+    try {
+      const property = await Property.findById(req.params.id);
+      if (!property)
+        return res
+          .status(404)
+          .json({ status: "fail", message: "Mülk bulunamadı" });
+
+      if (property.owner?.toString() !== req.user.id.toString()) {
+        return res.status(403).json({
+          status: "fail",
+          message: "Sadece kendi mülklerinize not ekleyebilirsiniz.",
+        });
+      }
+
+      if (req.file) {
+        property.notes = property.notes || "";
+        property.notes += `<img src="/${req.file.path}" alt="note image" />`;
+      }
+
+      await property.save({ validateBeforeSave: false });
+
+      res.json({
+        status: "success",
+        message: "Not başarıyla kaydedildi",
+        property,
+      });
+    } catch (err) {
+      console.error("Note upload error:", err);
+      res.status(500).json({
+        status: "error",
+        message: "Sunucu hatası (not yükleme)",
+      });
+    }
   }
-});
+);
 
 app.post("/api/assignments", verifyToken, async (req, res) => {
   try {
