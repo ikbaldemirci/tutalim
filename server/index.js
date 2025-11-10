@@ -516,7 +516,6 @@ app.post(
       next();
     });
   },
-  upload.single("contract"),
   async (req, res) => {
     try {
       const propertyId = req.params.id;
