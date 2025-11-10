@@ -320,9 +320,11 @@ export default function BasicTable({
 
   const handleUploadContract = async (id, file) => {
     if (!file) return;
+
     const formData = new FormData();
     formData.append("contract", file);
     setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
+
     try {
       const res = await axios.post(
         `https://tutalim.com/api/properties/${id}/contract`,
@@ -334,20 +336,33 @@ export default function BasicTable({
           },
         }
       );
-      if (res.data.status === "success") {
+
+      if (res.data?.status === "success") {
         onUpdate(res.data.property);
         setLoadingState((prev) => ({ ...prev, [id]: null }));
         setSnackbar({
           open: true,
-          message: "Sözleşme başarıyla yüklendi",
+          message: res.data.message,
           severity: "success",
         });
+      } else {
+        setLoadingState((prev) => ({ ...prev, [id]: null }));
+        setSnackbar({
+          open: true,
+          message: res.data?.message || "Sözleşme yüklenemedi",
+          severity: "error",
+        });
       }
-    } catch {
+    } catch (error) {
+      console.error("Upload error:", error);
+
+      const backendMessage =
+        error.response?.data?.message || "Sözleşme yüklenemedi";
+
       setLoadingState((prev) => ({ ...prev, [id]: null }));
       setSnackbar({
         open: true,
-        message: "Sözleşme yüklenemedi",
+        message: backendMessage,
         severity: "error",
       });
     }
