@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import * as bootstrap from "bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -29,7 +30,7 @@ function Navbar({ onLogout, bg }) {
     const navEl = document.getElementById("mainNavbar");
     if (!navEl) return;
 
-    const collapse = window.bootstrap.Collapse.getOrCreateInstance(navEl, {
+    const collapse = bootstrap.Collapse.getOrCreateInstance(navEl, {
       toggle: false,
     });
 
