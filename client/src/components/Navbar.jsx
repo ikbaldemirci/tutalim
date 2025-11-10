@@ -35,7 +35,10 @@ function Navbar({ onLogout, bg }) {
         !navbar.contains(event.target) &&
         !toggler.contains(event.target)
       ) {
-        navbar.classList.remove("show");
+        const collapse = new window.bootstrap.Collapse(navbar, {
+          toggle: false,
+        });
+        collapse.hide();
       }
     };
 
@@ -109,14 +112,12 @@ function Navbar({ onLogout, bg }) {
         <button
           className="navbar-toggler"
           type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNavbar"
           aria-controls="mainNavbar"
           aria-expanded="false"
           aria-label="Toggle navigation"
           style={{ border: "none" }}
-          onClick={() => {
-            const el = document.getElementById("mainNavbar");
-            el.classList.toggle("show");
-          }}
         >
           <span className="navbar-toggler-icon" />
         </button>
