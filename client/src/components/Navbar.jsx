@@ -36,32 +36,37 @@ function Navbar({ onLogout, bg }) {
           })
         : null;
 
-    const onDocClick = (e) => {
+    const handleOutsideClick = (e) => {
       const toggler = document.querySelector(".navbar-toggler");
       if (
         navEl.classList.contains("show") &&
         !navEl.contains(e.target) &&
         !toggler.contains(e.target)
       ) {
-        const c = getCollapse();
-        c && c.hide();
+        const collapse = getCollapse();
+        collapse && collapse.hide();
       }
     };
-    const onShown = () => {
-      document.addEventListener("click", onDocClick, { capture: true });
+
+    const handleShown = () => {
+      window.addEventListener("click", handleOutsideClick, { capture: true });
     };
 
-    const onHidden = () => {
-      document.removeEventListener("click", onDocClick, { capture: true });
+    const handleHidden = () => {
+      window.removeEventListener("click", handleOutsideClick, {
+        capture: true,
+      });
     };
 
-    navEl.addEventListener("shown.bs.collapse", onShown);
-    navEl.addEventListener("hidden.bs.collapse", onHidden);
+    navEl.addEventListener("shown.bs.collapse", handleShown);
+    navEl.addEventListener("hidden.bs.collapse", handleHidden);
 
     return () => {
-      navEl.removeEventListener("shown.bs.collapse", onShown);
-      navEl.removeEventListener("hidden.bs.collapse", onHidden);
-      document.removeEventListener("click", onDocClick, { capture: true });
+      navEl.removeEventListener("shown.bs.collapse", handleShown);
+      navEl.removeEventListener("hidden.bs.collapse", handleHidden);
+      window.removeEventListener("click", handleOutsideClick, {
+        capture: true,
+      });
     };
   }, []);
 
