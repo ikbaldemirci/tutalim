@@ -330,7 +330,12 @@ function About() {
                           duration={2.5}
                           ref={countUpRef}
                           preserveValue={true}
-                        />
+                        >
+                          {({ countUpRef: internalRef, start }) => {
+                            countUpRef.current = { start };
+                            return <span ref={internalRef} />;
+                          }}
+                        </CountUp>
                         +
                       </Typography>
                       <Typography variant="body1" sx={{ color: "#555" }}>
