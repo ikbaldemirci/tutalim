@@ -279,13 +279,13 @@ export default function BasicTable({
         setRealtorInput({ ...realtorInput, [id]: "" });
         setSnackbar({
           open: true,
-          message: res.data.message || "Atama başarılı ✅",
+          message: res.data.message || "Atama başarılı",
           severity: "success",
         });
       } else {
         setSnackbar({
           open: true,
-          message: res.data.message || "Atama başarısız ❌",
+          message: res.data.message || "Atama başarısız",
           severity: "warning",
         });
       }
@@ -293,7 +293,7 @@ export default function BasicTable({
       setSnackbar({
         open: true,
         message:
-          err.response?.data?.message || "Atama sırasında bir hata oluştu ❌",
+          err.response?.data?.message || "Atama sırasında bir hata oluştu",
         severity: "error",
       });
     }
@@ -339,7 +339,7 @@ export default function BasicTable({
         setLoadingState((prev) => ({ ...prev, [id]: null }));
         setSnackbar({
           open: true,
-          message: "Sözleşme başarıyla yüklendi 📄",
+          message: "Sözleşme başarıyla yüklendi",
           severity: "success",
         });
       }
@@ -347,7 +347,7 @@ export default function BasicTable({
       setLoadingState((prev) => ({ ...prev, [id]: null }));
       setSnackbar({
         open: true,
-        message: "Sözleşme yüklenemedi ❌",
+        message: "Sözleşme yüklenemedi",
         severity: "error",
       });
     }
@@ -369,7 +369,7 @@ export default function BasicTable({
         setLoadingState((prev) => ({ ...prev, [id]: null }));
         setSnackbar({
           open: true,
-          message: "Sözleşme silindi 🗑️",
+          message: "Sözleşme silindi",
           severity: "info",
         });
       }
@@ -377,7 +377,7 @@ export default function BasicTable({
       setLoadingState((prev) => ({ ...prev, [id]: null }));
       setSnackbar({
         open: true,
-        message: "Sözleşme silinemedi ❌",
+        message: "Sözleşme silinemedi",
         severity: "error",
       });
     }
@@ -395,21 +395,21 @@ export default function BasicTable({
         if (!isAutoSave) {
           setSnackbar({
             open: true,
-            message: "Not başarıyla kaydedildi ✅",
+            message: "Not başarıyla kaydedildi",
             severity: "success",
           });
           closeNotes();
         }
       }
     } catch (err) {
-      console.error("❌ Not kaydetme hatası:", err);
+      console.error("Not kaydetme hatası:", err);
 
       if (!isAutoSave) {
         setSnackbar({
           open: true,
           message:
             err.response?.data?.message ||
-            "Not kaydedilemedi. Lütfen tekrar deneyin ❌",
+            "Not kaydedilemedi. Lütfen tekrar deneyin",
           severity: "error",
         });
       }
