@@ -45,6 +45,16 @@ function Navbar({ onLogout, bg }) {
       }
     };
 
+    const toggler = document.querySelector(".navbar-toggler");
+    const handleTogglerClick = () => {
+      if (navEl.classList.contains("show")) {
+        collapse.hide();
+      } else {
+        collapse.show();
+      }
+    };
+    toggler.addEventListener("click", handleTogglerClick);
+
     const enableOutsideClose = () =>
       window.addEventListener("click", handleOutsideClick, true);
     const disableOutsideClose = () =>
@@ -57,6 +67,7 @@ function Navbar({ onLogout, bg }) {
       navEl.removeEventListener("shown.bs.collapse", enableOutsideClose);
       navEl.removeEventListener("hidden.bs.collapse", disableOutsideClose);
       disableOutsideClose();
+      toggler.removeEventListener("click", handleTogglerClick);
     };
   }, []);
 
