@@ -612,6 +612,12 @@ app.post(
           property.owner?.toString() === userId.toString());
 
       if (!isAuthorized) {
+        if (!property.realtor) {
+          return res.status(400).json({
+            status: "fail",
+            message: "Bu işlem için önce bir emlakçı atayın",
+          });
+        }
         return res.status(403).json({
           status: "fail",
           message:
