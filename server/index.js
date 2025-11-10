@@ -876,8 +876,8 @@ app.post("/api/logout", async (req, res) => {
     if (!refreshTokenValue) {
       res.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: false,
-        sameSite: "Lax",
+        secure: true,
+        sameSite: "none",
         path: "/",
       });
       return res.json({

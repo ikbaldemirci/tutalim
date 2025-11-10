@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import api from "../api";
 import {
   Table,
@@ -162,7 +161,7 @@ export default function BasicTable({
 
   const handleSave = async (id) => {
     try {
-      const res = await axios.put(
+      const res = await api.put(
         `https://tutalim.com/api/properties/${id}`,
         {
           ...editForm,
@@ -196,12 +195,9 @@ export default function BasicTable({
     if (!window.confirm("Bu mülkü silmek istediğinize emin misiniz?")) return;
 
     try {
-      const res = await axios.delete(
-        `https://tutalim.com/api/properties/${id}`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await api.delete(`https://tutalim.com/api/properties/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       if (res.data.status === "success") {
         onUpdate({ _id: id, deleted: true });
         setSnackbar({
@@ -265,7 +261,7 @@ export default function BasicTable({
 
   const handleAssign = async (id, payload) => {
     try {
-      const res = await axios.put(
+      const res = await api.put(
         `https://tutalim.com/api/properties/${id}/assign`,
         payload,
         {
@@ -336,7 +332,7 @@ export default function BasicTable({
     setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
 
     try {
-      const res = await axios.post(
+      const res = await api.post(
         `https://tutalim.com/api/properties/${id}/contract`,
         formData,
         {
@@ -396,7 +392,7 @@ export default function BasicTable({
     setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
 
     try {
-      const res = await axios.delete(
+      const res = await api.delete(
         `https://tutalim.com/api/properties/${id}/contract`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
