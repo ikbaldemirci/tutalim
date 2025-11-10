@@ -1,27 +1,25 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const cron = require("node-cron");
+const cookieParser = require("cookie-parser");
 const bcrypt = require("bcrypt");
-const collection = require("./config");
-const app = express();
-const Property = require("./propertyModel");
-const multer = require("multer");
+const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
-const crypto = require("crypto");
-const cookieParser = require("cookie-parser");
+const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
+const jwt = require("jsonwebtoken");
+const cron = require("node-cron");
+
+const app = express();
+
+const collection = require("./config");
+const Property = require("./propertyModel");
 const RefreshToken = require("./models/RefreshToken");
 const Assignment = require("./models/Assignment");
-const ACCESS_SECRET = process.env.ACCESS_SECRET || "tutalim-secret";
-const REFRESH_SECRET = process.env.REFRESH_SECRET || "tutalim-refresh-secret";
-const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN || 15);
-const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS || 30);
-
-const verifyToken = require("./middleware/verifyToken");
 const Notification = require("./models/Notification");
 const Reminder = require("./models/Reminder");
+const verifyToken = require("./middleware/verifyToken");
 
 const {
   sendMail,
@@ -33,6 +31,34 @@ const {
   reminderMailHtml,
   contactMailHtml,
 } = require("./utils/mailer");
+
+const ACCESS_SECRET = process.env.ACCESS_SECRET || "tutalim-secret";
+const REFRESH_SECRET = process.env.REFRESH_SECRET || "tutalim-refresh-secret";
+const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN || 15);
+const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS || 30);
+
+const allowedOrigins = ["https://tutalim.com", "https://www.tutalim.com"];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("Engellenen origin:", origin);
+        callback(new Error("CORS engellendi"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+app.use(cookieParser());
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ limit: "25mb", extended: true }));
+
+app.use("/uploads", express.static("uploads"));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -49,21 +75,11 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
-
 const upload = multer({ storage });
-
-app.use(cookieParser());
-app.use(express.json({ limit: "25mb" }));
-app.use(express.urlencoded({ limit: "25mb", extended: true }));
-app.options("*", cors());
-app.use("/uploads", express.static("uploads"));
-
-const allowedOrigins = ["https://tutalim.com", "https://www.tutalim.com"];
 
 app.post("/api/send-mail", async (req, res) => {
   try {
     const { to, subject, html, text } = req.body;
-
     if (!to || !subject || !html) {
       return res.status(400).json({
         status: "error",
@@ -78,8 +94,7 @@ app.post("/api/send-mail", async (req, res) => {
       text: text || html.replace(/<[^>]+>/g, ""),
     });
 
-    console.log(`✅ Mail gönderildi: ${info.messageId} -> ${to}`);
-
+    console.log(`Mail gönderildi: ${info.messageId} -> ${to}`);
     return res.json({
       status: "success",
       message: "E-posta başarıyla gönderildi",
@@ -96,25 +111,10 @@ app.post("/api/send-mail", async (req, res) => {
   }
 });
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("❌ Engellenen origin:", origin);
-        callback(new Error("CORS engellendi"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
 app.post("/api/signup", async (req, res) => {
   try {
     const { name, surname, mail, password, role } = req.body;
+
     const existingUser = await collection.findOne({ mail });
     if (existingUser) {
       return res.json({
@@ -141,7 +141,6 @@ app.post("/api/signup", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const verifyToken = crypto.randomBytes(20).toString("hex");
     const verifyExpires = new Date(Date.now() + 30 * 60 * 1000);
 
@@ -168,60 +167,65 @@ app.post("/api/signup", async (req, res) => {
       message: "Kullanıcı oluşturuldu, mail doğrulaması gönderildi.",
     });
   } catch (err) {
-    console.error(err);
+    console.error("Signup error:", err);
     res.status(500).json({ status: "error", message: "Server error" });
   }
 });
 
-const jwt = require("jsonwebtoken");
-
 app.post("/api/login", async (req, res) => {
-  const { mail, password } = req.body;
-  const user = await collection.findOne({ mail });
+  try {
+    const { mail, password } = req.body;
+    const user = await collection.findOne({ mail });
 
-  if (!user) {
-    return res.json({ status: "fail", message: "Kullanıcı bulunamadı" });
-  }
+    if (!user)
+      return res.json({ status: "fail", message: "Kullanıcı bulunamadı" });
 
-  if (!user.isVerified) {
-    return res.json({
-      status: "fail",
-      message: "Hesabınız henüz doğrulanmamış. Lütfen mailinizi kontrol edin.",
+    if (!user.isVerified) {
+      return res.json({
+        status: "fail",
+        message:
+          "Hesabınız henüz doğrulanmamış. Lütfen mailinizi kontrol edin.",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.json({ status: "fail", message: "Yanlış Şifre" });
+
+    const accessToken = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+        name: user.name,
+        surname: user.surname,
+        mail: user.mail,
+      },
+      ACCESS_SECRET,
+      { expiresIn: `${ACCESS_EXPIRES_MIN}m` }
+    );
+
+    const refreshTokenValue = uuidv4();
+    const refreshExpires = new Date();
+    refreshExpires.setDate(refreshExpires.getDate() + REFRESH_EXPIRES_DAYS);
+
+    await RefreshToken.create({
+      token: refreshTokenValue,
+      userId: user._id,
+      expiresAt: refreshExpires,
     });
+
+    res
+      .cookie("refreshToken", refreshTokenValue, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        path: "/",
+        maxAge: REFRESH_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
+      })
+      .json({ status: "success", token: accessToken });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ status: "error", message: "Server error" });
   }
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.json({ status: "fail", message: "Yanlış Şifre" });
-
-  const accessToken = jwt.sign(
-    {
-      id: user._id,
-      role: user.role,
-      name: user.name,
-      surname: user.surname,
-      mail: user.mail,
-    },
-    ACCESS_SECRET,
-    { expiresIn: `${ACCESS_EXPIRES_MIN}m` }
-  );
-
-  const refreshTokenValue = uuidv4();
-  const refreshExpires = new Date();
-  refreshExpires.setDate(refreshExpires.getDate() + REFRESH_EXPIRES_DAYS);
-
-  await RefreshToken.create({
-    token: refreshTokenValue,
-    userId: user._id,
-    expiresAt: refreshExpires,
-  });
-  res
-    .cookie("refreshToken", refreshTokenValue, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      path: "/",
-      maxAge: REFRESH_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
-    })
-    .json({ status: "success", token: accessToken });
 });
 
 app.get("/api/users", verifyToken, async (req, res) => {
