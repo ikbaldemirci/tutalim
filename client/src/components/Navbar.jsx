@@ -31,14 +31,21 @@ function Navbar({ onLogout, bg }) {
       const toggler = document.querySelector(".navbar-toggler");
 
       if (
-        navbar?.classList.contains("show") &&
+        navbar &&
+        navbar.classList.contains("show") &&
         !navbar.contains(event.target) &&
         !toggler.contains(event.target)
       ) {
-        const collapse = new window.bootstrap.Collapse(navbar, {
-          toggle: false,
-        });
-        collapse.hide();
+        try {
+          const collapse = window.bootstrap?.Collapse.getInstance(navbar);
+          if (collapse) {
+            collapse.hide();
+          } else {
+            new window.bootstrap.Collapse(navbar, { toggle: false }).hide();
+          }
+        } catch (err) {
+          console.error("Navbar collapse error:", err);
+        }
       }
     };
 
