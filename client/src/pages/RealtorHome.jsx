@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import api from "../api";
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
@@ -39,24 +38,20 @@ function RealtorHome() {
     severity: "success",
   });
 
+  // 🔹 Mülkleri getir
   useEffect(() => {
-    if (token && decoded?.id) {
-      axios
-        .get("https://tutalim.com/api/properties", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-
-        .then((res) => {
-          if (res.data.status === "success") {
-            setProperties(res.data.properties);
-          }
-        })
-        .catch((err) => {
-          console.error("Veri çekme hatası:", err);
-        });
-    }
+    if (!token || !decoded?.id) return;
+    api
+      .get("/properties")
+      .then((res) => {
+        if (res.data.status === "success") {
+          setProperties(res.data.properties);
+        }
+      })
+      .catch((err) => console.error("Veri çekme hatası:", err));
   }, [token]);
 
+  // 🔹 Davetleri getir
   useEffect(() => {
     if (!token) return;
     api
@@ -68,35 +63,39 @@ function RealtorHome() {
       .finally(() => setLoadingInvites(false));
   }, [token]);
 
+  // 🔹 Daveti kabul et
   const acceptInvite = async (id) => {
     try {
       const res = await api.post(`/assignments/${id}/accept`);
       if (res.data.status === "success") {
         setInvites((prev) => prev.filter((i) => i._id !== id));
-        axios
-          .get("https://tutalim.com/api/properties", {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((r) => {
-            if (r.data.status === "success") setProperties(r.data.properties);
-          });
+        if (res.data.property) {
+          setProperties((prev) => [...prev, res.data.property]);
+        }
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error("Davet kabul hatası:", err);
+    }
   };
 
+  // 🔹 Daveti reddet
   const rejectInvite = async (id) => {
     try {
       const res = await api.post(`/assignments/${id}/reject`);
       if (res.data.status === "success") {
         setInvites((prev) => prev.filter((i) => i._id !== id));
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error("Davet reddetme hatası:", err);
+    }
   };
 
+  // 🔹 Form değişimi
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // 🔹 Yeni mülk ekleme
   const handleAddProperty = async () => {
     if (!form.rentPrice || !form.rentDate || !form.endDate || !form.location) {
       setSnackbar({
@@ -108,19 +107,13 @@ function RealtorHome() {
     }
 
     try {
-      const res = await axios.post(
-        "https://tutalim.com/api/properties",
-        {
-          rentPrice: form.rentPrice,
-          rentDate: new Date(form.rentDate),
-          endDate: new Date(form.endDate),
-          location: form.location,
-          tenantName: form.tenantName,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await api.post("/properties", {
+        rentPrice: form.rentPrice,
+        rentDate: new Date(form.rentDate),
+        endDate: new Date(form.endDate),
+        location: form.location,
+        tenantName: form.tenantName,
+      });
 
       if (res.data.status === "success") {
         setProperties((prev) => [...prev, res.data.property]);
@@ -150,9 +143,9 @@ function RealtorHome() {
   return (
     <>
       <Navbar />
-      {/* <WelcomeHeader name={decoded?.name} /> */}
       <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
 
+      {/* Davetler */}
       <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
         {!loadingInvites && invites.length > 0 && (
           <Box
@@ -179,8 +172,7 @@ function RealtorHome() {
                 <Typography sx={{ fontSize: 14 }}>
                   {inv.fromUser?.name || inv.fromUser?.mail} sizi bu mülke{" "}
                   {inv.role === "realtor" ? "emlakçı" : "ev sahibi"} olarak
-                  atamak istiyor:
-                  <strong> {inv.property?.location}</strong>
+                  atamak istiyor: <strong>{inv.property?.location}</strong>
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1 }}>
                   <button
@@ -216,6 +208,7 @@ function RealtorHome() {
         )}
       </Box>
 
+      {/* Yeni ilan ekleme formu */}
       <Paper
         elevation={3}
         sx={{
@@ -318,6 +311,7 @@ function RealtorHome() {
         </Box>
       </Paper>
 
+      {/* Tablo */}
       {properties.length > 0 ? (
         <BasicTable
           data={properties}

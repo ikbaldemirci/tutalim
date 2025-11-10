@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import api from "../api";
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
@@ -18,20 +17,16 @@ function OwnerHome() {
   const [loadingInvites, setLoadingInvites] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      const ownerId = decoded?.id;
-      axios
-        .get("https://tutalim.com/api/properties", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((res) => {
-          if (res.data.status === "success") {
-            setProperties(res.data.properties);
-          }
-        })
-        .catch((err) => console.error("Veri çekme hatası:", err))
-        .finally(() => setLoading(false));
-    }
+    if (!token) return;
+    api
+      .get("/properties")
+      .then((res) => {
+        if (res.data.status === "success") {
+          setProperties(res.data.properties);
+        }
+      })
+      .catch((err) => console.error("Veri çekme hatası:", err))
+      .finally(() => setLoading(false));
   }, [token]);
 
   useEffect(() => {
@@ -50,17 +45,13 @@ function OwnerHome() {
       const res = await api.post(`/assignments/${id}/accept`);
       if (res.data.status === "success") {
         setInvites((prev) => prev.filter((i) => i._id !== id));
-        setLoading(true);
-        axios
-          .get("https://tutalim.com/api/properties", {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((r) => {
-            if (r.data.status === "success") setProperties(r.data.properties);
-          })
-          .finally(() => setLoading(false));
+        if (res.data.property) {
+          setProperties((prev) => [...prev, res.data.property]);
+        }
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error("Davet kabul hatası:", err);
+    }
   };
 
   const rejectInvite = async (id) => {
@@ -69,14 +60,14 @@ function OwnerHome() {
       if (res.data.status === "success") {
         setInvites((prev) => prev.filter((i) => i._id !== id));
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error("Davet reddetme hatası:", err);
+    }
   };
 
   return (
     <>
       <Navbar />
-
-      {/* <WelcomeHeader name={decoded?.name || "Kullanıcı"} /> */}
       <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
 
       {!loadingInvites && invites.length > 0 && (
@@ -105,8 +96,7 @@ function OwnerHome() {
                 <Typography sx={{ fontSize: 14 }}>
                   {inv.fromUser?.name || inv.fromUser?.mail} sizi bu mülke{" "}
                   {inv.role === "realtor" ? "emlakçı" : "ev sahibi"} olarak
-                  atamak istiyor:
-                  <strong> {inv.property?.location}</strong>
+                  atamak istiyor: <strong>{inv.property?.location}</strong>
                 </Typography>
                 <Box sx={{ display: "flex", gap: 1 }}>
                   <button

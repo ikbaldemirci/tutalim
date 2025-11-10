@@ -18,7 +18,6 @@ import {
   Box,
   Slide,
   Zoom,
-  Fade,
   Dialog,
   DialogActions,
   DialogContent,
@@ -58,36 +57,30 @@ export default function BasicTable({
     severity: "success",
   });
   const [sentInvitesMap, setSentInvitesMap] = useState({});
-
-  const tableRef = useRef(null);
-  const [tableScrollWidth, setTableScrollWidth] = useState(0);
-
   const [notesSaved, setNotesSaved] = useState({});
   const [notesDraft, setNotesDraft] = useState({});
   const [openRowId, setOpenRowId] = useState(null);
   const autoSaveTimers = useRef({});
 
-  const openNotes = (rowId) => {
-    setOpenRowId(rowId);
-    setNotesDraft((prev) => ({ ...prev, [rowId]: notesSaved[rowId] || "" }));
-  };
+  const tableRef = useRef(null);
+  const [tableScrollWidth, setTableScrollWidth] = useState(0);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [menuRowId, setMenuRowId] = useState(null);
 
-  const closeNotes = () => {
-    if (autoSaveTimers.current[openRowId]) {
-      clearTimeout(autoSaveTimers.current[openRowId]);
-      delete autoSaveTimers.current[openRowId];
-    }
-    setOpenRowId(null);
-  };
+  const token = localStorage.getItem("token");
+  const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
+  const userRole = decoded?.role;
+
+  const Transition = React.forwardRef((props, ref) => (
+    <Zoom ref={ref} {...props} timeout={400} />
+  ));
 
   useEffect(() => {
     const updateWidth = () => {
       const el = tableRef.current;
       if (el) setTableScrollWidth(el.scrollWidth || 0);
     };
-
     updateWidth();
-    const raf = requestAnimationFrame(updateWidth);
 
     const ro =
       typeof ResizeObserver !== "undefined"
@@ -96,11 +89,9 @@ export default function BasicTable({
     if (ro && tableRef.current) ro.observe(tableRef.current);
 
     window.addEventListener("resize", updateWidth);
-
     return () => {
       window.removeEventListener("resize", updateWidth);
       if (ro) ro.disconnect();
-      cancelAnimationFrame(raf);
     };
   }, [data]);
 
@@ -113,17 +104,6 @@ export default function BasicTable({
       setNotesSaved(synced);
     }
   }, [data]);
-
-  const token = localStorage.getItem("token");
-  const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
-  const userRole = decoded?.role;
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [menuRowId, setMenuRowId] = useState(null);
-
-  const Transition = React.forwardRef((props, ref) => (
-    <Zoom ref={ref} {...props} timeout={400} />
-  ));
 
   useEffect(() => {
     const loadSent = async () => {
@@ -161,24 +141,18 @@ export default function BasicTable({
 
   const handleSave = async (id) => {
     try {
-      const res = await api.put(
-        `https://tutalim.com/api/properties/${id}`,
-        {
-          ...editForm,
-          rentDate: editForm.rentDate ? new Date(editForm.rentDate) : undefined,
-          endDate: editForm.endDate ? new Date(editForm.endDate) : undefined,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await api.put(`/properties/${id}`, {
+        ...editForm,
+        rentDate: editForm.rentDate ? new Date(editForm.rentDate) : undefined,
+        endDate: editForm.endDate ? new Date(editForm.endDate) : undefined,
+      });
 
       if (res.data.status === "success") {
         onUpdate(res.data.property);
         setEditingRow(null);
         setSnackbar({
           open: true,
-          message: "Güncelleme başarılı 🎉",
+          message: "Güncelleme başarılı",
           severity: "success",
         });
       }
@@ -193,16 +167,13 @@ export default function BasicTable({
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bu mülkü silmek istediğinize emin misiniz?")) return;
-
     try {
-      const res = await api.delete(`https://tutalim.com/api/properties/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const res = await api.delete(`/properties/${id}`);
       if (res.data.status === "success") {
         onUpdate({ _id: id, deleted: true });
         setSnackbar({
           open: true,
-          message: "Mülk başarıyla silindi 🏠",
+          message: "Mülk başarıyla silindi",
           severity: "info",
         });
       }
@@ -225,11 +196,13 @@ export default function BasicTable({
         });
         return;
       }
+
       const res = await api.post("/assignments", {
         propertyId: id,
         targetMail,
         role,
       });
+
       if (res.data.status === "success") {
         if (role === "owner") setOwnerInput({ ...ownerInput, [id]: "" });
         if (role === "realtor") setRealtorInput({ ...realtorInput, [id]: "" });
@@ -261,13 +234,7 @@ export default function BasicTable({
 
   const handleAssign = async (id, payload) => {
     try {
-      const res = await api.put(
-        `https://tutalim.com/api/properties/${id}/assign`,
-        payload,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await api.put(`/properties/${id}/assign`, payload);
 
       if (res.data.status === "success") {
         onUpdate(res.data.property);
@@ -295,25 +262,6 @@ export default function BasicTable({
     }
   };
 
-  const filteredData = data.filter((row) => {
-    const searchLower = search?.toLowerCase() || "";
-    const matchSearch =
-      (row.tenantName && row.tenantName.toLowerCase().includes(searchLower)) ||
-      (row.location && row.location.toLowerCase().includes(searchLower)) ||
-      (row.rentPrice && row.rentPrice.toString().includes(search));
-    const matchDate =
-      (!startDate ||
-        (row.rentDate && new Date(row.rentDate) >= new Date(startDate))) &&
-      (!endDate || (row.endDate && new Date(row.endDate) <= new Date(endDate)));
-    return matchSearch && matchDate;
-  });
-
-  const handleClearFilters = () => {
-    setSearch("");
-    setStartDate("");
-    setEndDate("");
-  };
-
   const handleUploadContract = async (id, file) => {
     if (!file) return;
 
@@ -332,16 +280,9 @@ export default function BasicTable({
     setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
 
     try {
-      const res = await api.post(
-        `https://tutalim.com/api/properties/${id}/contract`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const res = await api.post(`/properties/${id}/contract`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (res.data?.status === "success") {
         onUpdate(res.data.property);
@@ -359,27 +300,14 @@ export default function BasicTable({
       }
     } catch (error) {
       console.error("Upload error:", error);
-
       const status = error.response?.status;
-      let errorMessage = "Sözleşme yüklenemedi";
-
-      if (status === 413) {
-        errorMessage = "Dosya boyutu 25 MB’den fazla olamaz";
-      } else if (status === 403) {
-        errorMessage = "Bu mülke dosya yükleme yetkiniz yok";
-      } else if (status === 404) {
-        errorMessage = "Mülk bulunamadı";
-      } else if (status === 500) {
-        errorMessage = "Sunucu hatası (sözleşme yükleme)";
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      }
-
-      setSnackbar({
-        open: true,
-        message: errorMessage,
-        severity: "error",
-      });
+      let msg = "Sözleşme yüklenemedi";
+      if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
+      else if (status === 403) msg = "Bu mülke dosya yükleme yetkiniz yok";
+      else if (status === 404) msg = "Mülk bulunamadı";
+      else if (status === 500) msg = "Sunucu hatası (sözleşme yükleme)";
+      else if (error.response?.data?.message) msg = error.response.data.message;
+      setSnackbar({ open: true, message: msg, severity: "error" });
     } finally {
       setLoadingState((prev) => ({ ...prev, [id]: null }));
     }
@@ -392,13 +320,7 @@ export default function BasicTable({
     setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
 
     try {
-      const res = await api.delete(
-        `https://tutalim.com/api/properties/${id}/contract`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-
+      const res = await api.delete(`/properties/${id}/contract`);
       if (res.data.status === "success") {
         onUpdate(res.data.property);
         setSnackbar({
@@ -415,25 +337,13 @@ export default function BasicTable({
       }
     } catch (error) {
       console.error("Delete contract error:", error);
-
       const status = error.response?.status;
-      let errorMessage = "Sözleşme silinemedi";
-
-      if (status === 403) {
-        errorMessage = "Bu mülkteki sözleşmeyi silme yetkiniz yok";
-      } else if (status === 404) {
-        errorMessage = "Mülk bulunamadı";
-      } else if (status === 500) {
-        errorMessage = "Sunucu hatası (sözleşme silme)";
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      }
-
-      setSnackbar({
-        open: true,
-        message: errorMessage,
-        severity: "error",
-      });
+      let msg = "Sözleşme silinemedi";
+      if (status === 403) msg = "Bu mülkteki sözleşmeyi silme yetkiniz yok";
+      else if (status === 404) msg = "Mülk bulunamadı";
+      else if (status === 500) msg = "Sunucu hatası (sözleşme silme)";
+      else if (error.response?.data?.message) msg = error.response.data.message;
+      setSnackbar({ open: true, message: msg, severity: "error" });
     } finally {
       setLoadingState((prev) => ({ ...prev, [id]: null }));
     }
@@ -442,29 +352,22 @@ export default function BasicTable({
   const handleNotes = async (id, isAutoSave = false) => {
     try {
       const payload = { notes: notesDraft[id] ?? "" };
-
-      const noteSizeInBytes = new Blob([JSON.stringify(payload)]).size;
-      const maxSize = 25 * 1024 * 1024;
-
-      if (noteSizeInBytes > maxSize) {
-        if (!isAutoSave) {
+      const noteSize = new Blob([JSON.stringify(payload)]).size;
+      if (noteSize > 25 * 1024 * 1024) {
+        if (!isAutoSave)
           setSnackbar({
             open: true,
             message: "Dosya boyutu 25 MB’den fazla olamaz",
             severity: "error",
           });
-        }
         return;
       }
 
       const res = await api.put(`/properties/${id}/notes`, payload);
 
       if (res.data.status === "success") {
-        if (res.data.property && onUpdate) {
-          onUpdate(res.data.property);
-        } else {
-          setNotesSaved((prev) => ({ ...prev, [id]: payload.notes }));
-        }
+        if (res.data.property && onUpdate) onUpdate(res.data.property);
+        else setNotesSaved((p) => ({ ...p, [id]: payload.notes }));
 
         if (!isAutoSave) {
           setSnackbar({
@@ -477,53 +380,62 @@ export default function BasicTable({
       }
     } catch (err) {
       console.error("Not kaydetme hatası:", err);
-
-      let errorMessage = "Not kaydedilemedi. Lütfen tekrar deneyin";
+      let msg = "Not kaydedilemedi. Lütfen tekrar deneyin";
       const status = err.response?.status;
-
-      if (status === 413) {
-        errorMessage = "Dosya boyutu 25 MB’den fazla olamaz";
-      } else if (status === 403) {
-        errorMessage = "Bu mülke not ekleme yetkiniz yok";
-      } else if (status === 404) {
-        errorMessage = "Mülk bulunamadı";
-      } else if (status === 500) {
-        errorMessage = "Sunucu hatası (not yükleme)";
-      } else if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      }
-
-      if (!isAutoSave) {
-        setSnackbar({
-          open: true,
-          message: errorMessage,
-          severity: "error",
-        });
-      }
+      if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
+      else if (status === 403) msg = "Bu mülke not ekleme yetkiniz yok";
+      else if (status === 404) msg = "Mülk bulunamadı";
+      else if (status === 500) msg = "Sunucu hatası (not yükleme)";
+      else if (err.response?.data?.message) msg = err.response.data.message;
+      if (!isAutoSave)
+        setSnackbar({ open: true, message: msg, severity: "error" });
     }
   };
 
   const handleNoteChange = (id, value) => {
     setNotesDraft((prev) => ({ ...prev, [id]: value }));
-
-    if (autoSaveTimers.current[id]) {
-      clearTimeout(autoSaveTimers.current[id]);
-    }
-
+    if (autoSaveTimers.current[id]) clearTimeout(autoSaveTimers.current[id]);
     autoSaveTimers.current[id] = setTimeout(() => {
-      if (openRowId === id) {
-        handleNotes(id, true);
-      }
+      if (openRowId === id) handleNotes(id, true);
     }, 1200);
+  };
+
+  const openNotes = (rowId) => {
+    setOpenRowId(rowId);
+    setNotesDraft((prev) => ({ ...prev, [rowId]: notesSaved[rowId] || "" }));
+  };
+
+  const closeNotes = () => {
+    if (autoSaveTimers.current[openRowId]) {
+      clearTimeout(autoSaveTimers.current[openRowId]);
+      delete autoSaveTimers.current[openRowId];
+    }
+    setOpenRowId(null);
   };
 
   useEffect(() => {
     return () => {
-      if (autoSaveTimers?.current) {
-        Object.values(autoSaveTimers.current).forEach((t) => clearTimeout(t));
-      }
+      Object.values(autoSaveTimers.current).forEach(clearTimeout);
     };
   }, []);
+
+  const filteredData = data.filter((row) => {
+    const s = search.toLowerCase();
+    const matchSearch =
+      row.tenantName?.toLowerCase().includes(s) ||
+      row.location?.toLowerCase().includes(s) ||
+      row.rentPrice?.toString().includes(search);
+    const matchDate =
+      (!startDate || new Date(row.rentDate) >= new Date(startDate)) &&
+      (!endDate || new Date(row.endDate) <= new Date(endDate));
+    return matchSearch && matchDate;
+  });
+
+  const handleClearFilters = () => {
+    setSearch("");
+    setStartDate("");
+    setEndDate("");
+  };
 
   return (
     <>
