@@ -26,31 +26,36 @@ function Navbar({ onLogout, bg }) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const handleOutsideClick = (event) => {
-      const navbar = document.getElementById("mainNavbar");
-      const toggler = document.querySelector(".navbar-toggler");
+    import("bootstrap/dist/js/bootstrap.bundle.min.js").then(() => {
+      const handleOutsideClick = (event) => {
+        const navbar = document.getElementById("mainNavbar");
+        const toggler = document.querySelector(".navbar-toggler");
 
-      if (
-        navbar &&
-        navbar.classList.contains("show") &&
-        !navbar.contains(event.target) &&
-        !toggler.contains(event.target)
-      ) {
-        try {
-          const collapse = window.bootstrap?.Collapse.getInstance(navbar);
-          if (collapse) {
+        if (
+          navbar &&
+          navbar.classList.contains("show") &&
+          !navbar.contains(event.target) &&
+          !toggler.contains(event.target)
+        ) {
+          try {
+            let collapse = window.bootstrap?.Collapse.getInstance(navbar);
+
+            if (!collapse) {
+              collapse = new window.bootstrap.Collapse(navbar, {
+                toggle: false,
+              });
+            }
+
             collapse.hide();
-          } else {
-            new window.bootstrap.Collapse(navbar, { toggle: false }).hide();
+          } catch (err) {
+            console.error("Navbar collapse error:", err);
           }
-        } catch (err) {
-          console.error("Navbar collapse error:", err);
         }
-      }
-    };
+      };
 
-    document.addEventListener("click", handleOutsideClick);
-    return () => document.removeEventListener("click", handleOutsideClick);
+      document.addEventListener("click", handleOutsideClick);
+      return () => document.removeEventListener("click", handleOutsideClick);
+    });
   }, []);
 
   const closeMobileMenu = () => {
