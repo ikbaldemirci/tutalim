@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useEffect, useState, useRef } from "react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
 import CountUp from "react-countup";
 import axios from "axios";
@@ -61,6 +61,7 @@ function About() {
     matchCount: 0,
   });
   const [visible, setVisible] = useState(false);
+  const countUpRef = useRef(null);
 
   useEffect(() => {
     let ignore = false;
@@ -314,7 +315,7 @@ function About() {
                       transition={{ type: "spring", stiffness: 250 }}
                       viewport={{ once: true, amount: 0.3 }}
                       style={{ willChange: "transform, opacity" }}
-                      onViewportEnter={() => setVisible(true)}
+                      onViewportEnter={() => countUpRef.current?.start()}
                     >
                       {stat.icon}
                       <Typography
@@ -323,7 +324,14 @@ function About() {
                         color="primary"
                         sx={{ my: 1 }}
                       >
-                        <CountUp end={stat.value} duration={2.5} />+
+                        <CountUp
+                          start={0}
+                          end={stat.value}
+                          duration={2.5}
+                          ref={countUpRef}
+                          preserveValue={true}
+                        />
+                        +
                       </Typography>
                       <Typography variant="body1" sx={{ color: "#555" }}>
                         {stat.label}
