@@ -133,10 +133,6 @@ function Navbar({ onLogout, bg }) {
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#mainNavbar"
-          aria-controls="mainNavbar"
-          aria-expanded="false"
           aria-label="Toggle navigation"
           style={{ border: "none" }}
         >
