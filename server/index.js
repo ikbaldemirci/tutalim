@@ -50,7 +50,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 25 * 1024 * 1024 } });
 
 app.use(cookieParser());
 app.use(express.json());
@@ -591,6 +591,23 @@ app.delete("/api/properties/:id", verifyToken, async (req, res) => {
 app.post(
   "/api/properties/:id/contract",
   verifyToken,
+  (req, res, next) => {
+    upload.single("contract")(req, res, (err) => {
+      if (err) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({
+            status: "fail",
+            message: "Dosya boyutu 25MB'den fazla olamaz",
+          });
+        }
+        return res.status(400).json({
+          status: "fail",
+          message: "Dosya yüklenirken bir hata oluştu.",
+        });
+      }
+      next();
+    });
+  },
   upload.single("contract"),
   async (req, res) => {
     try {
