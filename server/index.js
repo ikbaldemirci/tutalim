@@ -868,6 +868,10 @@ app.put(
         });
       }
 
+      if (typeof req.body?.notes !== "undefined") {
+        property.notes = req.body.notes;
+      }
+
       if (req.file) {
         property.notes = property.notes || "";
         property.notes += `<img src="/${req.file.path}" alt="note image" />`;

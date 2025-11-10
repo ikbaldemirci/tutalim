@@ -464,7 +464,11 @@ export default function BasicTable({
       const res = await api.put(`/properties/${id}/notes`, payload);
 
       if (res.data.status === "success") {
-        setNotesSaved((prev) => ({ ...prev, [id]: payload.notes }));
+        if (res.data.property && onUpdate) {
+          onUpdate(res.data.property);
+        } else {
+          setNotesSaved((prev) => ({ ...prev, [id]: payload.notes }));
+        }
 
         if (!isAutoSave) {
           setSnackbar({
