@@ -45,16 +45,6 @@ function Navbar({ onLogout, bg }) {
       }
     };
 
-    const toggler = document.querySelector(".navbar-toggler");
-    const handleTogglerClick = () => {
-      if (navEl.classList.contains("show")) {
-        collapse.hide();
-      } else {
-        collapse.show();
-      }
-    };
-    toggler.addEventListener("click", handleTogglerClick);
-
     const enableOutsideClose = () =>
       setTimeout(() => {
         document.addEventListener("click", handleOutsideClick, true);
@@ -69,14 +59,14 @@ function Navbar({ onLogout, bg }) {
       navEl.removeEventListener("shown.bs.collapse", enableOutsideClose);
       navEl.removeEventListener("hidden.bs.collapse", disableOutsideClose);
       disableOutsideClose();
-      toggler.removeEventListener("click", handleTogglerClick);
     };
   }, []);
 
   const closeMobileMenu = () => {
     const el = document.getElementById("mainNavbar");
     if (el && el.classList.contains("show")) {
-      el.classList.remove("show");
+      const collapse = bootstrap.Collapse.getOrCreateInstance(el);
+      collapse.hide();
     }
   };
 
@@ -179,6 +169,7 @@ function Navbar({ onLogout, bg }) {
                 Hakkında
               </NavLink>
             </li>
+
             <li className="nav-item mx-2 mb-2 mb-lg-0">
               <NavLink
                 to="/contact"
@@ -280,6 +271,7 @@ function Navbar({ onLogout, bg }) {
           </ul>
         </div>
       </div>
+
       <div
         style={{
           position: "absolute",
