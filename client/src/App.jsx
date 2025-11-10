@@ -22,6 +22,7 @@ const CheckMail = lazy(() => import("./pages/CheckMail"));
 const CheckMailVerify = lazy(() => import("./pages/CheckMailVerify"));
 const VerifyResult = lazy(() => import("./pages/VerifyResult"));
 const ResendVerify = lazy(() => import("./pages/ResendVerify"));
+import ScrollToTop from "./components/ScrollToTop";
 
 const theme = createTheme({
   palette: {
@@ -62,6 +63,7 @@ function App() {
             <ThemeProvider theme={theme}>
               <CssBaseline />
               <BrowserRouter>
+                <ScrollToTop />
                 <Suspense fallback={<LoadingScreen />}>
                   <Routes>
                     <Route path="/" element={<Home />} />
