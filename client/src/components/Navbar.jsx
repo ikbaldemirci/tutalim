@@ -109,16 +109,13 @@ function Navbar({ onLogout, bg }) {
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#mainNavbar"
           aria-controls="mainNavbar"
           aria-expanded="false"
           aria-label="Toggle navigation"
           style={{ border: "none" }}
           onClick={() => {
             const el = document.getElementById("mainNavbar");
-            if (el.classList.contains("show")) el.classList.remove("show");
-            else el.classList.add("show");
+            el.classList.toggle("show");
           }}
         >
           <span className="navbar-toggler-icon" />
