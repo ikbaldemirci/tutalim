@@ -12,9 +12,11 @@ import {
   Tooltip,
   useMediaQuery,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import StyledTextField from "../components/StyledTextField";
 
 function Signup({ onSwitch }) {
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [formData, setFormData] = useState({
