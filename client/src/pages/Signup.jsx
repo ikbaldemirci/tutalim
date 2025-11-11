@@ -15,7 +15,6 @@ import {
 import StyledTextField from "../components/StyledTextField";
 
 function Signup({ onSwitch }) {
-  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [formData, setFormData] = useState({
