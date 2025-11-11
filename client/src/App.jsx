@@ -23,6 +23,7 @@ const CheckMailVerify = lazy(() => import("./pages/CheckMailVerify"));
 const VerifyResult = lazy(() => import("./pages/VerifyResult"));
 const ResendVerify = lazy(() => import("./pages/ResendVerify"));
 import ScrollToTop from "./components/ScrollToTop";
+import NotificationProvider from "./NotificationProvider";
 
 const theme = createTheme({
   palette: {
@@ -62,10 +63,11 @@ function App() {
           <main>
             <ThemeProvider theme={theme}>
               <CssBaseline />
-              <BrowserRouter>
-                <ScrollToTop />
-                <Suspense fallback={<LoadingScreen />}>
-                  <Routes>
+              <NotificationProvider>
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <Suspense fallback={<LoadingScreen />}>
+                    <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
@@ -108,9 +110,10 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
-                  </Routes>
-                </Suspense>
-              </BrowserRouter>
+                    </Routes>
+                  </Suspense>
+                </BrowserRouter>
+              </NotificationProvider>
             </ThemeProvider>
           </main>
         </Fade>

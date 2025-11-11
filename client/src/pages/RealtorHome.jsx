@@ -44,7 +44,7 @@ function RealtorHome() {
     if (!token || !decoded?.id) return;
     didFetchPropsRef.current = true;
     api
-      .get("/properties")
+      .get("/properties", { meta: { silent: true } })
       .then((res) => {
         if (res.data.status === "success") {
           setProperties(res.data.properties);
@@ -59,7 +59,7 @@ function RealtorHome() {
     if (!token) return;
     didFetchInvitesRef.current = true;
     api
-      .get("/assignments/pending")
+      .get("/assignments/pending", { meta: { silent: true } })
       .then((res) => {
         if (res.data.status === "success")
           setInvites(res.data.assignments || []);
@@ -360,3 +360,4 @@ function RealtorHome() {
 }
 
 export default RealtorHome;
+

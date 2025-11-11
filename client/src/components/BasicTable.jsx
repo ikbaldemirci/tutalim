@@ -342,6 +342,7 @@ export default function BasicTable({
     try {
       const res = await api.post(`/properties/${id}/contract`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        meta: { toast: true },
       });
 
       if (res.data?.status === "success") {
