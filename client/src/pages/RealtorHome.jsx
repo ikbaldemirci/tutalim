@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../api";
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
@@ -38,9 +38,11 @@ function RealtorHome() {
     severity: "success",
   });
 
-  // 🔹 Mülkleri getir
+  const didFetchPropsRef = useRef(false);
   useEffect(() => {
+    if (didFetchPropsRef.current) return;
     if (!token || !decoded?.id) return;
+    didFetchPropsRef.current = true;
     api
       .get("/properties")
       .then((res) => {
@@ -49,11 +51,13 @@ function RealtorHome() {
         }
       })
       .catch((err) => console.error("Veri çekme hatası:", err));
-  }, [token]);
+  }, []);
 
-  // 🔹 Davetleri getir
+  const didFetchInvitesRef = useRef(false);
   useEffect(() => {
+    if (didFetchInvitesRef.current) return;
     if (!token) return;
+    didFetchInvitesRef.current = true;
     api
       .get("/assignments/pending")
       .then((res) => {
@@ -61,9 +65,8 @@ function RealtorHome() {
           setInvites(res.data.assignments || []);
       })
       .finally(() => setLoadingInvites(false));
-  }, [token]);
+  }, []);
 
-  // 🔹 Daveti kabul et
   const acceptInvite = async (id) => {
     try {
       const res = await api.post(`/assignments/${id}/accept`);
@@ -78,7 +81,6 @@ function RealtorHome() {
     }
   };
 
-  // 🔹 Daveti reddet
   const rejectInvite = async (id) => {
     try {
       const res = await api.post(`/assignments/${id}/reject`);
@@ -90,12 +92,10 @@ function RealtorHome() {
     }
   };
 
-  // 🔹 Form değişimi
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔹 Yeni mülk ekleme
   const handleAddProperty = async () => {
     if (!form.rentPrice || !form.rentDate || !form.endDate || !form.location) {
       setSnackbar({
@@ -126,7 +126,7 @@ function RealtorHome() {
         });
         setSnackbar({
           open: true,
-          message: "İlan başarıyla eklendi! 🏠",
+          message: "İlan başarıyla eklendi!",
           severity: "success",
         });
       }
@@ -145,7 +145,6 @@ function RealtorHome() {
       <Navbar />
       <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
 
-      {/* Davetler */}
       <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
         {!loadingInvites && invites.length > 0 && (
           <Box
@@ -208,7 +207,6 @@ function RealtorHome() {
         )}
       </Box>
 
-      {/* Yeni ilan ekleme formu */}
       <Paper
         elevation={3}
         sx={{

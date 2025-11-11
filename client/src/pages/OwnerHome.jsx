@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../api";
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
@@ -16,8 +16,10 @@ function OwnerHome() {
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
 
+  const didFetchPropsRef = useRef(false);
   useEffect(() => {
-    if (!token) return;
+    if (didFetchPropsRef.current) return;
+    didFetchPropsRef.current = true;
     api
       .get("/properties")
       .then((res) => {
@@ -27,10 +29,12 @@ function OwnerHome() {
       })
       .catch((err) => console.error("Veri çekme hatası:", err))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, []);
 
+  const didFetchInvitesRef = useRef(false);
   useEffect(() => {
-    if (!token) return;
+    if (didFetchInvitesRef.current) return;
+    didFetchInvitesRef.current = true;
     api
       .get("/assignments/pending")
       .then((res) => {
@@ -38,7 +42,7 @@ function OwnerHome() {
           setInvites(res.data.assignments || []);
       })
       .finally(() => setLoadingInvites(false));
-  }, [token]);
+  }, []);
 
   const acceptInvite = async (id) => {
     try {
