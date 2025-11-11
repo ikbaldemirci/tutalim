@@ -7,6 +7,10 @@ const api = axios.create({
   baseURL: "https://tutalim.com/api",
   withCredentials: true,
 });
+const bare = axios.create({
+  baseURL: "https://tutalim.com/api",
+  withCredentials: true,
+});
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -37,11 +41,7 @@ api.interceptors.response.use(
 
       isRefreshing = true;
       try {
-        const refreshRes = await axios.post(
-          "https://tutalim.com/api/refresh",
-          {},
-          { withCredentials: true }
-        );
+        const refreshRes = await bare.post("/refresh", {});
 
         if (refreshRes.data?.status === "success") {
           const newToken = refreshRes.data.token;

@@ -23,11 +23,7 @@ export default function ProtectedRoute({ children, role }) {
         if (!decoded.exp || decoded.exp * 1000 < Date.now()) {
           console.warn("🔁 Token expired, refresh deneniyor...");
           try {
-            const res = await api.post(
-              "/refresh",
-              {},
-              { withCredentials: true }
-            );
+            const res = await api.post("/refresh", {});
             if (res.data.status === "success") {
               localStorage.setItem("token", res.data.token);
               setVerified(true);

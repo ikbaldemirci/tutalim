@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import api from "../api";
 import {
   Box,
   Paper,
@@ -26,7 +27,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 
-axios.interceptors.response.use(
+if (false) axios.interceptors.response.use(
   (res) => res,
   async (error) => {
     if (error.response?.status === 401 && !error.config._retry) {
@@ -85,13 +86,10 @@ function Profile() {
 
   const handleProfileUpdate = async () => {
     try {
-      const res = await axios.put(
-        `https://tutalim.com/api/users/${decoded.id}`,
-        { name: form.name.trim(), surname: form.surname.trim() },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await api.put(`/users/${decoded.id}`, {
+        name: form.name.trim(),
+        surname: form.surname.trim(),
+      });
 
       if (res.data.status === "success") {
         if (res.data.token) {
@@ -128,16 +126,10 @@ function Profile() {
       });
 
     try {
-      const res = await axios.put(
-        `https://tutalim.com/api/users/${decoded.id}/password`,
-        {
-          currentPassword: form.currentPassword,
-          newPassword: form.newPassword,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await api.put(`/users/${decoded.id}/password`, {
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
 
       if (res.data.status === "success") {
         localStorage.setItem("token", res.data.token);
@@ -162,12 +154,7 @@ function Profile() {
 
   const handleFetchNotifications = async () => {
     try {
-      const res = await axios.get(
-        `https://tutalim.com/api/notifications/${decoded.id}`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await api.get(`/notifications/${decoded.id}`);
       if (res.data.status === "success") {
         setMailHistory(res.data.notifications || []);
       }
@@ -182,12 +169,7 @@ function Profile() {
 
   const handleFetchReminders = async () => {
     try {
-      const res = await axios.get(
-        `https://tutalim.com/api/reminders/${decoded.id}`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await api.get(`/reminders/${decoded.id}`);
       if (res.data.status === "success") setReminders(res.data.reminders);
     } catch (err) {
       console.error("Hatırlatıcılar alınamadı:", err);
@@ -211,17 +193,11 @@ function Profile() {
 
     const fixedDate = `${newReminder.remindAt}:00+03:00`;
     try {
-      const res = await axios.post(
-        `https://tutalim.com/api/reminders`,
-        {
-          propertyId: "67365dbcf0b06e42eb6ff123",
-          message: newReminder.message,
-          remindAt: fixedDate,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await api.post(`/reminders`, {
+        propertyId: "67365dbcf0b06e42eb6ff123",
+        message: newReminder.message,
+        remindAt: fixedDate,
+      });
 
       if (res.data.status === "success") {
         setReminders((prev) => [res.data.reminder, ...prev]);
@@ -247,9 +223,7 @@ function Profile() {
     if (!ok) return;
 
     try {
-      await axios.delete(`https://tutalim.com/api/reminders/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      await api.delete(`/reminders/${id}`);
       setReminders((prev) => prev.filter((r) => r._id !== id));
       setSnackbar({
         open: true,
