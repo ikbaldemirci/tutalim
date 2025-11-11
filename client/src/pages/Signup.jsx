@@ -10,10 +10,14 @@ import {
   Box,
   MenuItem,
   Tooltip,
+  useMediaQuery,
 } from "@mui/material";
 import StyledTextField from "../components/StyledTextField";
 
 function Signup({ onSwitch }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
@@ -130,7 +134,7 @@ function Signup({ onSwitch }) {
         fullWidth
       />
 
-      <Tooltip
+      {/* <Tooltip
         title={
           <Typography sx={{ fontSize: "0.85rem", p: 0.5 }}>
             En az <strong>8 karakter</strong>, bir <strong>büyük harf</strong>,
@@ -150,7 +154,50 @@ function Signup({ onSwitch }) {
           required
           fullWidth
         />
-      </Tooltip>
+      </Tooltip> */}
+
+      {isMobile ? (
+        <Box sx={{ width: "100%" }}>
+          <StyledTextField
+            label="Parola"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            fullWidth
+            helperText={
+              <Typography sx={{ fontSize: "0.8rem", color: "#bbb" }}>
+                En az <strong>8 karakter</strong>, bir <strong>büyük</strong>,
+                bir <strong>küçük</strong> harf, bir <strong>sayı</strong> ve
+                bir <strong>özel karakter</strong> içermelidir.
+              </Typography>
+            }
+          />
+        </Box>
+      ) : (
+        <Tooltip
+          title={
+            <Typography sx={{ fontSize: "0.85rem", p: 0.5 }}>
+              En az <strong>8 karakter</strong>, bir <strong>büyük harf</strong>
+              , bir <strong>küçük harf</strong>, bir <strong>sayı</strong> ve
+              bir <strong>özel karakter</strong> içermelidir.
+            </Typography>
+          }
+          placement="top-start"
+          arrow
+        >
+          <StyledTextField
+            label="Parola"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            fullWidth
+          />
+        </Tooltip>
+      )}
 
       {formData.password && (
         <Typography

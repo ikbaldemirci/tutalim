@@ -1,7 +1,13 @@
 import { LazyMotion, domAnimation, m } from "framer-motion";
-import { Box, Typography, Container, Paper, Divider } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Container,
+  Paper,
+  Divider,
+  useMediaQuery,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import TextType from "../components/TextType";
