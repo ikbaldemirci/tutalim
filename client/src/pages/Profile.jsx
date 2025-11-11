@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import api from "../api";
 import {
   Box,
@@ -26,34 +25,6 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import HistoryIcon from "@mui/icons-material/History";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
-
-if (false) axios.interceptors.response.use(
-  (res) => res,
-  async (error) => {
-    if (error.response?.status === 401 && !error.config._retry) {
-      error.config._retry = true;
-      try {
-        const refreshRes = await axios.post(
-          "https://tutalim.com/api/refresh",
-          {},
-          { withCredentials: true }
-        );
-        if (refreshRes.data.status === "success" && refreshRes.data.token) {
-          localStorage.setItem("token", refreshRes.data.token);
-          error.config.headers[
-            "Authorization"
-          ] = `Bearer ${refreshRes.data.token}`;
-          return axios(error.config);
-        }
-      } catch (err) {
-        console.error("Token yenileme hatası:", err);
-        localStorage.removeItem("token");
-        window.location.href = "/";
-      }
-    }
-    return Promise.reject(error);
-  }
-);
 
 function Profile() {
   const token = localStorage.getItem("token");
@@ -99,7 +70,7 @@ function Profile() {
         setIsEditing({ name: false, surname: false });
         setSnackbar({
           open: true,
-          message: "Profil güncellendi 🎉",
+          message: "Profil güncellendi",
           severity: "success",
         });
       }
@@ -205,7 +176,7 @@ function Profile() {
         setNewReminder({ message: "", remindAt: "" });
         setSnackbar({
           open: true,
-          message: "Hatırlatıcı eklendi ✅",
+          message: "Hatırlatıcı eklendi",
           severity: "success",
         });
       }
