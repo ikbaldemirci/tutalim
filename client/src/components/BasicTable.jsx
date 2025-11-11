@@ -414,49 +414,6 @@ export default function BasicTable({
     }
   };
 
-  // const handleNotes = async (id, isAutoSave = false) => {
-  //   try {
-  //     const payload = { notes: notesDraft[id] ?? "" };
-  //     const noteSize = new Blob([JSON.stringify(payload)]).size;
-  //     if (noteSize > 25 * 1024 * 1024) {
-  //       if (!isAutoSave)
-  //         setSnackbar({
-  //           open: true,
-  //           message: "Dosya boyutu 25 MB’den fazla olamaz",
-  //           severity: "error",
-  //         });
-  //       return;
-  //     }
-
-  //     const res = await api.put(`/properties/${id}/notes`, payload);
-
-  //     if (res.data.status === "success") {
-  //       if (res.data.property && onUpdate) onUpdate(res.data.property);
-  //       else setNotesSaved((p) => ({ ...p, [id]: payload.notes }));
-
-  //       if (!isAutoSave) {
-  //         setSnackbar({
-  //           open: true,
-  //           message: res.data.message || "Not başarıyla kaydedildi",
-  //           severity: "success",
-  //         });
-  //         closeNotes();
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error("Not kaydetme hatası:", err);
-  //     let msg = "Not kaydedilemedi. Lütfen tekrar deneyin";
-  //     const status = err.response?.status;
-  //     if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
-  //     else if (status === 403) msg = "Bu mülke not ekleme yetkiniz yok";
-  //     else if (status === 404) msg = "Mülk bulunamadı";
-  //     else if (status === 500) msg = "Sunucu hatası (not yükleme)";
-  //     else if (err.response?.data?.message) msg = err.response.data.message;
-  //     if (!isAutoSave)
-  //       setSnackbar({ open: true, message: msg, severity: "error" });
-  //   }
-  // };
-
   const handleNotes = async (id, isAutoSave = false) => {
     if (activeNotes.has(id)) return;
     setActiveNotes((prev) => new Set(prev).add(id));
