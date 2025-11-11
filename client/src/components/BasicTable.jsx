@@ -66,6 +66,8 @@ export default function BasicTable({
   const [tableScrollWidth, setTableScrollWidth] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRowId, setMenuRowId] = useState(null);
+  const [uploadingIds, setUploadingIds] = useState(new Set());
+  const [activeNotes, setActiveNotes] = useState(new Set());
 
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
@@ -262,8 +264,64 @@ export default function BasicTable({
     }
   };
 
+  // const handleUploadContract = async (id, file) => {
+  //   if (!file) return;
+
+  //   const maxSize = 25 * 1024 * 1024;
+  //   if (file.size > maxSize) {
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Dosya boyutu 25 MB’den fazla olamaz",
+  //       severity: "error",
+  //     });
+  //     return;
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append("contract", file);
+  //   setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
+
+  //   try {
+  //     const res = await api.post(`/properties/${id}/contract`, formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+
+  //     if (res.data?.status === "success") {
+  //       onUpdate(res.data.property);
+  //       setSnackbar({
+  //         open: true,
+  //         message: res.data.message || "Sözleşme başarıyla yüklendi",
+  //         severity: "success",
+  //       });
+  //     } else {
+  //       setSnackbar({
+  //         open: true,
+  //         message: res.data?.message || "Sözleşme yüklenemedi",
+  //         severity: "error",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Upload error:", error);
+  //     const status = error.response?.status;
+  //     let msg = "Sözleşme yüklenemedi";
+  //     if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
+  //     else if (status === 403) msg = "Bu mülke dosya yükleme yetkiniz yok";
+  //     else if (status === 404) msg = "Mülk bulunamadı";
+  //     else if (status === 500) msg = "Sunucu hatası (sözleşme yükleme)";
+  //     else if (error.response?.data?.message) msg = error.response.data.message;
+  //     setSnackbar({ open: true, message: msg, severity: "error" });
+  //   } finally {
+  //     setLoadingState((prev) => ({ ...prev, [id]: null }));
+  //   }
+  // };
+
   const handleUploadContract = async (id, file) => {
     if (!file) return;
+
+    if (uploadingIds.has(id)) {
+      console.log("Zaten yükleme devam ediyor, bekleniyor...");
+      return;
+    }
 
     const maxSize = 25 * 1024 * 1024;
     if (file.size > maxSize) {
@@ -275,9 +333,11 @@ export default function BasicTable({
       return;
     }
 
+    setUploadingIds((prev) => new Set(prev).add(id));
+    setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
+
     const formData = new FormData();
     formData.append("contract", file);
-    setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
 
     try {
       const res = await api.post(`/properties/${id}/contract`, formData, {
@@ -309,6 +369,11 @@ export default function BasicTable({
       else if (error.response?.data?.message) msg = error.response.data.message;
       setSnackbar({ open: true, message: msg, severity: "error" });
     } finally {
+      setUploadingIds((prev) => {
+        const copy = new Set(prev);
+        copy.delete(id);
+        return copy;
+      });
       setLoadingState((prev) => ({ ...prev, [id]: null }));
     }
   };
@@ -349,7 +414,53 @@ export default function BasicTable({
     }
   };
 
+  // const handleNotes = async (id, isAutoSave = false) => {
+  //   try {
+  //     const payload = { notes: notesDraft[id] ?? "" };
+  //     const noteSize = new Blob([JSON.stringify(payload)]).size;
+  //     if (noteSize > 25 * 1024 * 1024) {
+  //       if (!isAutoSave)
+  //         setSnackbar({
+  //           open: true,
+  //           message: "Dosya boyutu 25 MB’den fazla olamaz",
+  //           severity: "error",
+  //         });
+  //       return;
+  //     }
+
+  //     const res = await api.put(`/properties/${id}/notes`, payload);
+
+  //     if (res.data.status === "success") {
+  //       if (res.data.property && onUpdate) onUpdate(res.data.property);
+  //       else setNotesSaved((p) => ({ ...p, [id]: payload.notes }));
+
+  //       if (!isAutoSave) {
+  //         setSnackbar({
+  //           open: true,
+  //           message: res.data.message || "Not başarıyla kaydedildi",
+  //           severity: "success",
+  //         });
+  //         closeNotes();
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error("Not kaydetme hatası:", err);
+  //     let msg = "Not kaydedilemedi. Lütfen tekrar deneyin";
+  //     const status = err.response?.status;
+  //     if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
+  //     else if (status === 403) msg = "Bu mülke not ekleme yetkiniz yok";
+  //     else if (status === 404) msg = "Mülk bulunamadı";
+  //     else if (status === 500) msg = "Sunucu hatası (not yükleme)";
+  //     else if (err.response?.data?.message) msg = err.response.data.message;
+  //     if (!isAutoSave)
+  //       setSnackbar({ open: true, message: msg, severity: "error" });
+  //   }
+  // };
+
   const handleNotes = async (id, isAutoSave = false) => {
+    if (activeNotes.has(id)) return;
+    setActiveNotes((prev) => new Set(prev).add(id));
+
     try {
       const payload = { notes: notesDraft[id] ?? "" };
       const noteSize = new Blob([JSON.stringify(payload)]).size;
@@ -389,6 +500,12 @@ export default function BasicTable({
       else if (err.response?.data?.message) msg = err.response.data.message;
       if (!isAutoSave)
         setSnackbar({ open: true, message: msg, severity: "error" });
+    } finally {
+      setActiveNotes((prev) => {
+        const copy = new Set(prev);
+        copy.delete(id);
+        return copy;
+      });
     }
   };
 
