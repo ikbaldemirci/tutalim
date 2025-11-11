@@ -21,7 +21,7 @@ function OwnerHome() {
     if (didFetchPropsRef.current) return;
     didFetchPropsRef.current = true;
     api
-      .get("/properties", { meta: { silent: true } })
+      .get("/properties")
       .then((res) => {
         if (res.data.status === "success") {
           setProperties(res.data.properties);
@@ -36,7 +36,7 @@ function OwnerHome() {
     if (didFetchInvitesRef.current) return;
     didFetchInvitesRef.current = true;
     api
-      .get("/assignments/pending", { meta: { silent: true } })
+      .get("/assignments/pending")
       .then((res) => {
         if (res.data.status === "success")
           setInvites(res.data.assignments || []);
@@ -175,4 +175,3 @@ function OwnerHome() {
 }
 
 export default OwnerHome;
-
