@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import api from "../api";
+import { emit, NOTIFY_EVENT } from "../lib/bus";
 import {
   Table,
   TableBody,
@@ -154,35 +155,36 @@ export default function BasicTable({
         setEditingRow(null);
         setSnackbar({
           open: true,
-          message: "Güncelleme başarılı",
+          message: "GÃ¼ncelleme baÅŸarÄ±lÄ±",
           severity: "success",
         });
       }
     } catch {
       setSnackbar({
         open: true,
-        message: "Güncelleme sırasında hata oluştu",
+        message: "GÃ¼ncelleme sÄ±rasÄ±nda hata oluÅŸtu",
         severity: "error",
       });
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bu mülkü silmek istediğinize emin misiniz?")) return;
+    if (!window.confirm("Bu mÃ¼lkÃ¼ silmek istediÄŸinize emin misiniz?"))
+      return;
     try {
       const res = await api.delete(`/properties/${id}`);
       if (res.data.status === "success") {
         onUpdate({ _id: id, deleted: true });
         setSnackbar({
           open: true,
-          message: "Mülk başarıyla silindi",
+          message: "MÃ¼lk baÅŸarÄ±yla silindi",
           severity: "info",
         });
       }
     } catch {
       setSnackbar({
         open: true,
-        message: "Silme sırasında hata oluştu",
+        message: "Silme sÄ±rasÄ±nda hata oluÅŸtu",
         severity: "error",
       });
     }
@@ -214,13 +216,13 @@ export default function BasicTable({
         }));
         setSnackbar({
           open: true,
-          message: res.data.message || "Davet gönderildi. Onay bekleniyor.",
+          message: res.data.message || "Davet gÃ¶nderildi. Onay bekleniyor.",
           severity: "success",
         });
       } else {
         setSnackbar({
           open: true,
-          message: res.data.message || "Davet oluşturulamadı",
+          message: res.data.message || "Davet oluÅŸturulamadÄ±",
           severity: "warning",
         });
       }
@@ -228,7 +230,7 @@ export default function BasicTable({
       setSnackbar({
         open: true,
         message:
-          err.response?.data?.message || "İşlem sırasında bir hata oluştu",
+          err.response?.data?.message || "Ä°ÅŸlem sÄ±rasÄ±nda bir hata oluÅŸtu",
         severity: "error",
       });
     }
@@ -244,13 +246,13 @@ export default function BasicTable({
         setRealtorInput({ ...realtorInput, [id]: "" });
         setSnackbar({
           open: true,
-          message: res.data.message || "Atama başarılı",
+          message: res.data.message || "Atama baÅŸarÄ±lÄ±",
           severity: "success",
         });
       } else {
         setSnackbar({
           open: true,
-          message: res.data.message || "Atama başarısız",
+          message: res.data.message || "Atama baÅŸarÄ±sÄ±z",
           severity: "warning",
         });
       }
@@ -258,117 +260,57 @@ export default function BasicTable({
       setSnackbar({
         open: true,
         message:
-          err.response?.data?.message || "Atama sırasında bir hata oluştu",
+          err.response?.data?.message || "Atama sÄ±rasÄ±nda bir hata oluÅŸtu",
         severity: "error",
       });
     }
   };
 
-  // const handleUploadContract = async (id, file) => {
-  //   if (!file) return;
-
-  //   const maxSize = 25 * 1024 * 1024;
-  //   if (file.size > maxSize) {
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Dosya boyutu 25 MB’den fazla olamaz",
-  //       severity: "error",
-  //     });
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append("contract", file);
-  //   setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
-
-  //   try {
-  //     const res = await api.post(`/properties/${id}/contract`, formData, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-
-  //     if (res.data?.status === "success") {
-  //       onUpdate(res.data.property);
-  //       setSnackbar({
-  //         open: true,
-  //         message: res.data.message || "Sözleşme başarıyla yüklendi",
-  //         severity: "success",
-  //       });
-  //     } else {
-  //       setSnackbar({
-  //         open: true,
-  //         message: res.data?.message || "Sözleşme yüklenemedi",
-  //         severity: "error",
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Upload error:", error);
-  //     const status = error.response?.status;
-  //     let msg = "Sözleşme yüklenemedi";
-  //     if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
-  //     else if (status === 403) msg = "Bu mülke dosya yükleme yetkiniz yok";
-  //     else if (status === 404) msg = "Mülk bulunamadı";
-  //     else if (status === 500) msg = "Sunucu hatası (sözleşme yükleme)";
-  //     else if (error.response?.data?.message) msg = error.response.data.message;
-  //     setSnackbar({ open: true, message: msg, severity: "error" });
-  //   } finally {
-  //     setLoadingState((prev) => ({ ...prev, [id]: null }));
-  //   }
-  // };
-
   const handleUploadContract = async (id, file) => {
     if (!file) return;
-
     if (uploadingIds.has(id)) {
-      console.log("Zaten yükleme devam ediyor, bekleniyor...");
+      console.log("Upload is already in progress for this item. Skipping.");
       return;
     }
-
     const maxSize = 25 * 1024 * 1024;
     if (file.size > maxSize) {
-      setSnackbar({
-        open: true,
-        message: "Dosya boyutu 25 MB’den fazla olamaz",
+      emit(NOTIFY_EVENT, {
         severity: "error",
+        message: "Dosya boyutu 25 MB'den fazla olamaz",
       });
       return;
     }
-
     setUploadingIds((prev) => new Set(prev).add(id));
     setLoadingState((prev) => ({ ...prev, [id]: "upload" }));
-
     const formData = new FormData();
     formData.append("contract", file);
-
     try {
       const res = await api.post(`/properties/${id}/contract`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         meta: { toast: true },
       });
-
       if (res.data?.status === "success") {
         onUpdate(res.data.property);
-        setSnackbar({
-          open: true,
-          message: res.data.message || "Sözleşme başarıyla yüklendi",
+        emit(NOTIFY_EVENT, {
           severity: "success",
+          message: res.data.message || "Sözleşme başarıyla yüklendi",
         });
       } else {
-        setSnackbar({
-          open: true,
-          message: res.data?.message || "Sözleşme yüklenemedi",
+        emit(NOTIFY_EVENT, {
           severity: "error",
+          message: res.data?.message || "Sözleşme yüklenemedi",
         });
       }
     } catch (error) {
       console.error("Upload error:", error);
       const status = error.response?.status;
       let msg = "Sözleşme yüklenemedi";
-      if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
-      else if (status === 403) msg = "Bu mülke dosya yükleme yetkiniz yok";
+      if (status === 413) msg = "Dosya boyutu 25 MB'den fazla olamaz";
+      else if (status === 403) msg = "Bu mülkte dosya yükleme yetkiniz yok";
       else if (status === 404) msg = "Mülk bulunamadı";
       else if (status === 500) msg = "Sunucu hatası (sözleşme yükleme)";
       else if (error.response?.data?.message) msg = error.response.data.message;
-      setSnackbar({ open: true, message: msg, severity: "error" });
+      emit(NOTIFY_EVENT, { severity: "error", message: msg });
     } finally {
       setUploadingIds((prev) => {
         const copy = new Set(prev);
@@ -380,7 +322,7 @@ export default function BasicTable({
   };
 
   const handleDeleteContract = async (id) => {
-    if (!window.confirm("Bu sözleşmeyi silmek istediğinize emin misiniz?"))
+    if (!window.confirm("Bu sÃ¶zleÅŸmeyi silmek istediÄŸinize emin misiniz?"))
       return;
 
     setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
@@ -391,23 +333,23 @@ export default function BasicTable({
         onUpdate(res.data.property);
         setSnackbar({
           open: true,
-          message: res.data.message || "Sözleşme silindi",
+          message: res.data.message || "SÃ¶zleÅŸme silindi",
           severity: "info",
         });
       } else {
         setSnackbar({
           open: true,
-          message: res.data?.message || "Sözleşme silinemedi",
+          message: res.data?.message || "SÃ¶zleÅŸme silinemedi",
           severity: "error",
         });
       }
     } catch (error) {
       console.error("Delete contract error:", error);
       const status = error.response?.status;
-      let msg = "Sözleşme silinemedi";
-      if (status === 403) msg = "Bu mülkteki sözleşmeyi silme yetkiniz yok";
-      else if (status === 404) msg = "Mülk bulunamadı";
-      else if (status === 500) msg = "Sunucu hatası (sözleşme silme)";
+      let msg = "SÃ¶zleÅŸme silinemedi";
+      if (status === 403) msg = "Bu mÃ¼lkteki sÃ¶zleÅŸmeyi silme yetkiniz yok";
+      else if (status === 404) msg = "MÃ¼lk bulunamadÄ±";
+      else if (status === 500) msg = "Sunucu hatasÄ± (sÃ¶zleÅŸme silme)";
       else if (error.response?.data?.message) msg = error.response.data.message;
       setSnackbar({ open: true, message: msg, severity: "error" });
     } finally {
@@ -423,7 +365,7 @@ export default function BasicTable({
   //       if (!isAutoSave)
   //         setSnackbar({
   //           open: true,
-  //           message: "Dosya boyutu 25 MB’den fazla olamaz",
+  //           message: "Dosya boyutu 25 MBâ€™den fazla olamaz",
   //           severity: "error",
   //         });
   //       return;
@@ -438,20 +380,20 @@ export default function BasicTable({
   //       if (!isAutoSave) {
   //         setSnackbar({
   //           open: true,
-  //           message: res.data.message || "Not başarıyla kaydedildi",
+  //           message: res.data.message || "Not baÅŸarÄ±yla kaydedildi",
   //           severity: "success",
   //         });
   //         closeNotes();
   //       }
   //     }
   //   } catch (err) {
-  //     console.error("Not kaydetme hatası:", err);
-  //     let msg = "Not kaydedilemedi. Lütfen tekrar deneyin";
+  //     console.error("Not kaydetme hatasÄ±:", err);
+  //     let msg = "Not kaydedilemedi. LÃ¼tfen tekrar deneyin";
   //     const status = err.response?.status;
-  //     if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
-  //     else if (status === 403) msg = "Bu mülke not ekleme yetkiniz yok";
-  //     else if (status === 404) msg = "Mülk bulunamadı";
-  //     else if (status === 500) msg = "Sunucu hatası (not yükleme)";
+  //     if (status === 413) msg = "Dosya boyutu 25 MBâ€™den fazla olamaz";
+  //     else if (status === 403) msg = "Bu mÃ¼lke not ekleme yetkiniz yok";
+  //     else if (status === 404) msg = "MÃ¼lk bulunamadÄ±";
+  //     else if (status === 500) msg = "Sunucu hatasÄ± (not yÃ¼kleme)";
   //     else if (err.response?.data?.message) msg = err.response.data.message;
   //     if (!isAutoSave)
   //       setSnackbar({ open: true, message: msg, severity: "error" });
@@ -469,7 +411,7 @@ export default function BasicTable({
         if (!isAutoSave)
           setSnackbar({
             open: true,
-            message: "Dosya boyutu 25 MB’den fazla olamaz",
+            message: "Dosya boyutu 25 MBâ€™den fazla olamaz",
             severity: "error",
           });
         return;
@@ -484,20 +426,20 @@ export default function BasicTable({
         if (!isAutoSave) {
           setSnackbar({
             open: true,
-            message: res.data.message || "Not başarıyla kaydedildi",
+            message: res.data.message || "Not baÅŸarÄ±yla kaydedildi",
             severity: "success",
           });
           closeNotes();
         }
       }
     } catch (err) {
-      console.error("Not kaydetme hatası:", err);
-      let msg = "Not kaydedilemedi. Lütfen tekrar deneyin";
+      console.error("Not kaydetme hatasÄ±:", err);
+      let msg = "Not kaydedilemedi. LÃ¼tfen tekrar deneyin";
       const status = err.response?.status;
-      if (status === 413) msg = "Dosya boyutu 25 MB’den fazla olamaz";
-      else if (status === 403) msg = "Bu mülke not ekleme yetkiniz yok";
-      else if (status === 404) msg = "Mülk bulunamadı";
-      else if (status === 500) msg = "Sunucu hatası (not yükleme)";
+      if (status === 413) msg = "Dosya boyutu 25 MBâ€™den fazla olamaz";
+      else if (status === 403) msg = "Bu mÃ¼lke not ekleme yetkiniz yok";
+      else if (status === 404) msg = "MÃ¼lk bulunamadÄ±";
+      else if (status === 500) msg = "Sunucu hatasÄ± (not yÃ¼kleme)";
       else if (err.response?.data?.message) msg = err.response.data.message;
       if (!isAutoSave)
         setSnackbar({ open: true, message: msg, severity: "error" });
@@ -585,7 +527,7 @@ export default function BasicTable({
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
               <TextField
                 size="small"
-                placeholder="Kiracı, konum veya fiyat ara..."
+                placeholder="KiracÄ±, konum veya fiyat ara..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 InputProps={{
@@ -596,7 +538,7 @@ export default function BasicTable({
               <TextField
                 size="small"
                 type="date"
-                label="Başlangıç"
+                label="BaÅŸlangÄ±Ã§"
                 InputLabelProps={{ shrink: true }}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
@@ -604,7 +546,7 @@ export default function BasicTable({
               <TextField
                 size="small"
                 type="date"
-                label="Bitiş"
+                label="BitiÅŸ"
                 InputLabelProps={{ shrink: true }}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
@@ -615,20 +557,20 @@ export default function BasicTable({
             </Box>
           </Toolbar>
 
-          {/* 📋 Tablo */}
+          {/* ðŸ“‹ Tablo */}
           <Table ref={tableRef}>
             <TableHead sx={{ backgroundColor: "#2E86C1" }}>
               <TableRow>
                 {[
-                  "Kiracı",
+                  "KiracÄ±",
                   "Fiyat",
-                  "Başlangıç",
-                  "Bitiş",
+                  "BaÅŸlangÄ±Ã§",
+                  "BitiÅŸ",
                   "Konum",
-                  userRole === "realtor" ? "Ev Sahibi" : "Emlakçı",
-                  "Sözleşme",
+                  userRole === "realtor" ? "Ev Sahibi" : "EmlakÃ§Ä±",
+                  "SÃ¶zleÅŸme",
                   "Notlar",
-                  "İşlemler",
+                  "Ä°ÅŸlemler",
                 ].map((header) => (
                   <TableCell
                     key={header}
@@ -656,7 +598,7 @@ export default function BasicTable({
                     },
                   }}
                 >
-                  {/* Kiracı */}
+                  {/* KiracÄ± */}
                   <TableCell>
                     {editingRow === row._id ? (
                       <TextField
@@ -667,7 +609,7 @@ export default function BasicTable({
                       />
                     ) : (
                       row.tenantName || (
-                        <em style={{ color: "#888" }}>Henüz atanmadı</em>
+                        <em style={{ color: "#888" }}>HenÃ¼z atanmadÄ±</em>
                       )
                     )}
                   </TableCell>
@@ -683,11 +625,11 @@ export default function BasicTable({
                         size="small"
                       />
                     ) : (
-                      (row.rentPrice?.toLocaleString("tr-TR") || "-") + " ₺"
+                      (row.rentPrice?.toLocaleString("tr-TR") || "-") + " â‚º"
                     )}
                   </TableCell>
 
-                  {/* Başlangıç */}
+                  {/* BaÅŸlangÄ±Ã§ */}
                   <TableCell>
                     {editingRow === row._id ? (
                       <TextField
@@ -704,7 +646,7 @@ export default function BasicTable({
                     )}
                   </TableCell>
 
-                  {/* Bitiş */}
+                  {/* BitiÅŸ */}
                   <TableCell>
                     {editingRow === row._id ? (
                       <TextField
@@ -744,7 +686,7 @@ export default function BasicTable({
                           </span>
                         ) : sentInvitesMap[row._id]?.owner ? (
                           <Chip
-                            label="Yanıt bekleniyor"
+                            label="YanÄ±t bekleniyor"
                             color="warning"
                             variant="outlined"
                           />
@@ -834,12 +776,12 @@ export default function BasicTable({
                                 handleAssign(row._id, { realtorMail: null })
                               }
                             >
-                              Kaldır
+                              KaldÄ±r
                             </Button>
                           </Box>
                         ) : sentInvitesMap[row._id]?.realtor ? (
                           <Chip
-                            label="Yanıt bekleniyor"
+                            label="YanÄ±t bekleniyor"
                             color="warning"
                             variant="outlined"
                           />
@@ -897,7 +839,7 @@ export default function BasicTable({
                     )}
                   </TableCell>
 
-                  {/* Sözleşme */}
+                  {/* SÃ¶zleÅŸme */}
                   <TableCell>
                     {loadingState[row._id] === "upload" ? (
                       <Button
@@ -906,7 +848,7 @@ export default function BasicTable({
                         disabled
                         startIcon={<CircularProgress size={16} />}
                       >
-                        Yükleniyor...
+                        YÃ¼kleniyor...
                       </Button>
                     ) : loadingState[row._id] === "delete" ? (
                       <Button
@@ -925,7 +867,7 @@ export default function BasicTable({
                         component="label"
                         startIcon={<CloudUploadIcon />}
                       >
-                        Yükle
+                        YÃ¼kle
                         <input
                           type="file"
                           hidden
@@ -938,7 +880,8 @@ export default function BasicTable({
                             if (file.size > maxSize) {
                               setSnackbar({
                                 open: true,
-                                message: "Dosya boyutu 25 MB’den fazla olamaz",
+                                message:
+                                  "Dosya boyutu 25 MBâ€™den fazla olamaz",
                                 severity: "error",
                               });
                               e.target.value = null;
@@ -952,14 +895,14 @@ export default function BasicTable({
                       </Button>
                     ) : editingRow === row._id ? (
                       <Chip
-                        label="Sözleşmeyi Sil"
+                        label="SÃ¶zleÅŸmeyi Sil"
                         color="error"
                         onClick={() => handleDeleteContract(row._id)}
                         startIcon={<DeleteIcon />}
                       />
                     ) : (
                       <Chip
-                        label="Sözleşme"
+                        label="SÃ¶zleÅŸme"
                         color="success"
                         onClick={() =>
                           window.open(
@@ -976,7 +919,7 @@ export default function BasicTable({
                   <TableCell>
                     <Chip
                       label={
-                        notesSaved[row._id]?.trim() ? "Notu Gör" : "Not Ekle"
+                        notesSaved[row._id]?.trim() ? "Notu GÃ¶r" : "Not Ekle"
                       }
                       color="primary"
                       variant={
@@ -1040,7 +983,7 @@ export default function BasicTable({
                             textAlign: "center",
                           }}
                         >
-                          📝 Notlar
+                          ðŸ“ Notlar
                         </Typography>
                       </Box>
 
@@ -1141,7 +1084,7 @@ export default function BasicTable({
                     </Dialog>
                   </TableCell>
 
-                  {/* İşlemler */}
+                  {/* Ä°ÅŸlemler */}
                   <TableCell>
                     {editingRow === row._id ? (
                       <Box sx={{ display: "flex", gap: "0.5rem" }}>
@@ -1158,13 +1101,13 @@ export default function BasicTable({
                           size="small"
                           onClick={() => setEditingRow(null)}
                         >
-                          Vazgeç
+                          VazgeÃ§
                         </Button>
                       </Box>
                     ) : (
                       <Box sx={{ display: "flex", justifyContent: "center" }}>
                         <IconButton
-                          aria-label="işlemler"
+                          aria-label="iÅŸlemler"
                           onClick={(e) => {
                             setAnchorEl(e.currentTarget);
                             setMenuRowId(row._id);
@@ -1202,7 +1145,7 @@ export default function BasicTable({
                               setAnchorEl(null);
                             }}
                           >
-                            <EditIcon sx={{ fontSize: 18, mr: 1 }} /> Düzenle
+                            <EditIcon sx={{ fontSize: 18, mr: 1 }} /> DÃ¼zenle
                           </MenuItem>
 
                           <MenuItem
@@ -1225,7 +1168,7 @@ export default function BasicTable({
         </TableContainer>
       </Box>
 
-      {/* 🎬 Snackbar */}
+      {/* ðŸŽ¬ Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
