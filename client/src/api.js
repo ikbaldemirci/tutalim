@@ -19,7 +19,11 @@ api.interceptors.response.use(
   async (err) => {
     const originalRequest = err.config;
 
+    if (!originalRequest) return Promise.reject(err);
+
     if (err.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           pendingRequests.push({ resolve, reject });
@@ -28,12 +32,10 @@ api.interceptors.response.use(
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return api(originalRequest);
           })
-          .catch((error) => Promise.reject(error));
+          .catch((e) => Promise.reject(e));
       }
 
-      originalRequest._retry = true;
       isRefreshing = true;
-
       try {
         const refreshRes = await axios.post(
           "https://tutalim.com/api/refresh",
@@ -41,7 +43,7 @@ api.interceptors.response.use(
           { withCredentials: true }
         );
 
-        if (refreshRes.data.status === "success") {
+        if (refreshRes.data?.status === "success") {
           const newToken = refreshRes.data.token;
           localStorage.setItem("token", newToken);
 
@@ -50,12 +52,19 @@ api.interceptors.response.use(
 
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return api(originalRequest);
+        } else {
+          pendingRequests.forEach((p) => p.reject(refreshRes));
+          pendingRequests = [];
+          localStorage.removeItem("token");
+          window.location.href = "/";
+          return Promise.reject(err);
         }
       } catch (refreshErr) {
         pendingRequests.forEach((p) => p.reject(refreshErr));
         pendingRequests = [];
         localStorage.removeItem("token");
         window.location.href = "/";
+        return Promise.reject(refreshErr);
       } finally {
         isRefreshing = false;
       }
