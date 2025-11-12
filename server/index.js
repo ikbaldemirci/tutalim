@@ -29,6 +29,7 @@ const {
   assignmentAcceptedHtml,
   assignmentRejectedHtml,
   reminderMailHtml,
+  reminderMailText,
   contactMailHtml,
 } = require("./utils/mailer");
 
