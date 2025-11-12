@@ -503,25 +503,6 @@ function Profile() {
           <LocalizationProvider
             dateAdapter={AdapterDateFns}
             adapterLocale={trLocale}
-            localeText={{
-              okButtonLabel: "Tamam",
-              cancelButtonLabel: "İptal",
-              clearButtonLabel: "Temizle",
-              todayButtonLabel: "Bugün",
-              dateSelectLabel: "Tarih seç",
-              timeSelectLabel: "Saat seç",
-              toolbarTitle: "Tarih ve Saat Seç",
-              fieldYearPlaceholder: () => "yyyy",
-              fieldMonthPlaceholder: () => "aa",
-              fieldDayPlaceholder: () => "gg",
-
-              selectDate: "Tarih Seç",
-              selectTime: "Saat Seç",
-              previousMonth: "Önceki Ay",
-              nextMonth: "Sonraki Ay",
-              next: "İleri",
-              back: "Geri",
-            }}
           >
             <DateTimePicker
               label="Tarih ve Saat (5 dakikalık aralıklarla)"
