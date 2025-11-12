@@ -871,7 +871,7 @@ app.post("/api/refresh", async (req, res) => {
 app.post("/api/logout", async (req, res) => {
   try {
     const refreshTokenValue = req.cookies.refreshToken;
-    console.log("🚪 Çıkış isteği geldi, cookie:", refreshTokenValue);
+    console.log("Çıkış isteği geldi, cookie:", refreshTokenValue);
 
     if (!refreshTokenValue) {
       res.clearCookie("refreshToken", {
@@ -1464,7 +1464,7 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
   try {
     const { propertyId, message, remindAt } = req.body;
 
-    if (!propertyId || !message || !remindAt) {
+    if (!message || !remindAt) {
       return res.status(400).json({
         status: "fail",
         message: "Eksik alanlar mevcut.",
@@ -1473,7 +1473,7 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
 
     const reminder = await Reminder.create({
       userId: req.user.id,
-      propertyId,
+      propertyId: propertyId || null,
       message,
       remindAt,
     });

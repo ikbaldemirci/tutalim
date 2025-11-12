@@ -10,7 +10,8 @@ const ReminderSchema = new mongoose.Schema(
     propertyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "properties",
-      required: true,
+      required: false,
+      default: null,
     },
     message: {
       type: String,

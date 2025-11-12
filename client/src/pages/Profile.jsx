@@ -165,7 +165,6 @@ function Profile() {
     const fixedDate = `${newReminder.remindAt}:00+03:00`;
     try {
       const res = await api.post(`/reminders`, {
-        propertyId: "67365dbcf0b06e42eb6ff123",
         message: newReminder.message,
         remindAt: fixedDate,
       });
@@ -494,16 +493,27 @@ function Profile() {
             }
           />
           <TextField
-            label="Tarih"
+            label="Tarih (5 dakikalık aralıklarla)"
             type="datetime-local"
             fullWidth
             sx={{ mb: 2 }}
             InputLabelProps={{ shrink: true }}
+            inputProps={{
+              step: 300,
+            }}
             value={newReminder.remindAt}
-            onChange={(e) =>
-              setNewReminder({ ...newReminder, remindAt: e.target.value })
-            }
+            onChange={(e) => {
+              const value = e.target.value;
+              const date = new Date(value);
+              const minutes = date.getMinutes();
+              const roundedMinutes = Math.round(minutes / 5) * 5;
+              date.setMinutes(roundedMinutes);
+              date.setSeconds(0);
+              const iso = date.toISOString().slice(0, 16);
+              setNewReminder({ ...newReminder, remindAt: iso });
+            }}
           />
+
           <Button
             variant="contained"
             color="success"
