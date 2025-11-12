@@ -1621,16 +1621,18 @@ cron.schedule("*/5 * * * *", async () => {
           message: r.message,
           remindAt: r.remindAt,
         }),
+        text: reminderMailText({
+          name: r.userId.name,
+          message: r.message,
+          remindAt: r.remindAt,
+        }),
         userId: r.userId._id,
         propertyId: r.propertyId,
       });
 
       r.isDone = true;
       await r.save();
-      console.log(`Hatırlatıcı mail gönderildi: ${r.userId.mail}`);
     }
-
-    console.log(`Hatırlatıcı kontrolü tamamlandı (${reminders.length} kayıt)`);
   } catch (err) {
     console.error("Cron reminder kontrol hatası:", err);
   }
