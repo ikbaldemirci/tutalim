@@ -168,9 +168,7 @@ function Profile() {
       });
     }
 
-    const localDate = new Date(newReminder.remindAt);
-    const offsetMs = 3 * 60 * 60 * 1000;
-    const fixedDate = new Date(localDate.getTime() + offsetMs).toISOString();
+    const fixedDate = new Date(newReminder.remindAt).toISOString();
 
     try {
       const res = await api.post(`/reminders`, {
