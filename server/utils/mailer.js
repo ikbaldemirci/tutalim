@@ -263,6 +263,7 @@ module.exports = {
   assignmentAcceptedHtml,
   assignmentRejectedHtml,
   reminderMailHtml,
+  reminderMailText,
   contactMailHtml,
 };
 
