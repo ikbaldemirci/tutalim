@@ -524,6 +524,15 @@ function Profile() {
           <LocalizationProvider
             dateAdapter={AdapterDateFns}
             adapterLocale={trLocale}
+            localeText={{
+              okButtonLabel: "Tamam",
+              cancelButtonLabel: "İptal",
+              dateSelectLabel: "Tarih seç",
+              timeSelectLabel: "Saat seç",
+              toolbarTitle: "Tarih ve Saat Seç",
+              clearButtonLabel: "Temizle",
+              todayButtonLabel: "Bugün",
+            }}
           >
             <DateTimePicker
               label="Tarih ve Saat (5 dakikalık aralıklarla)"
