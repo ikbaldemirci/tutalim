@@ -155,14 +155,18 @@ function Profile() {
   }, [decoded]);
 
   const handleAddReminder = async () => {
-    if (!newReminder.message || !newReminder.remindAt)
+    if (!newReminder.message || !newReminder.remindAt) {
       return setSnackbar({
         open: true,
         message: "Mesaj ve tarih zorunludur.",
         severity: "warning",
       });
+    }
 
-    const fixedDate = `${newReminder.remindAt}:00+03:00`;
+    const localDate = new Date(newReminder.remindAt);
+    const offsetMs = 3 * 60 * 60 * 1000;
+    const fixedDate = new Date(localDate.getTime() + offsetMs).toISOString();
+
     try {
       const res = await api.post(`/reminders`, {
         message: newReminder.message,
