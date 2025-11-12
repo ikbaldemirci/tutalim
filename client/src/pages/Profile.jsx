@@ -26,6 +26,11 @@ import HistoryIcon from "@mui/icons-material/History";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import trLocale from "date-fns/locale/tr";
+
 function Profile() {
   const token = localStorage.getItem("token");
   const [decoded, setDecoded] = useState(token ? jwtDecode(token) : null);
@@ -496,7 +501,7 @@ function Profile() {
               setNewReminder({ ...newReminder, message: e.target.value })
             }
           />
-          <TextField
+          {/* <TextField
             label="Tarih (5 dakikalık aralıklarla)"
             type="datetime-local"
             fullWidth
@@ -516,7 +521,33 @@ function Profile() {
               const iso = date.toISOString().slice(0, 16);
               setNewReminder({ ...newReminder, remindAt: iso });
             }}
-          />
+          /> */}
+
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={trLocale}
+          >
+            <DateTimePicker
+              label="Tarih ve Saat (5 dakikalık aralıklarla)"
+              value={
+                newReminder.remindAt ? new Date(newReminder.remindAt) : null
+              }
+              onChange={(newValue) => {
+                if (newValue) {
+                  const iso = newValue.toISOString();
+                  setNewReminder({ ...newReminder, remindAt: iso });
+                }
+              }}
+              ampm={false}
+              minutesStep={5}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  sx: { mb: 2 },
+                },
+              }}
+            />
+          </LocalizationProvider>
 
           <Button
             variant="contained"
