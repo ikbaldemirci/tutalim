@@ -499,27 +499,6 @@ function Profile() {
               setNewReminder({ ...newReminder, message: e.target.value })
             }
           />
-          {/* <TextField
-            label="Tarih (5 dakikalık aralıklarla)"
-            type="datetime-local"
-            fullWidth
-            sx={{ mb: 2 }}
-            InputLabelProps={{ shrink: true }}
-            inputProps={{
-              step: 300,
-            }}
-            value={newReminder.remindAt}
-            onChange={(e) => {
-              const value = e.target.value;
-              const date = new Date(value);
-              const minutes = date.getMinutes();
-              const roundedMinutes = Math.round(minutes / 5) * 5;
-              date.setMinutes(roundedMinutes);
-              date.setSeconds(0);
-              const iso = date.toISOString().slice(0, 16);
-              setNewReminder({ ...newReminder, remindAt: iso });
-            }}
-          /> */}
 
           <LocalizationProvider
             dateAdapter={AdapterDateFns}
@@ -527,11 +506,21 @@ function Profile() {
             localeText={{
               okButtonLabel: "Tamam",
               cancelButtonLabel: "İptal",
+              clearButtonLabel: "Temizle",
+              todayButtonLabel: "Bugün",
               dateSelectLabel: "Tarih seç",
               timeSelectLabel: "Saat seç",
               toolbarTitle: "Tarih ve Saat Seç",
-              clearButtonLabel: "Temizle",
-              todayButtonLabel: "Bugün",
+              fieldYearPlaceholder: () => "yyyy",
+              fieldMonthPlaceholder: () => "aa",
+              fieldDayPlaceholder: () => "gg",
+
+              selectDate: "Tarih Seç",
+              selectTime: "Saat Seç",
+              previousMonth: "Önceki Ay",
+              nextMonth: "Sonraki Ay",
+              next: "İleri",
+              back: "Geri",
             }}
           >
             <DateTimePicker
