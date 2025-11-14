@@ -1196,7 +1196,7 @@ export default function BasicTable({
         </TableContainer>
       </Box>
 
-      <ReminderModal
+      {/* <ReminderModal
         open={openReminderModal}
         onClose={() => setOpenReminderModal(false)}
         onSubmit={async (data) => {
@@ -1245,6 +1245,86 @@ export default function BasicTable({
 
             const res = await api.post("/reminders", {
               ...data,
+              propertyId: selectedPropertyId,
+              remindAt,
+            });
+
+            if (res.data.status === "success") {
+              setSnackbar({
+                open: true,
+                message: "Hatırlatıcı başarıyla oluşturuldu",
+                severity: "success",
+              });
+              setOpenReminderModal(false);
+            } else {
+              setSnackbar({
+                open: true,
+                message: res.data.message || "Hatırlatıcı eklenemedi.",
+                severity: "error",
+              });
+            }
+          } catch (err) {
+            console.error("Hatırlatıcı oluşturma hatası:", err);
+            setSnackbar({
+              open: true,
+              message: "Hatırlatıcı eklenemedi.",
+              severity: "error",
+            });
+          }
+        }}
+        propertyId={selectedPropertyId}
+        isGeneral={false}
+      /> */}
+
+      <ReminderModal
+        open={openReminderModal}
+        onClose={() => setOpenReminderModal(false)}
+        onSubmit={async (formData) => {
+          try {
+            let remindAt = null;
+
+            if (formData.type === "monthlyPayment" && formData.dayOfMonth) {
+              const today = new Date();
+              const currentMonth = today.getMonth();
+              const year = today.getFullYear();
+
+              const nextDate = new Date(
+                year,
+                currentMonth,
+                formData.dayOfMonth,
+                9,
+                0,
+                0
+              );
+              if (nextDate < today) nextDate.setMonth(nextDate.getMonth() + 1);
+
+              remindAt = nextDate.toISOString();
+            }
+
+            if (formData.type === "contractEnd" && formData.monthsBefore) {
+              const property = data.find((p) => p._id === selectedPropertyId);
+
+              if (property?.endDate) {
+                const end = new Date(property.endDate);
+                end.setMonth(end.getMonth() - formData.monthsBefore);
+                end.setHours(9, 0, 0, 0);
+                remindAt = end.toISOString();
+              } else {
+                console.warn("Property endDate bulunamadı");
+              }
+            }
+
+            if (!remindAt) {
+              setSnackbar({
+                open: true,
+                message: "Tarih hesaplanamadı, girişleri kontrol et.",
+                severity: "warning",
+              });
+              return;
+            }
+
+            const res = await api.post("/reminders", {
+              ...formData,
               propertyId: selectedPropertyId,
               remindAt,
             });
