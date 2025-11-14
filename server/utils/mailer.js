@@ -195,21 +195,6 @@ function assignmentRejectedHtml({ toName, propertyLocation, link }) {
     </div>`;
 }
 
-// function reminderMailHtml({ name, message, remindAt }) {
-//   return `
-//     <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:24px;border:1px solid #eee;border-radius:12px">
-//       <div style="text-align:center;margin-bottom:16px">
-//         <img src="https://tutalim.com/images/tutalim.webp" alt="Tutalim" style="max-width:160px;height:auto" />
-//       </div>
-//       <h2>Hatırlatıcınız Geldi</h2>
-//       <p>Merhaba ${name},</p>
-//       <p>${message}</p>
-//       <p><b>Tarih:</b> ${new Date(remindAt).toLocaleString("tr-TR")}</p>
-//       <hr style="margin:24px 0;border:none;border-top:1px solid #eee" />
-//       <p style="color:#6b7280;font-size:12px">Bu e-posta otomatik gönderilmiştir, yanıtlamayın.</p>
-//     </div>`;
-// }
-
 function reminderMailHtml({ name, message, remindAt }) {
   const formatted = formatTR(remindAt);
   return `

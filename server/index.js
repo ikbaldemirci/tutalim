@@ -1571,6 +1571,72 @@ app.delete("/api/reminders/:id", verifyToken, async (req, res) => {
   }
 });
 
+app.post(
+  "/api/reminders/property/:propertyId",
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { propertyId } = req.params;
+      const { message, type, dayOfMonth, monthsBeforeEnd } = req.body;
+
+      const property = await Property.findById(propertyId);
+      if (!property)
+        return res
+          .status(404)
+          .json({ status: "fail", message: "Mülk bulunamadı." });
+
+      let remindAt;
+
+      if (type === "monthlyPayment") {
+        const now = new Date();
+        const currentDay = now.getDate();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        if (currentDay < dayOfMonth) {
+          remindAt = new Date(currentYear, currentMonth, dayOfMonth, 9, 0, 0);
+        } else {
+          remindAt = new Date(
+            currentYear,
+            currentMonth + 1,
+            dayOfMonth,
+            9,
+            0,
+            0
+          );
+        }
+      } else if (type === "contractEnd" && property.endDate) {
+        const endDate = new Date(property.endDate);
+        remindAt = new Date(endDate);
+        remindAt.setMonth(remindAt.getMonth() - monthsBeforeEnd);
+        remindAt.setHours(9, 0, 0, 0);
+      } else {
+        return res.status(400).json({
+          status: "fail",
+          message: "Geçersiz reminder tipi veya veri.",
+        });
+      }
+
+      const reminder = await Reminder.create({
+        userId: req.user.id,
+        propertyId,
+        message: message || "Mülk hatırlatıcısı",
+        type,
+        dayOfMonth: dayOfMonth || null,
+        monthsBeforeEnd: monthsBeforeEnd || null,
+        remindAt,
+      });
+
+      res.json({ status: "success", reminder });
+    } catch (err) {
+      console.error("Property reminder oluşturma hatası:", err);
+      res
+        .status(500)
+        .json({ status: "error", message: "Hatırlatıcı oluşturulamadı." });
+    }
+  }
+);
+
 app.post("/api/contact", async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
@@ -1611,18 +1677,20 @@ cron.schedule("*/5 * * * *", async () => {
     const reminders = await Reminder.find({
       remindAt: { $lte: now },
       isDone: false,
-    }).populate("userId", "name mail");
+    })
+      .populate("userId", "name mail")
+      .populate("propertyId", "location endDate");
 
     for (const r of reminders) {
       await sendMail({
         to: r.userId.mail,
         subject: "Tutalım | Hatırlatıcınızın Zamanı Geldi",
-        html: reminderMailHtml({
+        text: reminderMailText({
           name: r.userId.name,
           message: r.message,
           remindAt: r.remindAt,
         }),
-        text: reminderMailText({
+        html: reminderMailHtml({
           name: r.userId.name,
           message: r.message,
           remindAt: r.remindAt,
@@ -1633,6 +1701,27 @@ cron.schedule("*/5 * * * *", async () => {
 
       r.isDone = true;
       await r.save();
+
+      if (r.propertyId && r.type === "monthlyPayment") {
+        const prop = r.propertyId;
+        if (prop.endDate && new Date(prop.endDate) > now) {
+          const nextMonth = new Date(r.remindAt);
+          nextMonth.setMonth(nextMonth.getMonth() + 1);
+          nextMonth.setHours(9, 0, 0, 0);
+
+          await Reminder.create({
+            userId: r.userId._id,
+            propertyId: prop._id,
+            message: r.message,
+            type: "monthlyPayment",
+            dayOfMonth: r.dayOfMonth,
+            remindAt: nextMonth,
+          });
+        }
+      }
+
+      if (r.propertyId && r.type === "contractEnd") {
+      }
     }
   } catch (err) {
     console.error("Cron reminder kontrol hatası:", err);

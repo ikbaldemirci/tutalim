@@ -13,6 +13,11 @@ const ReminderSchema = new mongoose.Schema(
       required: false,
       default: null,
     },
+    type: {
+      type: String,
+      enum: ["manual", "monthlyPayment", "contractEnd"],
+      default: "manual",
+    },
     message: {
       type: String,
       required: true,
@@ -25,6 +30,8 @@ const ReminderSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    dayOfMonth: { type: Number, default: null },
+    monthsBeforeEnd: { type: Number, default: null },
   },
   { timestamps: true }
 );

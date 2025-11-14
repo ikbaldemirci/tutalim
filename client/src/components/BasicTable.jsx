@@ -35,8 +35,10 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
+import AlarmAddIcon from "@mui/icons-material/AlarmAdd";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
+import ReminderModal from "./ReminderModal";
 
 export default function BasicTable({
   data = [],
@@ -72,6 +74,9 @@ export default function BasicTable({
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
   const userRole = decoded?.role;
+
+  const [openReminderModal, setOpenReminderModal] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState(null);
 
   const Transition = React.forwardRef((props, ref) => (
     <Zoom ref={ref} {...props} timeout={400} />
@@ -1170,6 +1175,16 @@ export default function BasicTable({
                           >
                             <DeleteIcon sx={{ fontSize: 18, mr: 1 }} /> Sil
                           </MenuItem>
+                          <MenuItem
+                            onClick={() => {
+                              setSelectedPropertyId(menuRowId);
+                              setOpenReminderModal(true);
+                              setAnchorEl(null);
+                            }}
+                          >
+                            <AlarmAddIcon sx={{ fontSize: 18, mr: 1 }} />
+                            Hatırlatıcı Ekle
+                          </MenuItem>
                         </Menu>
                       </Box>
                     )}
@@ -1180,6 +1195,35 @@ export default function BasicTable({
           </Table>
         </TableContainer>
       </Box>
+
+      <ReminderModal
+        open={openReminderModal}
+        onClose={() => setOpenReminderModal(false)}
+        onSubmit={async (data) => {
+          try {
+            const res = await api.post("/reminders", {
+              ...data,
+              propertyId: selectedPropertyId,
+            });
+            if (res.data.status === "success") {
+              setSnackbar({
+                open: true,
+                message: "Hatırlatıcı oluşturuldu",
+                severity: "success",
+              });
+              setOpenReminderModal(false);
+            }
+          } catch (err) {
+            setSnackbar({
+              open: true,
+              message: "Hatırlatıcı eklenemedi",
+              severity: "error",
+            });
+          }
+        }}
+        propertyId={selectedPropertyId}
+        isGeneral={false}
+      />
 
       {/* 🎬 Snackbar */}
       <Snackbar

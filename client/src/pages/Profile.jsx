@@ -25,11 +25,12 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import HistoryIcon from "@mui/icons-material/History";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
+import ReminderModal from "../components/ReminderModal";
 
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import trLocale from "date-fns/locale/tr";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import trLocale from "date-fns/locale/tr";
 
 function Profile() {
   const token = localStorage.getItem("token");
@@ -476,7 +477,7 @@ function Profile() {
         </Paper>
       </Box>
 
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
+      {/* <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Box
           sx={{
             p: 3,
@@ -535,7 +536,33 @@ function Profile() {
             Ekle
           </Button>
         </Box>
-      </Modal>
+      </Modal> */}
+
+      <ReminderModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onSubmit={async (data) => {
+          try {
+            const res = await api.post("/reminders", data);
+            if (res.data.status === "success") {
+              setReminders((prev) => [res.data.reminder, ...prev]);
+              setSnackbar({
+                open: true,
+                message: "Hatırlatıcı eklendi",
+                severity: "success",
+              });
+              setOpenModal(false);
+            }
+          } catch {
+            setSnackbar({
+              open: true,
+              message: "Hatırlatıcı eklenemedi.",
+              severity: "error",
+            });
+          }
+        }}
+        isGeneral={true}
+      />
 
       <Snackbar
         open={snackbar.open}
