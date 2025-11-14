@@ -1201,22 +1201,73 @@ export default function BasicTable({
         onClose={() => setOpenReminderModal(false)}
         onSubmit={async (data) => {
           try {
+            let remindAt = null;
+
+            if (data.type === "monthlyPayment" && data.dayOfMonth) {
+              const today = new Date();
+              const currentMonth = today.getMonth();
+              const year = today.getFullYear();
+
+              const nextDate = new Date(
+                year,
+                currentMonth,
+                data.dayOfMonth,
+                9,
+                0,
+                0
+              );
+
+              if (nextDate < today) nextDate.setMonth(nextDate.getMonth() + 1);
+
+              remindAt = nextDate.toISOString();
+            }
+
+            if (data.type === "contractEnd" && data.monthsBefore) {
+              const property = properties.find(
+                (p) => p._id === selectedPropertyId
+              );
+              if (property?.endDate) {
+                const end = new Date(property.endDate);
+                end.setMonth(end.getMonth() - data.monthsBefore);
+                end.setHours(9, 0, 0, 0);
+                remindAt = end.toISOString();
+              }
+            }
+
+            if (!remindAt) {
+              setSnackbar({
+                open: true,
+                message: "Tarih hesaplanamadı, girişleri kontrol et.",
+                severity: "warning",
+              });
+              return;
+            }
+
             const res = await api.post("/reminders", {
               ...data,
               propertyId: selectedPropertyId,
+              remindAt,
             });
+
             if (res.data.status === "success") {
               setSnackbar({
                 open: true,
-                message: "Hatırlatıcı oluşturuldu",
+                message: "Hatırlatıcı başarıyla oluşturuldu",
                 severity: "success",
               });
               setOpenReminderModal(false);
+            } else {
+              setSnackbar({
+                open: true,
+                message: res.data.message || "Hatırlatıcı eklenemedi.",
+                severity: "error",
+              });
             }
           } catch (err) {
+            console.error("Hatırlatıcı oluşturma hatası:", err);
             setSnackbar({
               open: true,
-              message: "Hatırlatıcı eklenemedi",
+              message: "Hatırlatıcı eklenemedi.",
               severity: "error",
             });
           }
