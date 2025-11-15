@@ -27,11 +27,6 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import ReminderModal from "../components/ReminderModal";
 
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-// import trLocale from "date-fns/locale/tr";
-
 function Profile() {
   const token = localStorage.getItem("token");
   const [decoded, setDecoded] = useState(token ? jwtDecode(token) : null);
@@ -476,67 +471,6 @@ function Profile() {
           </Box>
         </Paper>
       </Box>
-
-      {/* <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box
-          sx={{
-            p: 3,
-            bgcolor: "background.paper",
-            maxWidth: 400,
-            mx: "auto",
-            mt: "20vh",
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" mb={2}>
-            Yeni Hatırlatıcı Ekle
-          </Typography>
-          <TextField
-            label="Mesaj"
-            fullWidth
-            sx={{ mb: 2 }}
-            value={newReminder.message}
-            onChange={(e) =>
-              setNewReminder({ ...newReminder, message: e.target.value })
-            }
-          />
-
-          <LocalizationProvider
-            dateAdapter={AdapterDateFns}
-            adapterLocale={trLocale}
-          >
-            <DateTimePicker
-              label="Tarih ve Saat (5 dakikalık aralıklarla)"
-              value={
-                newReminder.remindAt ? new Date(newReminder.remindAt) : null
-              }
-              onChange={(newValue) => {
-                if (newValue) {
-                  const iso = newValue.toISOString();
-                  setNewReminder({ ...newReminder, remindAt: iso });
-                }
-              }}
-              ampm={false}
-              minutesStep={5}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  sx: { mb: 2 },
-                },
-              }}
-            />
-          </LocalizationProvider>
-
-          <Button
-            variant="contained"
-            color="success"
-            fullWidth
-            onClick={handleAddReminder}
-          >
-            Ekle
-          </Button>
-        </Box>
-      </Modal> */}
 
       <ReminderModal
         open={openModal}
