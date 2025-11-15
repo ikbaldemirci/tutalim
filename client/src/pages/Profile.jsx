@@ -11,7 +11,6 @@ import {
   Snackbar,
   Alert,
   Divider,
-  Modal,
   Tabs,
   Tab,
   IconButton,
@@ -373,7 +372,7 @@ function Profile() {
                   </Button>
                 </Box>
 
-                <Box
+                {/* <Box
                   sx={{
                     maxHeight: reminders.length > 5 ? "55vh" : "none",
                     overflowY: reminders.length > 5 ? "auto" : "visible",
@@ -415,6 +414,133 @@ function Profile() {
                         </IconButton>
                       </Paper>
                     ))
+                  ) : (
+                    <Typography color="text.secondary">
+                      Henüz hatırlatıcı yok.
+                    </Typography>
+                  )}
+                </Box> */}
+
+                <Box
+                  sx={{
+                    maxHeight: reminders.length > 5 ? "55vh" : "none",
+                    overflowY: reminders.length > 5 ? "auto" : "visible",
+                    pr: 1,
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  {reminders.length > 0 ? (
+                    <>
+                      <Typography
+                        variant="h6"
+                        fontWeight={600}
+                        color="primary"
+                        mt={2}
+                        mb={1}
+                      >
+                        Aktif Hatırlatıcılar
+                      </Typography>
+                      {reminders.filter((r) => !r.isDone).length > 0 ? (
+                        reminders
+                          .filter((r) => !r.isDone)
+                          .map((r) => (
+                            <Paper
+                              key={r._id}
+                              sx={{
+                                p: 1.5,
+                                mb: 1,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                gap: 2,
+                                background: "#f8f9fa",
+                                borderLeft: "4px solid #2E86C1",
+                              }}
+                            >
+                              <Box>
+                                <Typography
+                                  variant="subtitle1"
+                                  fontWeight={600}
+                                >
+                                  {r.message}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {new Date(r.remindAt).toLocaleString("tr-TR")}
+                                </Typography>
+                              </Box>
+                              <IconButton
+                                aria-label="hatırlatıcıyı sil"
+                                onClick={() => handleDeleteReminder(r._id)}
+                                sx={{ color: "#dc3545" }}
+                              >
+                                <DeleteOutlineOutlinedIcon />
+                              </IconButton>
+                            </Paper>
+                          ))
+                      ) : (
+                        <Typography color="text.secondary" mb={2}>
+                          Aktif hatırlatıcı yok.
+                        </Typography>
+                      )}
+
+                      <Typography
+                        variant="h6"
+                        fontWeight={600}
+                        color="success.main"
+                        mt={3}
+                        mb={1}
+                      >
+                        Tamamlananlar
+                      </Typography>
+                      {reminders.filter((r) => r.isDone).length > 0 ? (
+                        reminders
+                          .filter((r) => r.isDone)
+                          .map((r) => (
+                            <Paper
+                              key={r._id}
+                              sx={{
+                                p: 1.5,
+                                mb: 1,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                gap: 2,
+                                background: "#e8f5e9",
+                                borderLeft: "4px solid #28B463",
+                              }}
+                            >
+                              <Box>
+                                <Typography
+                                  variant="subtitle1"
+                                  fontWeight={600}
+                                >
+                                  {r.message}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {new Date(r.remindAt).toLocaleString("tr-TR")}
+                                </Typography>
+                              </Box>
+                              <IconButton
+                                aria-label="hatırlatıcıyı sil"
+                                onClick={() => handleDeleteReminder(r._id)}
+                                sx={{ color: "#dc3545" }}
+                              >
+                                <DeleteOutlineOutlinedIcon />
+                              </IconButton>
+                            </Paper>
+                          ))
+                      ) : (
+                        <Typography color="text.secondary">
+                          Tamamlanmış hatırlatıcı yok.
+                        </Typography>
+                      )}
+                    </>
                   ) : (
                     <Typography color="text.secondary">
                       Henüz hatırlatıcı yok.
