@@ -568,7 +568,7 @@ export default function BasicTable({
                   }}
                 >
                   {/* Hatırlatıcı */}
-                  <TableCell align="center">
+                  <TableCell>
                     <IconButton
                       color="primary"
                       onClick={() => {
@@ -663,7 +663,7 @@ export default function BasicTable({
                     )}
                   </TableCell>
 
-                  <TableCell align="center">
+                  <TableCell>
                     {userRole === "realtor" ? (
                       <>
                         {row.owner ? (
