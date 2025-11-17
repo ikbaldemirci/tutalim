@@ -530,6 +530,7 @@ export default function BasicTable({
             <TableHead sx={{ backgroundColor: "#2E86C1" }}>
               <TableRow>
                 {[
+                  "Hatırlatıcı",
                   "Kiracı",
                   "Fiyat",
                   "Başlangıç",
@@ -566,6 +567,23 @@ export default function BasicTable({
                     },
                   }}
                 >
+                  {/* Hatırlatıcı */}
+                  <TableCell align="center">
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        setSelectedPropertyId(row._id);
+                        setOpenReminderModal(true);
+                      }}
+                      sx={{
+                        backgroundColor: "rgba(46,134,193,0.1)",
+                        "&:hover": { backgroundColor: "rgba(46,134,193,0.2)" },
+                      }}
+                    >
+                      <AlarmAddIcon />
+                    </IconButton>
+                  </TableCell>
+
                   {/* Kiracı */}
                   <TableCell>
                     {editingRow === row._id ? (
@@ -1123,16 +1141,6 @@ export default function BasicTable({
                             sx={{ color: "error.main" }}
                           >
                             <DeleteIcon sx={{ fontSize: 18, mr: 1 }} /> Sil
-                          </MenuItem>
-                          <MenuItem
-                            onClick={() => {
-                              setSelectedPropertyId(menuRowId);
-                              setOpenReminderModal(true);
-                              setAnchorEl(null);
-                            }}
-                          >
-                            <AlarmAddIcon sx={{ fontSize: 18, mr: 1 }} />
-                            Hatırlatıcı Ekle
                           </MenuItem>
                         </Menu>
                       </Box>
