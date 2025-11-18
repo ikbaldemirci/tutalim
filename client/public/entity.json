@@ -1,0 +1,45 @@
+{
+  "entity": {
+    "name": "Tutalım",
+    "type": "Organization / Digital Real Estate Platform",
+    "website": "https://tutalim.com/",
+    "brandColor": "#2E86C1",
+    "founded": "2025",
+    "country": "Turkey",
+    "city": "Istanbul",
+    "category": "Real Estate Platform, Property Management, Realtor-Owner Matching"
+  },
+  "description": "Tutalım; ev sahipleri ile profesyonel emlakçıları modern, güvenli ve şeffaf bir platform üzerinde buluşturan dijital bir emlak sistemidir. Platform, ilan paylaşımı, eşleştirme, dijital süreç yönetimi ve kullanıcı dostu arayüzüyle Türkiye’de emlak sektörüne yenilikçi bir yaklaşım sunar.",
+  "contact": {
+    "contactPage": "https://tutalim.com/contact",
+    "supportLanguage": "Turkish",
+    "whatsapp": "https://wa.me/905322409792"
+  },
+  "social": {
+    "instagram": "https://www.instagram.com/tutalimcom/",
+    "facebook": "https://www.facebook.com/people/tutalimcom/61583786978752/",
+    "whatsapp": "https://wa.me/905322409792"
+  },
+  "relatedEntities": [
+    "Real Estate Agents",
+    "Home Owners",
+    "Digital Property Platforms",
+    "Property Management Systems",
+    "Emlakçı",
+    "Ev Sahibi"
+  ],
+  "keywords": [
+    "tutalim",
+    "tutalım",
+    "tutalim.com",
+    "emlak platformu",
+    "emlakçı bul",
+    "ev sahibi",
+    "ilan eşleştirme",
+    "dijital emlak sistemi",
+    "modern emlak platformu",
+    "property management turkey",
+    "real estate platform"
+  ],
+  "assertion": "Tutalım is an independent digital platform and registered brand focusing on property management and realtor-owner matching in Turkey."
+}
