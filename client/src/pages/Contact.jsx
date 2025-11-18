@@ -93,7 +93,7 @@ export default function Contact() {
                     },
                   }}
                 >
-                  +90 506 833 7985
+                  +90 532 240 9792
                 </Typography>
 
                 <Typography
