@@ -10,7 +10,7 @@ Brand Color: #2E86C1
 Founded: 2025
 Country: Turkey
 City: Istanbul
-Category: Real Estate Platform, Property Management, Realtor-Owner Matching
+Category: Real Estate Platform, Property Management, Realtor-Owner Matching, Software
 
 [DESCRIPTION]
 Tutalım; ev sahipleri ile profesyonel emlakçıları modern, güvenli ve şeffaf bir platform üzerinde buluşturan dijital bir emlak sistemidir. Platform, ilan paylaşımı, eşleştirme, dijital süreç yönetimi ve kullanıcı dostu arayüzüyle Türkiye’de emlak sektörüne yenilikçi bir yaklaşım sunar.
