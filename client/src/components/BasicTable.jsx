@@ -80,6 +80,7 @@ export default function BasicTable({
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
 
   const [propertyReminders, setPropertyReminders] = useState({});
+  const [propertyReminderMap, setPropertyReminderMap] = useState({});
 
   const Transition = React.forwardRef((props, ref) => (
     <Zoom ref={ref} {...props} timeout={400} />
@@ -160,6 +161,18 @@ export default function BasicTable({
 
     loadReminders();
   }, []);
+
+  useEffect(() => {
+    if (reminders && reminders.length > 0) {
+      const map = {};
+      reminders.forEach((r) => {
+        if (r.propertyId) {
+          map[r.propertyId._id] = true;
+        }
+      });
+      setPropertyReminderMap(map);
+    }
+  }, [reminders]);
 
   const handleEditClick = (row) => {
     setEditingRow(row._id);
@@ -1272,6 +1285,17 @@ export default function BasicTable({
                 message: "Hatırlatıcı başarıyla oluşturuldu",
                 severity: "success",
               });
+              setPropertyReminders((prev) => ({
+                ...prev,
+                [selectedPropertyId]: [
+                  ...(prev[selectedPropertyId] || []),
+                  res.data.reminder,
+                ],
+              }));
+              setPropertyReminderMap((prev) => ({
+                ...prev,
+                [selectedPropertyId]: true,
+              }));
               setOpenReminderModal(false);
             } else {
               setSnackbar({
