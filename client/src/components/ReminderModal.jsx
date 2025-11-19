@@ -21,6 +21,7 @@ export default function ReminderModal({
   onSubmit,
   propertyId = null,
   isGeneral = false,
+  existingReminders = [],
 }) {
   const [form, setForm] = useState({
     message: "",
@@ -99,6 +100,39 @@ export default function ReminderModal({
         <Typography variant="h6" mb={2} color="primary" fontWeight={600}>
           {isGeneral ? "Yeni Hatırlatıcı Ekle" : "Mülke Özel Hatırlatıcı"}
         </Typography>
+
+        {!isGeneral && existingReminders.length > 0 && (
+          <Box
+            sx={{
+              p: 2,
+              mb: 2,
+              borderRadius: 2,
+              backgroundColor: "#E8F6F3",
+              borderLeft: "5px solid #28B463",
+            }}
+          >
+            <Typography fontWeight={600} mb={1}>
+              Bu mülke ait mevcut hatırlatıcılar:
+            </Typography>
+
+            {existingReminders.map((r, i) => (
+              <Typography key={i} sx={{ mb: 0.5 }}>
+                •{" "}
+                <b>
+                  {r.type === "monthlyPayment"
+                    ? "Her ay belirli bir günde hatırlatma"
+                    : "Sözleşme bitimine yakın hatırlatma"}
+                </b>{" "}
+                — {new Date(r.remindAt).toLocaleString("tr-TR")}
+              </Typography>
+            ))}
+
+            <Typography mt={1} fontSize="0.85rem" color="text.secondary">
+              Tüm hatırlatıcılarınızı Profil → Hatırlatıcılarım sekmesinden
+              görüntüleyebilirsiniz.
+            </Typography>
+          </Box>
+        )}
 
         {!isGeneral && (
           <FormControl fullWidth sx={{ mb: 2 }}>

@@ -36,6 +36,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import AlarmAddIcon from "@mui/icons-material/AlarmAdd";
+import AlarmOnIcon from "@mui/icons-material/AlarmOn";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import ReminderModal from "./ReminderModal";
@@ -77,6 +78,8 @@ export default function BasicTable({
 
   const [openReminderModal, setOpenReminderModal] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
+
+  const [propertyReminders, setPropertyReminders] = useState({});
 
   const Transition = React.forwardRef((props, ref) => (
     <Zoom ref={ref} {...props} timeout={400} />
@@ -130,6 +133,33 @@ export default function BasicTable({
     };
     loadSent();
   }, [data?.length]);
+
+  useEffect(() => {
+    const loadReminders = async () => {
+      try {
+        const userId = decoded?.id;
+        if (!userId) return;
+
+        const res = await api.get(`/reminders/${userId}`);
+
+        if (res.data.status === "success") {
+          const map = {};
+          res.data.reminders.forEach((r) => {
+            if (r.propertyId) {
+              const pid = r.propertyId._id || r.propertyId;
+              if (!map[pid]) map[pid] = [];
+              map[pid].push(r);
+            }
+          });
+          setPropertyReminders(map);
+        }
+      } catch (err) {
+        console.error("Reminder map load error:", err);
+      }
+    };
+
+    loadReminders();
+  }, []);
 
   const handleEditClick = (row) => {
     setEditingRow(row._id);
@@ -580,7 +610,12 @@ export default function BasicTable({
                         "&:hover": { backgroundColor: "rgba(46,134,193,0.2)" },
                       }}
                     >
-                      <AlarmAddIcon />
+                      {propertyReminders[row._id]?.length > 0 ? (
+                        // <AlarmOnIcon style={{ color: "#28B463" }} />
+                        <AlarmOnIcon color="success" />
+                      ) : (
+                        <AlarmAddIcon />
+                      )}
                     </IconButton>
                   </TableCell>
 
@@ -1231,6 +1266,7 @@ export default function BasicTable({
         }}
         propertyId={selectedPropertyId}
         isGeneral={false}
+        existingReminders={propertyReminders[selectedPropertyId] || []}
       />
 
       {/* 🎬 Snackbar */}
