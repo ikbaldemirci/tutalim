@@ -1319,6 +1319,29 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
       });
     }
 
+    if (propertyId) {
+      const property = await Property.findById(propertyId);
+      if (!property) {
+        return res.status(404).json({
+          status: "fail",
+          message: "Mülk bulunamadı.",
+        });
+      }
+
+      if (property.endDate) {
+        const end = new Date(property.endDate);
+        const reminderDate = new Date(remindAt);
+
+        if (reminderDate > end) {
+          return res.status(400).json({
+            status: "fail",
+            message:
+              "Bu sözleşme için hatırlatıcı oluşturulamaz. Sözleşme süresi dolmuş.",
+          });
+        }
+      }
+    }
+
     const reminder = await Reminder.create({
       userId: req.user.id,
       propertyId: propertyId || null,
@@ -1462,6 +1485,17 @@ app.post(
           status: "fail",
           message: "Geçersiz reminder tipi veya veri.",
         });
+      }
+
+      if (property.endDate) {
+        const end = new Date(property.endDate);
+        if (remindAt >= end) {
+          return res.status(400).json({
+            status: "fail",
+            message:
+              "Bu sözleşme için hatırlatıcı oluşturulamaz. Sözleşme süresi dolmuş.",
+          });
+        }
       }
 
       const reminder = await Reminder.create({
