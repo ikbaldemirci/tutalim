@@ -623,26 +623,23 @@ export default function BasicTable({
                         setSelectedPropertyId(row._id);
                         setOpenReminderModal(true);
                       }}
+                      sx={{
+                        backgroundColor:
+                          propertyReminders[row._id]?.length > 0
+                            ? "rgba(40,180,99,0.1)"
+                            : "rgba(46,134,193,0.1)",
+                        "&:hover": {
+                          backgroundColor:
+                            propertyReminders[row._id]?.length > 0
+                              ? "rgba(40,180,99,0.2)"
+                              : "rgba(46,134,193,0.2)",
+                        },
+                      }}
                     >
                       {propertyReminders[row._id]?.length > 0 ? (
-                        <AlarmOnIcon
-                          color="success"
-                          sx={{
-                            backgroundColor: "rgba(46,134,193,0.1)",
-                            "&:hover": {
-                              backgroundColor: "rgba(46,134,193,0.2)",
-                            },
-                          }}
-                        />
+                        <AlarmOnIcon color="success" />
                       ) : (
-                        <AlarmAddIcon
-                          sx={{
-                            backgroundColor: "rgba(46,134,193,0.1)",
-                            "&:hover": {
-                              backgroundColor: "rgba(46,134,193,0.2)",
-                            },
-                          }}
-                        />
+                        <AlarmAddIcon color="primary" />
                       )}
                     </IconButton>
                   </TableCell>
