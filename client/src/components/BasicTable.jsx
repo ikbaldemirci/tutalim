@@ -1322,8 +1322,18 @@ export default function BasicTable({
 
               if (property?.endDate) {
                 const end = new Date(property.endDate);
-                end.setMonth(end.getMonth() - formData.monthsBefore);
-                end.setHours(9, 0, 0, 0);
+                const year = end.getFullYear();
+                const month = end.getMonth();
+                const day = end.getDate();
+
+                const target = new Date(
+                  year,
+                  month - formData.monthsBefore,
+                  day,
+                  9,
+                  0,
+                  0
+                );
                 remindAt = end.toISOString();
               } else {
                 console.warn("Property endDate bulunamadı");
