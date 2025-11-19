@@ -611,8 +611,7 @@ export default function BasicTable({
                       }}
                     >
                       {propertyReminders[row._id]?.length > 0 ? (
-                        // <AlarmOnIcon style={{ color: "#28B463" }} />
-                        <AlarmOnIcon color="success" />
+                        <AlarmOnIcon color="success.main" />
                       ) : (
                         <AlarmAddIcon />
                       )}

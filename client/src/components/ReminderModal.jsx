@@ -108,7 +108,7 @@ export default function ReminderModal({
               mb: 2,
               borderRadius: 2,
               backgroundColor: "#E8F6F3",
-              borderLeft: "5px solid #28B463",
+              borderLeft: "4px solid #28B463",
             }}
           >
             <Typography fontWeight={600} mb={1}>
@@ -121,8 +121,8 @@ export default function ReminderModal({
                 <b>
                   {r.type === "monthlyPayment"
                     ? "Her ay belirli bir günde hatırlatma"
-                    : "Sözleşme bitimine yakın hatırlatma"}
-                </b>{" "}
+                    : "Sözleşme bitmeden X ay önce hatırlatma"}
+                </b>
                 — {new Date(r.remindAt).toLocaleString("tr-TR")}
               </Typography>
             ))}

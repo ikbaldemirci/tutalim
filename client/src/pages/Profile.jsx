@@ -365,61 +365,12 @@ function Profile() {
                   </Typography>
                   <Button
                     variant="contained"
-                    color="success"
+                    color="success.main"
                     onClick={() => setOpenModal(true)}
                   >
                     + Yeni Hatırlatıcı
                   </Button>
                 </Box>
-
-                {/* <Box
-                  sx={{
-                    maxHeight: reminders.length > 5 ? "55vh" : "none",
-                    overflowY: reminders.length > 5 ? "auto" : "visible",
-                    pr: 1,
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  {reminders.length > 0 ? (
-                    reminders.map((r) => (
-                      <Paper
-                        key={r._id}
-                        sx={{
-                          p: 1.5,
-                          mb: 1,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: 2,
-                          background: r.isDone ? "#e8f5e9" : "#f8f9fa",
-                          borderLeft: r.isDone
-                            ? "4px solid #28B463"
-                            : "4px solid #2E86C1",
-                        }}
-                      >
-                        <Box>
-                          <Typography variant="subtitle1" fontWeight={600}>
-                            {r.message}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {new Date(r.remindAt).toLocaleString("tr-TR")}
-                          </Typography>
-                        </Box>
-                        <IconButton
-                          aria-label="hatırlatıcıyı sil"
-                          onClick={() => handleDeleteReminder(r._id)}
-                          sx={{ color: "#dc3545" }}
-                        >
-                          <DeleteOutlineOutlinedIcon />
-                        </IconButton>
-                      </Paper>
-                    ))
-                  ) : (
-                    <Typography color="text.secondary">
-                      Henüz hatırlatıcı yok.
-                    </Typography>
-                  )}
-                </Box> */}
 
                 <Box
                   sx={{
