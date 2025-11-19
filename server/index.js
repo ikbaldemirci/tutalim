@@ -1310,7 +1310,26 @@ app.get("/api/notifications/:userId", verifyToken, async (req, res) => {
 
 app.post("/api/reminders", verifyToken, async (req, res) => {
   try {
-    const { propertyId, message, remindAt } = req.body;
+    const { propertyId, message, remindAt, type, dayOfMonth, monthsBefore } =
+      req.body;
+
+    let finalRemindAt = remindAt ? new Date(remindAt) : null;
+
+    if (!type) {
+      if (!finalRemindAt || finalRemindAt <= new Date()) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Geçmiş bir zamana hatırlatıcı oluşturamazsınız.",
+        });
+      }
+    }
+
+    if (type && !propertyId) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Bu hatırlatıcı bir mülke bağlı olmalıdır.",
+      });
+    }
 
     if (!message || !remindAt) {
       return res.status(400).json({
@@ -1319,42 +1338,89 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
       });
     }
 
+    let property = null;
     if (propertyId) {
-      const property = await Property.findById(propertyId);
+      property = await Property.findById(propertyId);
       if (!property) {
-        return res.status(404).json({
+        return res.status(400).json({
           status: "fail",
           message: "Mülk bulunamadı.",
         });
       }
+    }
 
-      if (property.endDate) {
-        const end = new Date(property.endDate);
-        const reminderDate = new Date(remindAt);
-
-        if (reminderDate > end) {
-          return res.status(400).json({
-            status: "fail",
-            message:
-              "Bu sözleşme için hatırlatıcı oluşturulamaz. Sözleşme süresi dolmuş.",
-          });
-        }
+    if (type === "monthlyPayment") {
+      if (!dayOfMonth || dayOfMonth < 1 || dayOfMonth > 31) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Gün değeri 1 ile 31 arasında olmalıdır.",
+        });
       }
+
+      if (!finalRemindAt || finalRemindAt <= new Date()) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Geçmiş tarihe hatırlatıcı eklenemez.",
+        });
+      }
+
+      if (new Date(finalRemindAt) > new Date(property.endDate)) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Sözleşme bitiş tarihinden sonraya hatırlatıcı eklenemez.",
+        });
+      }
+
+      if (new Date(finalRemindAt) < new Date(property.startDate)) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Sözleşme başlangıç tarihinden önce hatırlatıcı eklenemez.",
+        });
+      }
+    }
+
+    if (type === "contractEnd") {
+      if (!monthsBefore || monthsBefore < 1 || monthsBefore > 24) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Ay değeri 1 ile 24 arasında olmalıdır.",
+        });
+      }
+
+      const endDate = new Date(property.endDate);
+      const next = new Date(endDate);
+      next.setMonth(next.getMonth() - monthsBefore);
+
+      if (next <= new Date()) {
+        return res.status(400).json({
+          status: "fail",
+          message: "Bu hatırlatma geçmiş bir tarihe denk geliyor.",
+        });
+      }
+
+      finalRemindAt = next;
     }
 
     const reminder = await Reminder.create({
       userId: req.user.id,
       propertyId: propertyId || null,
       message,
-      remindAt,
+      remindAt: finalRemindAt,
+      type: type || null,
+      dayOfMonth: dayOfMonth || null,
+      monthsBefore: monthsBefore || null,
     });
 
-    res.json({ status: "success", reminder });
+    return res.json({
+      status: "success",
+      reminder,
+    });
   } catch (err) {
     console.error("Reminder create error:", err);
-    res
-      .status(500)
-      .json({ status: "error", message: "Hatırlatıcı eklenemedi." });
+    return res.status(500).json({
+      status: "error",
+      message: "Hatırlatıcı eklenemedi.",
+    });
   }
 });
 
@@ -1563,6 +1629,12 @@ cron.schedule("*/5 * * * *", async () => {
       .populate("propertyId", "location endDate");
 
     for (const r of reminders) {
+      if (r.type === "contractEnd") {
+        if (new Date(r.remindAt) <= now) {
+          console.log("Atlandı (contractEnd geçmiş tarih):", r._id);
+          continue;
+        }
+      }
       await sendMail({
         to: r.userId.mail,
         subject: "Tutalım | Hatırlatıcınızın Zamanı Geldi",

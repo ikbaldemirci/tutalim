@@ -1338,6 +1338,16 @@ export default function BasicTable({
               });
               return;
             }
+
+            if (new Date(remindAt) <= new Date()) {
+              setSnackbar({
+                open: true,
+                message: "Geçmiş bir zamana hatırlatıcı oluşturulamaz.",
+                severity: "warning",
+              });
+              return;
+            }
+
             const property = data.find((p) => p._id === selectedPropertyId);
 
             if (property?.endDate) {
@@ -1360,36 +1370,31 @@ export default function BasicTable({
               remindAt,
             });
 
-            if (res.data.status === "success") {
-              setSnackbar({
-                open: true,
-                message: "Hatırlatıcı başarıyla oluşturuldu",
-                severity: "success",
-              });
-
-              setPropertyReminders((prev) => ({
-                ...prev,
-                [selectedPropertyId]: [
-                  ...(prev[selectedPropertyId] || []),
-                  res.data.reminder,
-                ],
-              }));
-
-              setPropertyReminderMap((prev) => ({
-                ...prev,
-                [selectedPropertyId]: true,
-              }));
-
-              setOpenReminderModal(false);
-            } else {
+            if (res.data.status !== "success") {
               setSnackbar({
                 open: true,
                 message: res.data.message || "Hatırlatıcı eklenemedi.",
                 severity: "error",
               });
+              return;
             }
+
+            setPropertyReminders((prev) => ({
+              ...prev,
+              [selectedPropertyId]: [
+                ...(prev[selectedPropertyId] || []),
+                res.data.reminder,
+              ],
+            }));
+
+            setSnackbar({
+              open: true,
+              message: "Hatırlatıcı başarıyla oluşturuldu",
+              severity: "success",
+            });
+
+            setOpenReminderModal(false);
           } catch (err) {
-            console.error("Hatırlatıcı oluşturma hatası:", err);
             setSnackbar({
               open: true,
               message: "Hatırlatıcı eklenemedi.",
