@@ -598,7 +598,7 @@ export default function BasicTable({
                   }}
                 >
                   {/* Hatırlatıcı */}
-                  <TableCell align="center">
+                  {/* <TableCell align="center">
                     <IconButton
                       color="primary"
                       onClick={() => {
@@ -614,6 +614,35 @@ export default function BasicTable({
                         <AlarmOnIcon color="success" />
                       ) : (
                         <AlarmAddIcon />
+                      )}
+                    </IconButton>
+                  </TableCell> */}
+                  <TableCell align="center">
+                    <IconButton
+                      onClick={() => {
+                        setSelectedPropertyId(row._id);
+                        setOpenReminderModal(true);
+                      }}
+                    >
+                      {propertyReminders[row._id]?.length > 0 ? (
+                        <AlarmOnIcon
+                          color="success"
+                          sx={{
+                            backgroundColor: "rgba(46,134,193,0.1)",
+                            "&:hover": {
+                              backgroundColor: "rgba(46,134,193,0.2)",
+                            },
+                          }}
+                        />
+                      ) : (
+                        <AlarmAddIcon
+                          sx={{
+                            backgroundColor: "rgba(46,134,193,0.1)",
+                            "&:hover": {
+                              backgroundColor: "rgba(46,134,193,0.2)",
+                            },
+                          }}
+                        />
                       )}
                     </IconButton>
                   </TableCell>
