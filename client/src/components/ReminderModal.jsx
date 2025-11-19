@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, use } from "react";
 import {
   Modal,
   Box,
@@ -71,6 +71,18 @@ export default function ReminderModal({
       monthsBefore: "",
     });
   };
+
+  useEffect(() => {
+    if (open) {
+      setForm({
+        message: "",
+        remindAt: null,
+        type: "",
+        dayOfMonth: "",
+        monthsBefore: "",
+      });
+    }
+  }, [open]);
 
   return (
     <Modal open={open} onClose={onClose}>
