@@ -118,17 +118,29 @@ export default function ReminderModal({
               Bu mülke ait mevcut hatırlatıcılar:
             </Typography>
 
-            {existingReminders.map((r, i) => (
-              <Typography key={i} sx={{ mb: 0.5 }}>
-                •{" "}
-                <b>
-                  {r.type === "monthlyPayment"
-                    ? "Her ay belirli bir günde hatırlatma"
-                    : "Sözleşme bitmeden X ay önce hatırlatma"}
-                </b>
-                — {new Date(r.remindAt).toLocaleString("tr-TR")}
-              </Typography>
-            ))}
+            {existingReminders.map((r, i) => {
+              const dateStr = new Date(r.remindAt).toLocaleString("tr-TR");
+              if (r.type === "monthlyPayment") {
+                return (
+                  <Typography key={i} sx={{ mb: 0.5 }}>
+                    • <b>Her ay {r.dayOfMonth}. gün hatırlatma</b> — {dateStr}
+                  </Typography>
+                );
+              }
+              if (r.type === "contractEnd") {
+                return (
+                  <Typography key={i} sx={{ mb: 0.5 }}>
+                    • <b>Sözleşme bitmeden {r.monthsBefore} ay önce</b> —{" "}
+                    {dateStr}
+                  </Typography>
+                );
+              }
+              return (
+                <Typography key={i} sx={{ mb: 0.5 }}>
+                  • <b>Hatırlatma</b> — {dateStr}
+                </Typography>
+              );
+            })}
 
             <Typography mt={1} fontSize="0.85rem" color="text.secondary">
               Tüm hatırlatıcılarınızı Profil → Hatırlatıcılarım sekmesinden
