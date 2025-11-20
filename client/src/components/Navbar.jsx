@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import api from "../api";
-import SocialIcons from "./SocialIcons"; // 🔥 EKLENDİ
+import SocialIcons from "./SocialIcons";
 
 function Navbar({ onLogout, bg }) {
   const navigate = useNavigate();
@@ -112,198 +112,147 @@ function Navbar({ onLogout, bg }) {
       style={computedNavStyle}
     >
       <div
-        className="container py-2 d-flex align-items-center justify-content-between"
+        className="container d-flex align-items-center justify-content-between"
         style={{
           paddingTop: scrolled ? 8 : 12,
           paddingBottom: scrolled ? 8 : 12,
           transition: "padding 0.2s ease",
+          display: "flex",
         }}
       >
-        <NavLink to="/" className="navbar-brand d-flex align-items-center">
-          <img
-            src="/images/tutalim.webp"
-            alt="Tutalım Logo"
-            style={{
-              width: "140px",
-              marginRight: "10px",
-              filter: "brightness(0) invert(1)",
-            }}
-          />
-        </NavLink>
-
-        <div className="d-lg-none">
+        <div className="d-flex align-items-center">
+          <NavLink to="/" className="navbar-brand d-flex align-items-center">
+            <img
+              src="/images/tutalim.webp"
+              alt="Tutalım Logo"
+              style={{
+                width: "140px",
+                filter: "brightness(0) invert(1)",
+              }}
+            />
+          </NavLink>
+        </div>
+        <div
+          className="d-flex align-items-center justify-content-center"
+          style={{ flexGrow: 1 }}
+        >
           <SocialIcons />
         </div>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          aria-label="Toggle navigation"
-          style={{ border: "none" }}
-        >
-          <span className="navbar-toggler-icon" />
-        </button>
+        <div className="d-flex align-items-center">
+          <button
+            className="navbar-toggler d-lg-none ms-2"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavbar"
+            aria-label="Toggle navigation"
+            style={{ border: "none" }}
+          >
+            <span className="navbar-toggler-icon" />
+          </button>
 
-        <div className="collapse navbar-collapse" id="mainNavbar">
-          <ul className="navbar-nav ms-auto align-items-center gap-2 gap-lg-0">
-            <li className="nav-item mx-2 mb-2 mb-lg-0">
-              <NavLink
-                end
-                to="/"
-                className="nav-link text-white fw-semibold"
-                onClick={closeMobileMenu}
-                style={({ isActive }) => ({
-                  borderBottom: isActive ? "2px solid white" : "none",
-                  paddingBottom: 2,
-                })}
-              >
-                Ana Sayfa
-              </NavLink>
-            </li>
+          <div className="collapse navbar-collapse" id="mainNavbar">
+            <ul className="navbar-nav ms-auto align-items-center gap-2">
+              <li className="nav-item">
+                <NavLink
+                  to="/"
+                  end
+                  className="nav-link text-white fw-semibold"
+                  onClick={closeMobileMenu}
+                >
+                  Ana Sayfa
+                </NavLink>
+              </li>
 
-            <li className="nav-item mx-2 mb-2 mb-lg-0">
-              <NavLink
-                to="/about"
-                className="nav-link text-white fw-semibold"
-                onClick={closeMobileMenu}
-                style={({ isActive }) => ({
-                  borderBottom: isActive ? "2px solid white" : "none",
-                  paddingBottom: 2,
-                })}
-              >
-                Hakkında
-              </NavLink>
-            </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/about"
+                  className="nav-link text-white fw-semibold"
+                  onClick={closeMobileMenu}
+                >
+                  Hakkında
+                </NavLink>
+              </li>
 
-            <li className="nav-item mx-2 mb-2 mb-lg-0">
-              <NavLink
-                to="/contact"
-                className="nav-link text-white fw-semibold"
-                onClick={closeMobileMenu}
-                style={({ isActive }) => ({
-                  borderBottom: isActive ? "2px solid white" : "none",
-                  paddingBottom: 2,
-                })}
-              >
-                İletişim
-              </NavLink>
-            </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/contact"
+                  className="nav-link text-white fw-semibold"
+                  onClick={closeMobileMenu}
+                >
+                  İletişim
+                </NavLink>
+              </li>
 
-            {token && (
-              <>
-                <li className="nav-item mx-2 mb-2 mb-lg-0">
-                  <NavLink
-                    to={decoded?.role === "owner" ? "/owner" : "/realtor"}
-                    className="nav-link text-white fw-semibold"
-                    onClick={closeMobileMenu}
-                    style={({ isActive }) => ({
-                      borderBottom: isActive ? "2px solid white" : "none",
-                      paddingBottom: 2,
-                    })}
-                  >
-                    Portföy
-                  </NavLink>
-                </li>
-                <li className="nav-item mx-3 d-none d-lg-flex">
-                  <SocialIcons />
-                </li>
+              {token && (
+                <>
+                  <li className="nav-item">
+                    <NavLink
+                      to={decoded?.role === "owner" ? "/owner" : "/realtor"}
+                      className="nav-link text-white fw-semibold"
+                      onClick={closeMobileMenu}
+                    >
+                      Portföy
+                    </NavLink>
+                  </li>
 
-                <li className="nav-item d-flex align-items-center mx-2 mt-3 mt-lg-0">
-                  <Tooltip title="Hesap Menüsü" arrow>
-                    <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
-                      <Avatar
-                        sx={{
-                          width: 36,
-                          height: 36,
-                          bgcolor: "#ffffff",
-                          color: "#2E86C1",
-                          fontSize: "0.95rem",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                          boxShadow:
-                            "0 0 0 2px rgba(255,255,255,0.85), 0 2px 6px rgba(0,0,0,0.15)",
+                  <li className="nav-item d-flex align-items-center ms-3">
+                    <Tooltip title="Hesap Menüsü" arrow>
+                      <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
+                        <Avatar
+                          sx={{
+                            width: 36,
+                            height: 36,
+                            bgcolor: "#ffffff",
+                            color: "#2E86C1",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {decoded?.name?.[0]?.toUpperCase()}
+                        </Avatar>
+                      </IconButton>
+                    </Tooltip>
+
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                      PaperProps={{
+                        elevation: 4,
+                        sx: {
+                          mt: 1.5,
+                          minWidth: 160,
+                          borderRadius: "10px",
+                        },
+                      }}
+                    >
+                      <MenuItem
+                        onClick={() => {
+                          handleMenuClose();
+                          navigate("/profile");
                         }}
                       >
-                        {decoded?.name?.[0]?.toUpperCase() || "U"}
-                      </Avatar>
-                    </IconButton>
-                  </Tooltip>
+                        <PersonIcon fontSize="small" /> Profilim
+                      </MenuItem>
 
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                    PaperProps={{
-                      elevation: 4,
-                      sx: {
-                        mt: 1.5,
-                        minWidth: 160,
-                        borderRadius: "10px",
-                        overflow: "visible",
-                        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                    transformOrigin={{
-                      horizontal: "right",
-                      vertical: "top",
-                    }}
-                    anchorOrigin={{
-                      horizontal: "right",
-                      vertical: "bottom",
-                    }}
-                  >
-                    <MenuItem
-                      onClick={() => {
-                        handleMenuClose();
-                        navigate("/profile");
-                      }}
-                      sx={{ fontWeight: 500, gap: 1 }}
-                    >
-                      <PersonIcon fontSize="small" /> Profilim
-                    </MenuItem>
+                      <Divider />
 
-                    <Divider />
-
-                    <MenuItem
-                      onClick={() => {
-                        handleLogout();
-                        handleMenuClose();
-                      }}
-                      sx={{
-                        color: "error.main",
-                        fontWeight: 500,
-                        gap: 1,
-                        "&:hover": { bgcolor: "rgba(255,0,0,0.05)" },
-                      }}
-                    >
-                      <LogoutIcon fontSize="small" /> Çıkış Yap
-                    </MenuItem>
-                  </Menu>
-                </li>
-              </>
-            )}
-          </ul>
+                      <MenuItem
+                        onClick={() => {
+                          handleLogout();
+                          handleMenuClose();
+                        }}
+                        sx={{ color: "error.main" }}
+                      >
+                        <LogoutIcon fontSize="small" /> Çıkış Yap
+                      </MenuItem>
+                    </Menu>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
         </div>
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: 2,
-          background: "rgba(255,255,255,0.2)",
-        }}
-      >
-        <div
-          style={{
-            width: `${scrollProgress}%`,
-            height: "100%",
-            background: "#5DADE2",
-            transition: "width 0.1s linear",
-          }}
-        />
       </div>
     </nav>
   );
