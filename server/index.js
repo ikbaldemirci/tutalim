@@ -1313,7 +1313,7 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
     const { propertyId, message, remindAt, type, dayOfMonth, monthsBefore } =
       req.body;
 
-    let finalRemindAt = remindAt || null;
+    let finalRemindAt = remindAt ? new Date(remindAt) : null;
 
     if (!type) {
       if (!finalRemindAt || finalRemindAt <= new Date()) {
@@ -1387,18 +1387,14 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
         });
       }
 
-      const endDate = new Date(property.endDate);
-      const next = new Date(endDate);
-      next.setMonth(next.getMonth() - monthsBefore);
+      finalRemindAt = new Date(remindAt);
 
-      if (next <= new Date()) {
+      if (finalRemindAt <= new Date()) {
         return res.status(400).json({
           status: "fail",
           message: "Bu hatırlatma geçmiş bir tarihe denk geliyor.",
         });
       }
-
-      finalRemindAt = next;
     }
 
     const reminder = await Reminder.create({
