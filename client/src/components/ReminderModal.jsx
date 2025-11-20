@@ -28,7 +28,7 @@ export default function ReminderModal({
     remindAt: null,
     type: "",
     dayOfMonth: "",
-    monthsBefore: "",
+    monthsBeforeEnd: "",
   });
 
   const handleChange = (e) => {
@@ -60,7 +60,9 @@ export default function ReminderModal({
       propertyId,
       type: form.type || null,
       dayOfMonth: form.dayOfMonth ? Number(form.dayOfMonth) : null,
-      monthsBefore: form.monthsBefore ? Number(form.monthsBefore) : null,
+      monthsBeforeEnd: form.monthsBeforeEnd
+        ? Number(form.monthsBeforeEnd)
+        : null,
     };
 
     onSubmit(data);
@@ -69,7 +71,7 @@ export default function ReminderModal({
       remindAt: null,
       type: "",
       dayOfMonth: "",
-      monthsBefore: "",
+      monthsBeforeEnd: "",
     });
   };
 
@@ -80,7 +82,7 @@ export default function ReminderModal({
         remindAt: null,
         type: "",
         dayOfMonth: "",
-        monthsBefore: "",
+        monthsBeforeEnd: "",
       });
     }
   }, [open]);
@@ -130,7 +132,7 @@ export default function ReminderModal({
               if (r.type === "contractEnd") {
                 return (
                   <Typography key={i} sx={{ mb: 0.5 }}>
-                    • <b>Sözleşme bitmeden {r.monthsBefore} ay önce</b> —{" "}
+                    • <b>Sözleşme bitmeden {r.monthsBeforeEnd} ay önce</b> —
                     {dateStr}
                   </Typography>
                 );
@@ -185,12 +187,12 @@ export default function ReminderModal({
         {form.type === "contractEnd" && (
           <TextField
             label="Kaç Ay Öncesinden Hatırlatılsın?"
-            name="monthsBefore"
+            name="monthsBeforeEnd"
             type="number"
             fullWidth
             sx={{ mb: 2 }}
             inputProps={{ min: 1, max: 12 }}
-            value={form.monthsBefore}
+            value={form.monthsBeforeEnd}
             onChange={handleChange}
           />
         )}

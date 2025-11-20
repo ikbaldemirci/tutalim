@@ -1310,7 +1310,7 @@ app.get("/api/notifications/:userId", verifyToken, async (req, res) => {
 
 app.post("/api/reminders", verifyToken, async (req, res) => {
   try {
-    const { propertyId, message, remindAt, type, dayOfMonth, monthsBefore } =
+    const { propertyId, message, remindAt, type, dayOfMonth, monthsBeforeEnd } =
       req.body;
 
     let finalRemindAt = remindAt ? new Date(remindAt) : null;
@@ -1380,7 +1380,7 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
     }
 
     if (type === "contractEnd") {
-      if (!monthsBefore || monthsBefore < 1 || monthsBefore > 24) {
+      if (!monthsBeforeEnd || monthsBeforeEnd < 1 || monthsBeforeEnd > 24) {
         return res.status(400).json({
           status: "fail",
           message: "Ay değeri 1 ile 24 arasında olmalıdır.",
@@ -1404,7 +1404,7 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
       remindAt: finalRemindAt,
       type: type || null,
       dayOfMonth: dayOfMonth || null,
-      monthsBefore: monthsBefore || null,
+      monthsBeforeEnd: monthsBeforeEnd || null,
     });
 
     return res.json({

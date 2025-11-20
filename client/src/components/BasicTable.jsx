@@ -1317,13 +1317,13 @@ export default function BasicTable({
               remindAt = nextDate.toISOString();
             }
 
-            if (formData.type === "contractEnd" && formData.monthsBefore) {
+            if (formData.type === "contractEnd" && formData.monthsBeforeEnd) {
               const property = data.find((p) => p._id === selectedPropertyId);
 
               if (property?.endDate) {
                 const end = new Date(property.endDate);
                 const target = new Date(end);
-                target.setMonth(target.getMonth() - formData.monthsBefore);
+                target.setMonth(target.getMonth() - formData.monthsBeforeEnd);
                 target.setHours(9, 0, 0, 0);
                 remindAt = target.toISOString();
               } else {
