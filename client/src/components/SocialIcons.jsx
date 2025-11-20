@@ -16,7 +16,7 @@ export default function SocialIcons({ direction = "row" }) {
       <Tooltip title="WhatsApp ile İletişime Geç">
         <IconButton
           component="a"
-          href="https://wa.me/905522776688"
+          href="https://wa.me/905322409792"
           target="_blank"
           rel="noopener noreferrer"
           sx={{ color: "#fff" }}
@@ -40,7 +40,7 @@ export default function SocialIcons({ direction = "row" }) {
       <Tooltip title="Facebook">
         <IconButton
           component="a"
-          href="https://facebook.com/tutalimcom"
+          href="https://www.facebook.com/people/tutalimcom/61583786978752/"
           target="_blank"
           rel="noopener noreferrer"
           sx={{ color: "#fff" }}
