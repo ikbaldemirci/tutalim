@@ -13,7 +13,6 @@ export default function SocialIcons({ direction = "row" }) {
         gap: 1.2,
       }}
     >
-      {/* WhatsApp */}
       <Tooltip title="WhatsApp ile İletişime Geç">
         <IconButton
           component="a"
@@ -34,7 +33,6 @@ export default function SocialIcons({ direction = "row" }) {
         </IconButton>
       </Tooltip>
 
-      {/* Instagram */}
       <Tooltip title="Instagram">
         <IconButton
           component="a"
@@ -55,7 +53,6 @@ export default function SocialIcons({ direction = "row" }) {
         </IconButton>
       </Tooltip>
 
-      {/* Facebook */}
       <Tooltip title="Facebook">
         <IconButton
           component="a"
