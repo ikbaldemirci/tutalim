@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import { CircularProgress, Box, Typography } from "@mui/material";
 import BasicTable from "../components/BasicTable";
 import WelcomeHeader from "../components/WelcomeHeader";
+import InviteList from "../components/InviteList";
 
 function OwnerHome() {
   const token = localStorage.getItem("token");
@@ -74,7 +75,7 @@ function OwnerHome() {
       <Navbar />
       <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
 
-      {!loadingInvites && invites.length > 0 && (
+      {/* {!loadingInvites && invites.length > 0 && (
         <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
           <Box
             sx={{
@@ -134,7 +135,14 @@ function OwnerHome() {
             ))}
           </Box>
         </Box>
-      )}
+      )} */}
+
+      <InviteList
+        invites={invites}
+        loadingInvites={loadingInvites}
+        acceptInvite={acceptInvite}
+        rejectInvite={rejectInvite}
+      />
 
       {loading ? (
         <Box

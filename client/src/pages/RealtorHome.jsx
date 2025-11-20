@@ -15,6 +15,7 @@ import {
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import BasicTable from "../components/BasicTable";
 import WelcomeHeader from "../components/WelcomeHeader";
+import InviteList from "../components/InviteList";
 
 function RealtorHome() {
   const token = localStorage.getItem("token");
@@ -145,7 +146,7 @@ function RealtorHome() {
       <Navbar />
       <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
 
-      <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
+      {/* <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
         {!loadingInvites && invites.length > 0 && (
           <Box
             sx={{
@@ -205,7 +206,14 @@ function RealtorHome() {
             ))}
           </Box>
         )}
-      </Box>
+      </Box> */}
+
+      <InviteList
+        invites={invites}
+        loadingInvites={loadingInvites}
+        acceptInvite={acceptInvite}
+        rejectInvite={rejectInvite}
+      />
 
       <Paper
         elevation={3}
