@@ -778,7 +778,7 @@ export default function BasicTable({
                     )}
                   </TableCell>
 
-                  <TableCell align="center">
+                  <TableCell>
                     {userRole === "realtor" ? (
                       <>
                         {row.owner ? (
