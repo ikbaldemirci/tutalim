@@ -1,8 +1,15 @@
-import { Paper, Typography, Box, Fade } from "@mui/material";
+import { Paper, Typography, Box, Fade, Badge, IconButton } from "@mui/material";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
-function WelcomeHeader({ name, totalCount = 0, show = true }) {
+function WelcomeHeader({
+  name,
+  totalCount = 0,
+  show = true,
+  inviteCount = 0,
+  onOpenInvites = () => {},
+}) {
   const today = new Date().toLocaleDateString("tr-TR", {
     weekday: "long",
     day: "numeric",
@@ -114,6 +121,24 @@ function WelcomeHeader({ name, totalCount = 0, show = true }) {
                 {totalCount} İlan
               </Typography>
             </Box>
+          )}
+
+          {inviteCount > 0 && (
+            <IconButton onClick={onOpenInvites} sx={{ p: 0 }}>
+              <Badge
+                badgeContent={inviteCount}
+                color="error"
+                overlap="circular"
+              >
+                <NotificationsIcon
+                  sx={{
+                    fontSize: 28,
+                    color: "#2E86C1",
+                    cursor: "pointer",
+                  }}
+                />
+              </Badge>
+            </IconButton>
           )}
         </Box>
       </Paper>

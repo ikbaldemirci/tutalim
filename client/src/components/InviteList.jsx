@@ -1,12 +1,121 @@
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Button,
+  CircularProgress,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function InviteList({
-  invites,
-  loadingInvites,
+  invites = [],
+  loadingInvites = false,
   acceptInvite,
   rejectInvite,
+  mode = "inline",
 }) {
-  if (loadingInvites || invites.length === 0) return null;
+  if (loadingInvites) {
+    return (
+      <Box sx={{ textAlign: "center", py: 4 }}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
+
+  if (!invites || invites.length === 0) return null;
+
+  const renderInvites = () => (
+    <Box
+      sx={{
+        maxHeight: mode === "inline" ? 130 : "none",
+        overflowY: mode === "inline" ? "auto" : "visible",
+        pr: mode === "inline" ? 1 : 0,
+      }}
+    >
+      {invites.map((inv) => (
+        <Box
+          key={inv._id}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            py: 1.3,
+            borderBottom: "1px solid #e3eef7",
+          }}
+        >
+          <Typography sx={{ fontSize: 14 }}>
+            {inv.fromUser?.name || inv.fromUser?.mail} sizi bu mülke{" "}
+            {inv.role === "realtor" ? "emlakçı" : "ev sahibi"} olarak atamak
+            istiyor: <strong>{inv.property?.location}</strong>
+          </Typography>
+
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              size="small"
+              variant="contained"
+              sx={{
+                background: "#2E86C1",
+                textTransform: "none",
+                fontWeight: 600,
+              }}
+              onClick={() => acceptInvite(inv._id)}
+            >
+              Kabul Et
+            </Button>
+
+            <Button
+              size="small"
+              variant="outlined"
+              sx={{
+                borderColor: "#999",
+                color: "#444",
+                textTransform: "none",
+                fontWeight: 600,
+              }}
+              onClick={() => rejectInvite(inv._id)}
+            >
+              Reddet
+            </Button>
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
+
+  if (mode === "modal") {
+    return (
+      <Box>
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: 17,
+            mb: 1.5,
+            color: "#2E86C1",
+          }}
+        >
+          Bekleyen Davetler ({invites.length})
+        </Typography>
+        {renderInvites()}
+      </Box>
+    );
+  }
+
+  if (mode === "accordion") {
+    return (
+      <Box sx={{ maxWidth: 1000, mx: "auto", mt: 2 }}>
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography sx={{ fontWeight: 600 }}>
+              Bekleyen Davetler ({invites.length})
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>{renderInvites()}</AccordionDetails>
+        </Accordion>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -18,7 +127,6 @@ export default function InviteList({
         borderRadius: 2,
         boxShadow: "0 2px 8px rgba(46,134,193,0.15)",
         p: 2,
-        border: "1px solid #cce4f6",
       }}
     >
       <Typography
@@ -28,61 +136,7 @@ export default function InviteList({
         Bekleyen Davetler ({invites.length})
       </Typography>
 
-      <Box
-        sx={{
-          maxHeight: 240,
-          overflowY: "auto",
-          pr: 1,
-        }}
-      >
-        {invites.map((inv) => (
-          <Box
-            key={inv._id}
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              py: 1.2,
-              borderBottom: "1px solid #e6f3fb",
-            }}
-          >
-            <Typography sx={{ fontSize: 14 }}>
-              {inv.fromUser?.name || inv.fromUser?.mail} sizi bu mülke{" "}
-              {inv.role === "realtor" ? "emlakçı" : "ev sahibi"} olarak atamak
-              istiyor: <strong>{inv.property?.location}</strong>
-            </Typography>
-
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <button
-                onClick={() => acceptInvite(inv._id)}
-                style={{
-                  padding: "6px 10px",
-                  background: "#2E86C1",
-                  color: "#fff",
-                  border: 0,
-                  borderRadius: 6,
-                  cursor: "pointer",
-                }}
-              >
-                Kabul Et
-              </button>
-              <button
-                onClick={() => rejectInvite(inv._id)}
-                style={{
-                  padding: "6px 10px",
-                  background: "#eee",
-                  color: "#333",
-                  border: 0,
-                  borderRadius: 6,
-                  cursor: "pointer",
-                }}
-              >
-                Reddet
-              </button>
-            </Box>
-          </Box>
-        ))}
-      </Box>
+      {renderInvites()}
     </Box>
   );
 }

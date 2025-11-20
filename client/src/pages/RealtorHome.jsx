@@ -16,6 +16,8 @@ import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import BasicTable from "../components/BasicTable";
 import WelcomeHeader from "../components/WelcomeHeader";
 import InviteList from "../components/InviteList";
+import FloatingInvites from "../components/FloatingInvites";
+import InviteModal from "../components/InviteModal";
 
 function RealtorHome() {
   const token = localStorage.getItem("token");
@@ -25,6 +27,8 @@ function RealtorHome() {
   const [loadingState, setLoadingState] = useState({});
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+
   const [form, setForm] = useState({
     rentPrice: "",
     rentDate: "",
@@ -144,7 +148,12 @@ function RealtorHome() {
   return (
     <>
       <Navbar />
-      <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
+      <WelcomeHeader
+        name={decoded?.name}
+        totalCount={properties.length}
+        inviteCount={invites.length}
+        onOpenInvites={() => setInviteModalOpen(true)}
+      />
 
       {/* <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
         {!loadingInvites && invites.length > 0 && (
@@ -363,6 +372,19 @@ function RealtorHome() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <FloatingInvites
+        count={invites.length}
+        onClick={() => setInviteModalOpen(true)}
+      />
+
+      <InviteModal
+        open={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        invites={invites}
+        loadingInvites={loadingInvites}
+        acceptInvite={acceptInvite}
+        rejectInvite={rejectInvite}
+      />
     </>
   );
 }

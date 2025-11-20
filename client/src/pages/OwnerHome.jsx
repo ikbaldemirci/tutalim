@@ -6,6 +6,8 @@ import { CircularProgress, Box, Typography } from "@mui/material";
 import BasicTable from "../components/BasicTable";
 import WelcomeHeader from "../components/WelcomeHeader";
 import InviteList from "../components/InviteList";
+import FloatingInvites from "../components/FloatingInvites";
+import InviteModal from "../components/InviteModal";
 
 function OwnerHome() {
   const token = localStorage.getItem("token");
@@ -16,6 +18,7 @@ function OwnerHome() {
   const [loading, setLoading] = useState(true);
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   const didFetchPropsRef = useRef(false);
   useEffect(() => {
@@ -73,7 +76,12 @@ function OwnerHome() {
   return (
     <>
       <Navbar />
-      <WelcomeHeader name={decoded?.name} totalCount={properties.length} />
+      <WelcomeHeader
+        name={decoded?.name}
+        totalCount={properties.length}
+        inviteCount={invites.length}
+        onOpenInvites={() => setInviteModalOpen(true)}
+      />
 
       {/* {!loadingInvites && invites.length > 0 && (
         <Box sx={{ maxWidth: 1000, margin: "0 auto", mt: 2 }}>
@@ -178,6 +186,19 @@ function OwnerHome() {
           Henüz ilan bulunmuyor.
         </Box>
       )}
+      <FloatingInvites
+        count={invites.length}
+        onClick={() => setInviteModalOpen(true)}
+      />
+
+      <InviteModal
+        open={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        invites={invites}
+        loadingInvites={loadingInvites}
+        acceptInvite={acceptInvite}
+        rejectInvite={rejectInvite}
+      />
     </>
   );
 }
