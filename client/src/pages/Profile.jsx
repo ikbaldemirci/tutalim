@@ -365,8 +365,11 @@ function Profile() {
                   </Typography>
                   <Button
                     variant="contained"
-                    sx={{ bgcolor: "success.main" }}
-                    color="#ffffff"
+                    sx={{
+                      bgcolor: "success.main",
+                      color: "#ffffff",
+                      "&:hover": { bgcolor: "success.dark" },
+                    }}
                     onClick={() => setOpenModal(true)}
                   >
                     + Yeni Hatırlatıcı
