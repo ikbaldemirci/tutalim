@@ -161,6 +161,26 @@ export default function BasicTable({
     loadReminders();
   }, []);
 
+  const handleReminderUpdate = (payload) => {
+    if (payload.updateOnly && payload.deletedReminderId) {
+      setPropertyReminders((prev) => {
+        const pid = selectedPropertyId;
+        return {
+          ...prev,
+          [pid]: (prev[pid] || []).filter(
+            (r) => r._id !== payload.deletedReminderId
+          ),
+        };
+      });
+      setSnackbar({
+        open: true,
+        message: "Hatırlatıcı silindi",
+        severity: "success",
+      });
+      return;
+    }
+  };
+
   const handleEditClick = (row) => {
     setEditingRow(row._id);
     setEditForm({
@@ -1298,6 +1318,10 @@ export default function BasicTable({
         // }}
         onSubmit={async (formData) => {
           try {
+            if (formData.updateOnly) {
+              handleReminderUpdate(formData);
+              return;
+            }
             let remindAt = null;
             if (formData.type === "monthlyPayment" && formData.dayOfMonth) {
               const today = new Date();

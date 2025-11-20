@@ -14,6 +14,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import trLocale from "date-fns/locale/tr";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import IconButton from "@mui/material/IconButton";
+import api from "../api";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 export default function ReminderModal({
   open,
@@ -75,6 +80,23 @@ export default function ReminderModal({
     });
   };
 
+  const handleDelete = async (id) => {
+    const ok = window.confirm("Bu hatırlatıcıyı silmek istiyor musun?");
+    if (!ok) return;
+
+    try {
+      await api.delete(`/reminders/${id}`);
+
+      if (existingReminders && Array.isArray(existingReminders)) {
+        const updated = existingReminders.filter((r) => r._id !== id);
+        onSubmit({ deletedReminderId: id, updateOnly: true });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Hatırlatıcı silinemedi!");
+    }
+  };
+
   useEffect(() => {
     if (open) {
       setForm({
@@ -120,7 +142,7 @@ export default function ReminderModal({
               Bu mülke ait mevcut hatırlatıcılar:
             </Typography>
 
-            {existingReminders.map((r, i) => {
+            {/* {existingReminders.map((r, i) => {
               const dateStr = new Date(r.remindAt).toLocaleString("tr-TR");
               if (r.type === "monthlyPayment") {
                 return (
@@ -141,6 +163,36 @@ export default function ReminderModal({
                 <Typography key={i} sx={{ mb: 0.5 }}>
                   • <b>Hatırlatma</b> — {dateStr}
                 </Typography>
+              );
+            })} */}
+
+            {existingReminders.map((r, i) => {
+              const dateStr = new Date(r.remindAt).toLocaleString("tr-TR");
+              let title = "Hatırlatma";
+              if (r.type === "monthlyPayment") {
+                title = `Her ay ${r.dayOfMonth}. gün hatırlatma`;
+              } else if (r.type === "contractEnd") {
+                const months = r.monthsBeforeEnd ?? r.monthsBefore ?? "?";
+                title = `Sözleşme bitmeden ${months} ay önce`;
+              }
+
+              return (
+                <Box
+                  key={i}
+                  sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
+                >
+                  <Typography sx={{ flexGrow: 1 }}>
+                    • <b>{title}</b> — {dateStr}
+                  </Typography>
+
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => handleDelete(r._id)}
+                  >
+                    <DeleteOutlineOutlinedIcon />
+                  </IconButton>
+                </Box>
               );
             })}
 
