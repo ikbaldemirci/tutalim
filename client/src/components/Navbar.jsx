@@ -10,9 +10,11 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Box,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import api from "../api";
+import SocialIcons from "./SocialIcons"; // 🔥 EKLENDİ
 
 function Navbar({ onLogout, bg }) {
   const navigate = useNavigate();
@@ -76,8 +78,7 @@ function Navbar({ onLogout, bg }) {
 
   const handleLogout = async () => {
     try {
-      const res = await api.post("/logout", {}, { withCredentials: true });
-      console.log("Logout response:", res.data);
+      await api.post("/logout", {}, { withCredentials: true });
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
@@ -100,7 +101,7 @@ function Navbar({ onLogout, bg }) {
         background: "rgba(46,134,193,0.98)",
         color: "#fff",
         backdropFilter: "saturate(180%) blur(8px)",
-        transition: "background 0.3s ease, box-shadow 0.3s ease",
+        transition: "background 0.3s ease",
         boxShadow: "0 6px 16px rgba(0,0,0,0.12)",
       }
     : navStyle;
@@ -111,7 +112,7 @@ function Navbar({ onLogout, bg }) {
       style={computedNavStyle}
     >
       <div
-        className="container py-2"
+        className="container py-2 d-flex align-items-center justify-content-between"
         style={{
           paddingTop: scrolled ? 8 : 12,
           paddingBottom: scrolled ? 8 : 12,
@@ -129,6 +130,10 @@ function Navbar({ onLogout, bg }) {
             }}
           />
         </NavLink>
+
+        <div className="d-lg-none">
+          <SocialIcons />
+        </div>
 
         <button
           className="navbar-toggler"
@@ -199,6 +204,9 @@ function Navbar({ onLogout, bg }) {
                     Portföy
                   </NavLink>
                 </li>
+                <li className="nav-item mx-3 d-none d-lg-flex">
+                  <SocialIcons />
+                </li>
 
                 <li className="nav-item d-flex align-items-center mx-2 mt-3 mt-lg-0">
                   <Tooltip title="Hesap Menüsü" arrow>
@@ -235,8 +243,14 @@ function Navbar({ onLogout, bg }) {
                         boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
                       },
                     }}
-                    transformOrigin={{ horizontal: "right", vertical: "top" }}
-                    anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                    transformOrigin={{
+                      horizontal: "right",
+                      vertical: "top",
+                    }}
+                    anchorOrigin={{
+                      horizontal: "right",
+                      vertical: "bottom",
+                    }}
                   >
                     <MenuItem
                       onClick={() => {
