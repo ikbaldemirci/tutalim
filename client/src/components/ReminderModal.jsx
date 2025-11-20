@@ -109,6 +109,9 @@ export default function ReminderModal({
               borderRadius: 2,
               backgroundColor: "#E8F6F3",
               borderLeft: "4px solid #28B463",
+              maxHeight: "200px",
+              overflowY: "auto",
+              pr: "10px",
             }}
           >
             <Typography fontWeight={600} mb={1}>
