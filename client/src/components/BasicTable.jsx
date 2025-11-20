@@ -55,6 +55,7 @@ export default function BasicTable({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [snackbar, setSnackbar] = useState({
+    key: 0,
     open: false,
     message: "",
     severity: "success",
@@ -173,6 +174,7 @@ export default function BasicTable({
         };
       });
       setSnackbar({
+        key: Date.now(),
         open: true,
         message: "Hatırlatıcı silindi",
         severity: "success",
@@ -208,6 +210,7 @@ export default function BasicTable({
         onUpdate(res.data.property);
         setEditingRow(null);
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: "Güncelleme başarılı",
           severity: "success",
@@ -215,6 +218,7 @@ export default function BasicTable({
       }
     } catch {
       setSnackbar({
+        key: Date.now(),
         open: true,
         message: "Güncelleme sırasında hata oluştu",
         severity: "error",
@@ -229,6 +233,7 @@ export default function BasicTable({
       if (res.data.status === "success") {
         onUpdate({ _id: id, deleted: true });
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: "Mülk başarıyla silindi",
           severity: "info",
@@ -236,6 +241,7 @@ export default function BasicTable({
       }
     } catch {
       setSnackbar({
+        key: Date.now(),
         open: true,
         message: "Silme sırasında hata oluştu",
         severity: "error",
@@ -247,6 +253,7 @@ export default function BasicTable({
     try {
       if (!targetMail) {
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: "Mail gerekli",
           severity: "warning",
@@ -268,12 +275,14 @@ export default function BasicTable({
           [id]: { ...(prev[id] || {}), [role]: true },
         }));
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: res.data.message || "Davet gönderildi. Onay bekleniyor.",
           severity: "success",
         });
       } else {
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: res.data.message || "Davet oluşturulamadı",
           severity: "warning",
@@ -281,6 +290,7 @@ export default function BasicTable({
       }
     } catch (err) {
       setSnackbar({
+        key: Date.now(),
         open: true,
         message:
           err.response?.data?.message || "İşlem sırasında bir hata oluştu",
@@ -298,12 +308,14 @@ export default function BasicTable({
         setOwnerInput({ ...ownerInput, [id]: "" });
         setRealtorInput({ ...realtorInput, [id]: "" });
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: res.data.message || "Atama başarılı",
           severity: "success",
         });
       } else {
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: res.data.message || "Atama başarısız",
           severity: "warning",
@@ -311,6 +323,7 @@ export default function BasicTable({
       }
     } catch (err) {
       setSnackbar({
+        key: Date.now(),
         open: true,
         message:
           err.response?.data?.message || "Atama sırasında bir hata oluştu",
@@ -330,6 +343,7 @@ export default function BasicTable({
     const maxSize = 25 * 1024 * 1024;
     if (file.size > maxSize) {
       setSnackbar({
+        key: Date.now(),
         open: true,
         message: "Dosya boyutu 25 MB’den fazla olamaz",
         severity: "error",
@@ -351,12 +365,14 @@ export default function BasicTable({
       if (res.data?.status === "success") {
         onUpdate(res.data.property);
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: res.data.message || "Sözleşme başarıyla yüklendi",
           severity: "success",
         });
       } else {
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: res.data?.message || "Sözleşme yüklenemedi",
           severity: "error",
@@ -371,7 +387,12 @@ export default function BasicTable({
       else if (status === 404) msg = "Mülk bulunamadı";
       else if (status === 500) msg = "Sunucu hatası (sözleşme yükleme)";
       else if (error.response?.data?.message) msg = error.response.data.message;
-      setSnackbar({ open: true, message: msg, severity: "error" });
+      setSnackbar({
+        key: Date.now(),
+        open: true,
+        message: msg,
+        severity: "error",
+      });
     } finally {
       setUploadingIds((prev) => {
         const copy = new Set(prev);
@@ -393,12 +414,14 @@ export default function BasicTable({
       if (res.data.status === "success") {
         onUpdate(res.data.property);
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: res.data.message || "Sözleşme silindi",
           severity: "info",
         });
       } else {
         setSnackbar({
+          key: Date.now(),
           open: true,
           message: res.data?.message || "Sözleşme silinemedi",
           severity: "error",
@@ -412,7 +435,12 @@ export default function BasicTable({
       else if (status === 404) msg = "Mülk bulunamadı";
       else if (status === 500) msg = "Sunucu hatası (sözleşme silme)";
       else if (error.response?.data?.message) msg = error.response.data.message;
-      setSnackbar({ open: true, message: msg, severity: "error" });
+      setSnackbar({
+        key: Date.now(),
+        open: true,
+        message: msg,
+        severity: "error",
+      });
     } finally {
       setLoadingState((prev) => ({ ...prev, [id]: null }));
     }
@@ -428,6 +456,7 @@ export default function BasicTable({
       if (noteSize > 25 * 1024 * 1024) {
         if (!isAutoSave)
           setSnackbar({
+            key: Date.now(),
             open: true,
             message: "Dosya boyutu 25 MB’den fazla olamaz",
             severity: "error",
@@ -443,6 +472,7 @@ export default function BasicTable({
 
         if (!isAutoSave) {
           setSnackbar({
+            key: Date.now(),
             open: true,
             message: res.data.message || "Not başarıyla kaydedildi",
             severity: "success",
@@ -460,7 +490,12 @@ export default function BasicTable({
       else if (status === 500) msg = "Sunucu hatası (not yükleme)";
       else if (err.response?.data?.message) msg = err.response.data.message;
       if (!isAutoSave)
-        setSnackbar({ open: true, message: msg, severity: "error" });
+        setSnackbar({
+          key: Date.now(),
+          open: true,
+          message: msg,
+          severity: "error",
+        });
     } finally {
       setActiveNotes((prev) => {
         const copy = new Set(prev);
@@ -945,6 +980,7 @@ export default function BasicTable({
                             const maxSize = 25 * 1024 * 1024;
                             if (file.size > maxSize) {
                               setSnackbar({
+                                key: Date.now(),
                                 open: true,
                                 message: "Dosya boyutu 25 MB’den fazla olamaz",
                                 severity: "error",
@@ -1236,86 +1272,6 @@ export default function BasicTable({
       <ReminderModal
         open={openReminderModal}
         onClose={() => setOpenReminderModal(false)}
-        // onSubmit={async (formData) => {
-        //   try {
-        //     let remindAt = null;
-
-        //     if (formData.type === "monthlyPayment" && formData.dayOfMonth) {
-        //       const today = new Date();
-        //       const currentMonth = today.getMonth();
-        //       const year = today.getFullYear();
-
-        //       const nextDate = new Date(
-        //         year,
-        //         currentMonth,
-        //         formData.dayOfMonth,
-        //         9,
-        //         0,
-        //         0
-        //       );
-        //       if (nextDate < today) nextDate.setMonth(nextDate.getMonth() + 1);
-
-        //       remindAt = nextDate.toISOString();
-        //     }
-
-        //     if (formData.type === "contractEnd" && formData.monthsBefore) {
-        //       const property = data.find((p) => p._id === selectedPropertyId);
-
-        //       if (property?.endDate) {
-        //         const end = new Date(property.endDate);
-        //         end.setMonth(end.getMonth() - formData.monthsBefore);
-        //         end.setHours(9, 0, 0, 0);
-        //         remindAt = end.toISOString();
-        //       } else {
-        //         console.warn("Property endDate bulunamadı");
-        //       }
-        //     }
-
-        //     if (!remindAt) {
-        //       setSnackbar({
-        //         open: true,
-        //         message: "Tarih hesaplanamadı, girişleri kontrol et.",
-        //         severity: "warning",
-        //       });
-        //       return;
-        //     }
-
-        //     const res = await api.post("/reminders", {
-        //       ...formData,
-        //       propertyId: selectedPropertyId,
-        //       remindAt,
-        //     });
-
-        //     if (res.data.status === "success") {
-        //       setSnackbar({
-        //         open: true,
-        //         message: "Hatırlatıcı başarıyla oluşturuldu",
-        //         severity: "success",
-        //       });
-        //       setPropertyReminders((prev) => ({
-        //         ...prev,
-        //         [selectedPropertyId]: [
-        //           ...(prev[selectedPropertyId] || []),
-        //           res.data.reminder,
-        //         ],
-        //       }));
-        //       setOpenReminderModal(false);
-        //     } else {
-        //       setSnackbar({
-        //         open: true,
-        //         message: res.data.message || "Hatırlatıcı eklenemedi.",
-        //         severity: "error",
-        //       });
-        //     }
-        //   } catch (err) {
-        //     console.error("Hatırlatıcı oluşturma hatası:", err);
-        //     setSnackbar({
-        //       open: true,
-        //       message: "Hatırlatıcı eklenemedi.",
-        //       severity: "error",
-        //     });
-        //   }
-        // }}
         onSubmit={async (formData) => {
           try {
             if (formData.updateOnly) {
@@ -1357,6 +1313,7 @@ export default function BasicTable({
 
             if (!remindAt) {
               setSnackbar({
+                key: Date.now(),
                 open: true,
                 message: "Tarih hesaplanamadı, girişleri kontrol et.",
                 severity: "warning",
@@ -1366,6 +1323,7 @@ export default function BasicTable({
 
             if (new Date(remindAt) <= new Date()) {
               setSnackbar({
+                key: Date.now(),
                 open: true,
                 message: "Geçmiş bir zamana hatırlatıcı oluşturulamaz.",
                 severity: "warning",
@@ -1382,6 +1340,7 @@ export default function BasicTable({
               if (reminderDate > endDate) {
                 setSnackbar({
                   open: true,
+                  key: Date.now(),
                   message:
                     "Bu sözleşme için artık hatırlatıcı oluşturamazsınız.",
                   severity: "warning",
@@ -1397,6 +1356,7 @@ export default function BasicTable({
 
             if (res.data.status !== "success") {
               setSnackbar({
+                key: Date.now(),
                 open: true,
                 message: res.data.message || "Hatırlatıcı eklenemedi.",
                 severity: "error",
@@ -1413,6 +1373,7 @@ export default function BasicTable({
             }));
 
             setSnackbar({
+              key: Date.now(),
               open: true,
               message: "Hatırlatıcı başarıyla oluşturuldu",
               severity: "success",
@@ -1421,6 +1382,7 @@ export default function BasicTable({
             setOpenReminderModal(false);
           } catch (err) {
             setSnackbar({
+              key: Date.now(),
               open: true,
               message: "Hatırlatıcı eklenemedi.",
               severity: "error",
@@ -1434,6 +1396,7 @@ export default function BasicTable({
 
       {/* 🎬 Snackbar */}
       <Snackbar
+        key={snackbar.key}
         open={snackbar.open}
         autoHideDuration={3000}
         TransitionComponent={(props) => <Slide {...props} direction="up" />}
