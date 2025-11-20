@@ -1313,7 +1313,7 @@ app.post("/api/reminders", verifyToken, async (req, res) => {
     const { propertyId, message, remindAt, type, dayOfMonth, monthsBefore } =
       req.body;
 
-    let finalRemindAt = remindAt ? new Date(remindAt) : null;
+    let finalRemindAt = remindAt || null;
 
     if (!type) {
       if (!finalRemindAt || finalRemindAt <= new Date()) {

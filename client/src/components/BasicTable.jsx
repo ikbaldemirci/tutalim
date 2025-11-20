@@ -1325,7 +1325,7 @@ export default function BasicTable({
                 const target = new Date(end);
                 target.setMonth(target.getMonth() - formData.monthsBefore);
                 target.setHours(9, 0, 0, 0);
-                remindAt = end.toISOString();
+                remindAt = target.toISOString();
               } else {
                 console.warn("Property endDate bulunamadı");
               }
