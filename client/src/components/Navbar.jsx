@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import api from "../api";
+import SocialIcons from "./SocialIcons";
 
 function Navbar({ onLogout, bg }) {
   const navigate = useNavigate();
@@ -129,6 +130,14 @@ function Navbar({ onLogout, bg }) {
             }}
           />
         </NavLink>
+
+        <div className="d-none d-lg-flex mx-auto">
+          <SocialIcons />
+        </div>
+
+        <div className="d-flex d-lg-none mx-auto">
+          <SocialIcons />
+        </div>
 
         <button
           className="navbar-toggler"
