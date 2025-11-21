@@ -196,50 +196,6 @@ function Navbar({ onLogout, bg }) {
           )}
         </div>
       </div>
-
-      <div className="collapse navbar-collapse" id="mainNavbar">
-        <ul className="navbar-nav px-3 pb-3">
-          <li className="nav-item">
-            <NavLink
-              to="/"
-              onClick={closeMobileMenu}
-              className="nav-link fw-semibold"
-            >
-              Ana Sayfa
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/about"
-              onClick={closeMobileMenu}
-              className="nav-link fw-semibold"
-            >
-              Hakkında
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/contact"
-              onClick={closeMobileMenu}
-              className="nav-link fw-semibold"
-            >
-              İletişim
-            </NavLink>
-          </li>
-
-          {token && (
-            <li className="nav-item">
-              <NavLink
-                to={decoded?.role === "owner" ? "/owner" : "/realtor"}
-                onClick={closeMobileMenu}
-                className="nav-link fw-semibold"
-              >
-                Portföy
-              </NavLink>
-            </li>
-          )}
-        </ul>
-      </div>
     </nav>
   );
 }
