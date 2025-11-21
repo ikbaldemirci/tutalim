@@ -24,7 +24,6 @@ function Navbar({ onLogout, bg }) {
   const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
-  // collapse fix
   useEffect(() => {
     const collapseEl = document.getElementById("mainNavbar");
     if (!collapseEl) return;
@@ -34,15 +33,27 @@ function Navbar({ onLogout, bg }) {
     });
 
     const toggler = document.querySelector(".navbar-toggler");
-
-    const toggleMenu = () => {
-      if (collapseEl.classList.contains("show")) collapse.hide();
-      else collapse.show();
-    };
+    const toggleMenu = () =>
+      collapseEl.classList.contains("show") ? collapse.hide() : collapse.show();
 
     toggler?.addEventListener("click", toggleMenu);
 
-    return () => toggler?.removeEventListener("click", toggleMenu);
+    // dışarı tıklayınca kapat
+    const closeOnOutside = (e) => {
+      if (
+        collapseEl.classList.contains("show") &&
+        !collapseEl.contains(e.target) &&
+        !toggler.contains(e.target)
+      ) {
+        collapse.hide();
+      }
+    };
+    document.addEventListener("click", closeOnOutside);
+
+    return () => {
+      toggler?.removeEventListener("click", toggleMenu);
+      document.removeEventListener("click", closeOnOutside);
+    };
   }, []);
 
   const closeMobileMenu = () => {
@@ -69,19 +80,16 @@ function Navbar({ onLogout, bg }) {
       }}
     >
       <div className="container position-relative d-flex align-items-center justify-content-between">
-        {/* LEFT — LOGO */}
+        {/* LOGO */}
         <NavLink to="/" className="navbar-brand">
           <img
             src="/images/tutalim.webp"
             alt="Tutalım Logo"
-            style={{
-              width: "140px",
-              filter: "brightness(0) invert(1)",
-            }}
+            style={{ width: "140px", filter: "brightness(0) invert(1)" }}
           />
         </NavLink>
 
-        {/* ★ CENTER — SOCIAL ICONS (ABSOLUTE CENTER) */}
+        {/* DESKTOP SOCIAL ICONS (tam ortada) */}
         <div
           className="d-none d-lg-flex"
           style={{
@@ -93,24 +101,25 @@ function Navbar({ onLogout, bg }) {
           <SocialIcons />
         </div>
 
-        {/* ★ MOBILE SOCIAL ICONS (LOGO & TOGGLER ARASINDA) */}
+        {/* MOBILE SOCIAL ICONS (logo ile toggler arası) */}
         <div className="d-flex d-lg-none ms-auto me-2">
           <SocialIcons />
         </div>
 
-        {/* RIGHT — TOGGLER */}
+        {/* HAMBURGER BTN */}
         <button
           className="navbar-toggler"
           type="button"
           aria-controls="mainNavbar"
           aria-expanded="false"
           aria-label="Toggle navigation"
+          style={{ border: "none", boxShadow: "none" }}
         >
           <span className="navbar-toggler-icon"></span>
         </button>
       </div>
 
-      {/* MOBILE MENU (AŞAĞI AÇILAN) */}
+      {/* MOBILE COLLAPSE MENU */}
       <div className="collapse navbar-collapse" id="mainNavbar">
         <ul className="navbar-nav px-3 pb-3">
           <li className="nav-item">
@@ -122,7 +131,6 @@ function Navbar({ onLogout, bg }) {
               Ana Sayfa
             </NavLink>
           </li>
-
           <li className="nav-item">
             <NavLink
               to="/about"
@@ -132,7 +140,6 @@ function Navbar({ onLogout, bg }) {
               Hakkında
             </NavLink>
           </li>
-
           <li className="nav-item">
             <NavLink
               to="/contact"
@@ -144,26 +151,20 @@ function Navbar({ onLogout, bg }) {
           </li>
 
           {token && (
-            <>
-              <li className="nav-item">
-                <NavLink
-                  to={decoded?.role === "owner" ? "/owner" : "/realtor"}
-                  onClick={closeMobileMenu}
-                  className="nav-link fw-semibold"
-                >
-                  Portföy
-                </NavLink>
-              </li>
-
-              <li className="nav-item mt-3">
-                <SocialIcons />
-              </li>
-            </>
+            <li className="nav-item">
+              <NavLink
+                to={decoded?.role === "owner" ? "/owner" : "/realtor"}
+                onClick={closeMobileMenu}
+                className="nav-link fw-semibold"
+              >
+                Portföy
+              </NavLink>
+            </li>
           )}
         </ul>
       </div>
 
-      {/* DESKTOP MENÜ + AVATAR */}
+      {/* DESKTOP MENU */}
       <div className="d-none d-lg-flex container justify-content-end align-items-center">
         <ul className="navbar-nav d-flex flex-row gap-3 me-3">
           <li className="nav-item">
@@ -171,13 +172,11 @@ function Navbar({ onLogout, bg }) {
               Ana Sayfa
             </NavLink>
           </li>
-
           <li className="nav-item">
             <NavLink to="/about" className="nav-link text-white fw-semibold">
               Hakkında
             </NavLink>
           </li>
-
           <li className="nav-item">
             <NavLink to="/contact" className="nav-link text-white fw-semibold">
               İletişim
