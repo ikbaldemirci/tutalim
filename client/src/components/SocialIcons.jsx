@@ -30,11 +30,7 @@ export default function SocialIcons({ direction = "row" }) {
             padding: { xs: "4px", sm: "8px" },
           }}
         >
-          <WhatsAppIcon
-            sx={{
-              fontSize: { xs: 18, sm: 24 },
-            }}
-          />
+          <WhatsAppIcon sx={{ fontSize: 24 }} />
         </IconButton>
       </Tooltip>
 
@@ -52,11 +48,7 @@ export default function SocialIcons({ direction = "row" }) {
             padding: { xs: "4px", sm: "8px" },
           }}
         >
-          <InstagramIcon
-            sx={{
-              fontSize: { xs: 18, sm: 24 },
-            }}
-          />
+          <InstagramIcon sx={{ fontSize: 24 }} />
         </IconButton>
       </Tooltip>
 
@@ -74,11 +66,7 @@ export default function SocialIcons({ direction = "row" }) {
             padding: { xs: "4px", sm: "8px" },
           }}
         >
-          <FacebookIcon
-            sx={{
-              fontSize: { xs: 18, sm: 24 },
-            }}
-          />
+          <FacebookIcon sx={{ fontSize: 24 }} />
         </IconButton>
       </Tooltip>
     </Box>
