@@ -10,10 +10,13 @@ export default function SocialIcons({ direction = "row" }) {
         display: "flex",
         flexDirection: direction,
         alignItems: "center",
-        gap: 1.2,
+        gap: {
+          xs: 0,
+          sm: 1.2,
+        },
       }}
     >
-      <Tooltip title="WhatsApp ile İletişime Geç">
+      <Tooltip title="WhatsApp">
         <IconButton
           component="a"
           href="https://wa.me/905322409792"
@@ -23,13 +26,15 @@ export default function SocialIcons({ direction = "row" }) {
             color: "#fff",
             opacity: 0.85,
             transition: "all 0.2s ease",
-            "&:hover": {
-              transform: "scale(1.05)",
-              opacity: 1,
-            },
+            "&:hover": { transform: "scale(1.05)", opacity: 1 },
+            padding: { xs: "4px", sm: "8px" },
           }}
         >
-          <WhatsAppIcon sx={{ fontSize: 24 }} />
+          <WhatsAppIcon
+            sx={{
+              fontSize: { xs: 18, sm: 24 },
+            }}
+          />
         </IconButton>
       </Tooltip>
 
@@ -43,13 +48,15 @@ export default function SocialIcons({ direction = "row" }) {
             color: "#fff",
             opacity: 0.85,
             transition: "all 0.2s ease",
-            "&:hover": {
-              transform: "scale(1.05)",
-              opacity: 1,
-            },
+            "&:hover": { transform: "scale(1.05)", opacity: 1 },
+            padding: { xs: "4px", sm: "8px" },
           }}
         >
-          <InstagramIcon sx={{ fontSize: 24 }} />
+          <InstagramIcon
+            sx={{
+              fontSize: { xs: 18, sm: 24 },
+            }}
+          />
         </IconButton>
       </Tooltip>
 
@@ -63,13 +70,15 @@ export default function SocialIcons({ direction = "row" }) {
             color: "#fff",
             opacity: 0.85,
             transition: "all 0.2s ease",
-            "&:hover": {
-              transform: "scale(1.05)",
-              opacity: 1,
-            },
+            "&:hover": { transform: "scale(1.05)", opacity: 1 },
+            padding: { xs: "4px", sm: "8px" },
           }}
         >
-          <FacebookIcon sx={{ fontSize: 24 }} />
+          <FacebookIcon
+            sx={{
+              fontSize: { xs: 18, sm: 24 },
+            }}
+          />
         </IconButton>
       </Tooltip>
     </Box>
