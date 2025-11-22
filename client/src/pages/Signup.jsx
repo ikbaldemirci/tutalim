@@ -219,6 +219,13 @@ function Signup({ onSwitch }) {
         type="submit"
         fullWidth
         disabled={loading}
+        sx={{
+          display: "block",
+          maxWidth: "260px",
+          width: "100%",
+          mx: "auto",
+          mt: 1,
+        }}
       >
         {loading ? "Kaydediliyor..." : "Kayıt Ol"}
       </Button>
@@ -228,6 +235,8 @@ function Signup({ onSwitch }) {
         sx={{
           textTransform: "none",
           color: "#fff",
+          mx: "auto",
+          mt: 1,
           "&:hover": { color: "#5DADE2" },
         }}
       >
