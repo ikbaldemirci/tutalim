@@ -113,7 +113,18 @@ function Login({ onSwitch }) {
         required
       />
 
-      <Button variant="contained" color="primary" type="submit" fullWidth>
+      <Button
+        variant="contained"
+        color="primary"
+        type="submit"
+        sx={{
+          display: "block",
+          maxWidth: "260px",
+          width: "100%",
+          mx: "auto",
+          mt: 1,
+        }}
+      >
         Giriş Yap
       </Button>
 
