@@ -873,9 +873,15 @@ export default function BasicTable({
                                   borderColor: "#d32f2f",
                                 },
                               }}
-                              onClick={() =>
-                                handleAssign(row._id, { realtorMail: null })
-                              }
+                              onClick={() => {
+                                if (
+                                  window.confirm(
+                                    "Yetki kaldırılacak. Emin misin?"
+                                  )
+                                ) {
+                                  handleAssign(row._id, { realtorMail: null });
+                                }
+                              }}
                             >
                               Kaldır
                             </Button>
