@@ -1,5 +1,9 @@
 const jwt = require("jsonwebtoken");
 
+if (!process.env.ACCESS_SECRET) {
+  throw new Error("ACCESS_SECRET çevre değişkeni tanımlanmalıdır!");
+}
+
 module.exports = function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
 

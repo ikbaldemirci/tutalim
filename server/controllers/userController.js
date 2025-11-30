@@ -2,8 +2,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const collection = require("../config");
 
-const ACCESS_SECRET = process.env.ACCESS_SECRET || "tutalim-secret";
-const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN || 15);
+const ACCESS_SECRET = process.env.ACCESS_SECRET;
+const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN);
+
+if (!ACCESS_SECRET) {
+  throw new Error("ACCESS_SECRET çevre değişkeni zorunludur (userController)!");
+}
 
 exports.getUser = async (req, res) => {
   try {

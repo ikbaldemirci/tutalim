@@ -11,6 +11,12 @@ const {
   CONTACT_RECEIVER,
 } = process.env;
 
+if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+  console.warn(
+    "UYARI: SMTP konfigürasyonu eksik! Mail gönderimi çalışmayabilir."
+  );
+}
+
 const transporter = nodemailer.createTransport({
   host: SMTP_HOST,
   port: Number(SMTP_PORT || 465),

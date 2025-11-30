@@ -10,10 +10,16 @@ const {
   resetPasswordHtml,
 } = require("../utils/mailer");
 
-const ACCESS_SECRET = process.env.ACCESS_SECRET || "tutalim-secret";
-const REFRESH_SECRET = process.env.REFRESH_SECRET || "tutalim-refresh-secret";
-const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN || 15);
-const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS || 30);
+const ACCESS_SECRET = process.env.ACCESS_SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
+const ACCESS_EXPIRES_MIN = Number(process.env.ACCESS_EXPIRES_MIN);
+const REFRESH_EXPIRES_DAYS = Number(process.env.REFRESH_EXPIRES_DAYS);
+
+if (!ACCESS_SECRET || !REFRESH_SECRET) {
+  throw new Error(
+    "ACCESS_SECRET ve REFRESH_SECRET çevre değişkenleri tanımlanmalıdır!"
+  );
+}
 
 exports.signup = async (req, res) => {
   try {
@@ -120,9 +126,9 @@ exports.login = async (req, res) => {
     res
       .cookie("refreshToken", refreshTokenValue, {
         httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        domain: "tutalim.com",
+        secure: process.env.COOKIE_SECURE === "true",
+        sameSite: process.env.COOKIE_SAME_SITE || "Lax",
+        domain: process.env.COOKIE_DOMAIN || undefined,
         path: "/",
         maxAge: REFRESH_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
       })
@@ -188,8 +194,8 @@ exports.logout = async (req, res) => {
     if (!refreshTokenValue) {
       res.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: true,
-        sameSite: "none",
+        secure: process.env.COOKIE_SECURE === "true",
+        sameSite: process.env.COOKIE_SAME_SITE || "Lax",
         path: "/",
       });
       return res.json({
@@ -209,8 +215,8 @@ exports.logout = async (req, res) => {
 
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: false,
-      sameSite: "Lax",
+      secure: process.env.COOKIE_SECURE === "true",
+      sameSite: process.env.COOKIE_SAME_SITE || "Lax",
       path: "/",
     });
 
