@@ -17,8 +17,24 @@ import SocialIcons from "./SocialIcons";
 
 function Navbar({ onLogout, bg }) {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const decoded = token ? jwtDecode(token) : null;
+
+  const [authToken, setAuthToken] = useState(localStorage.getItem("token"));
+
+  useEffect(() => {
+    const sync = (e) => {
+      setAuthToken(e.detail ?? localStorage.getItem("token"));
+    };
+
+    window.addEventListener("token-updated", sync);
+    return () => window.removeEventListener("token-updated", sync);
+  }, []);
+
+  let decoded = null;
+  try {
+    decoded = authToken ? jwtDecode(authToken) : null;
+  } catch (err) {
+    decoded = null;
+  }
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -26,6 +42,20 @@ function Navbar({ onLogout, bg }) {
 
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolledVal = window.scrollY;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrolledVal / height) * 100;
+
+      setScrollProgress(progress);
+      setScrolled(scrolledVal > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const navEl = document.getElementById("mainNavbar");
@@ -83,6 +113,8 @@ function Navbar({ onLogout, bg }) {
       console.error("Logout error:", err);
     } finally {
       localStorage.removeItem("token");
+      window.dispatchEvent(new CustomEvent("token-updated", { detail: null }));
+      setAuthToken(null);
       if (onLogout) onLogout();
       navigate("/", { state: { showLogoutMsg: true } });
     }
@@ -193,7 +225,7 @@ function Navbar({ onLogout, bg }) {
               </NavLink>
             </li>
 
-            {token && (
+            {authToken && (
               <>
                 <li className="nav-item mx-2 mb-2 mb-lg-0">
                   <NavLink

@@ -46,7 +46,9 @@ api.interceptors.response.use(
         if (refreshRes.data?.status === "success") {
           const newToken = refreshRes.data.token;
           localStorage.setItem("token", newToken);
-
+          window.dispatchEvent(
+            new CustomEvent("token-updated", { detail: newToken })
+          );
           pendingRequests.forEach((p) => p.resolve(newToken));
           pendingRequests = [];
 
@@ -56,6 +58,9 @@ api.interceptors.response.use(
           pendingRequests.forEach((p) => p.reject(refreshRes));
           pendingRequests = [];
           localStorage.removeItem("token");
+          window.dispatchEvent(
+            new CustomEvent("token-updated", { detail: null })
+          );
           window.location.href = "/";
           return Promise.reject(err);
         }
@@ -63,6 +68,9 @@ api.interceptors.response.use(
         pendingRequests.forEach((p) => p.reject(refreshErr));
         pendingRequests = [];
         localStorage.removeItem("token");
+        window.dispatchEvent(
+          new CustomEvent("token-updated", { detail: null })
+        );
         window.location.href = "/";
         return Promise.reject(refreshErr);
       } finally {
