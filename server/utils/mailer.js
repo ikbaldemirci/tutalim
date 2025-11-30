@@ -32,10 +32,11 @@ async function sendMail({
   replyTo = null,
   userId = null,
   propertyId = null,
+  from = null,
 }) {
   try {
     const info = await transporter.sendMail({
-      from: SMTP_FROM,
+      from: from || SMTP_FROM,
       to,
       subject,
       text,
