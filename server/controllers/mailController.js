@@ -3,6 +3,7 @@ const { sendMail, contactMailHtml } = require("../utils/mailer");
 exports.sendMail = async (req, res) => {
   try {
     const { to, subject, html, text } = req.body;
+
     if (!to || !subject || !html) {
       return res.status(400).json({
         status: "error",
@@ -17,15 +18,12 @@ exports.sendMail = async (req, res) => {
       text: text || html.replace(/<[^>]+>/g, ""),
     });
 
-    console.log(`Mail gönderildi: ${info.messageId} -> ${to}`);
     return res.json({
       status: "success",
       message: "E-posta başarıyla gönderildi",
-      to,
       messageId: info.messageId,
     });
   } catch (err) {
-    console.error("❌ Mail gönderme hatası:", err);
     return res.status(500).json({
       status: "error",
       message: "Mail gönderilemedi",
@@ -47,20 +45,20 @@ exports.sendContactMail = async (req, res) => {
 
     await sendMail({
       to: process.env.CONTACT_RECEIVER,
-      from: `"İletişim Formu" <${process.env.CONTACT_RECEIVER}>`,
-      subject: `Tutalım | Yeni İletişim Talebi: ${subject || "Genel"}`,
+      subject: `Yeni İletişim Mesajı (${subject || "Genel"})`,
+
       html: contactMailHtml({ name, email, subject, message }),
-      text: message,
+
       replyTo: email,
     });
 
-    res.json({
+    return res.json({
       status: "success",
       message: "Mesajınız başarıyla gönderildi.",
     });
   } catch (err) {
     console.error("İletişim formu hatası:", err);
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Sunucu hatası, mesaj gönderilemedi.",
     });
