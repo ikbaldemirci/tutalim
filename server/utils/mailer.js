@@ -42,14 +42,7 @@ async function sendMail({
       text,
       html,
       replyTo,
-      messageId: `<tutalim-${Date.now()}@tutalim.com>`,
-      headers: {
-        "X-App-Name": "Tutalim",
-        "X-App-Version": "1.0.0",
-        "X-Mail-Generated-By": "mailer.js",
-        "X-Form-Source": "Tutalim-System",
-        ...(replyTo ? { "X-Reply-To": replyTo } : {}),
-      },
+      replyTo,
     });
 
     setImmediate(async () => {
@@ -189,9 +182,8 @@ function assignmentRejectedHtml({ toName, propertyLocation, link }) {
       <h2>Davet Onaylanmadı</h2>
       <p>Merhaba,</p>
       <p><strong>${toName}</strong> davetinizi onaylamadı.</p>
-      <p><b>${
-        propertyLocation || ""
-      }</b> konumundaki mülk için gönderdiğiniz davet reddedildi.</p>
+      <p><b>${propertyLocation || ""
+    }</b> konumundaki mülk için gönderdiğiniz davet reddedildi.</p>
       <p style="margin:24px 0">
         <a href="${link}" style="background:#dc3545;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;display:inline-block">
           Portföyümü Gör

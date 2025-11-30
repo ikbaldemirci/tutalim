@@ -47,7 +47,7 @@ exports.sendContactMail = async (req, res) => {
 
     await sendMail({
       to: process.env.CONTACT_RECEIVER,
-      from: process.env.CONTACT_RECEIVER,
+      from: `"İletişim Formu" <${process.env.CONTACT_RECEIVER}>`,
       subject: `Tutalım | Yeni İletişim Talebi: ${subject || "Genel"}`,
       html: contactMailHtml({ name, email, subject, message }),
       text: message,
