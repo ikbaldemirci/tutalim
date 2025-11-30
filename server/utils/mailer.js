@@ -35,20 +35,25 @@ async function sendMail({
   from = null,
 }) {
   try {
-    const info = await transporter.sendMail({
+    const mailOptions = {
       from: from || SMTP_FROM,
       to,
       subject,
       text,
       html,
-      replyTo,
       messageId: `<tutalim-${Date.now()}@tutalim.com>`,
       headers: {
         "X-Mailer": "Tutalim-System",
         "X-Auto-Response-Suppress": "All",
         "X-Priority": "3",
       },
-    });
+    };
+
+    if (replyTo) {
+      mailOptions.replyTo = replyTo;
+    }
+
+    const info = await transporter.sendMail(mailOptions);
 
     setImmediate(async () => {
       try {
@@ -187,9 +192,8 @@ function assignmentRejectedHtml({ toName, propertyLocation, link }) {
       <h2>Davet Onaylanmadı</h2>
       <p>Merhaba,</p>
       <p><strong>${toName}</strong> davetinizi onaylamadı.</p>
-      <p><b>${
-        propertyLocation || ""
-      }</b> konumundaki mülk için gönderdiğiniz davet reddedildi.</p>
+      <p><b>${propertyLocation || ""
+    }</b> konumundaki mülk için gönderdiğiniz davet reddedildi.</p>
       <p style="margin:24px 0">
         <a href="${link}" style="background:#dc3545;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;display:inline-block">
           Portföyümü Gör

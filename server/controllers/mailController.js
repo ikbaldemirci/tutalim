@@ -5,10 +5,6 @@ const AppError = require("../utils/AppError");
 exports.sendMail = catchAsync(async (req, res, next) => {
   const { to, subject, html, text } = req.body;
 
-  if (!to || !subject || !html) {
-    return next(new AppError("Eksik alanlar var (to, subject, html)", 400));
-  }
-
   const info = await sendMail({
     to,
     subject,
@@ -25,10 +21,6 @@ exports.sendMail = catchAsync(async (req, res, next) => {
 
 exports.sendContactMail = catchAsync(async (req, res, next) => {
   const { name, email, subject, message } = req.body;
-
-  if (!name || !email || !message) {
-    return next(new AppError("Lütfen tüm zorunlu alanları doldurun.", 400));
-  }
 
   await sendMail({
     to: process.env.CONTACT_RECEIVER,

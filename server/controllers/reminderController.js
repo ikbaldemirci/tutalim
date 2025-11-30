@@ -9,22 +9,6 @@ exports.createReminder = catchAsync(async (req, res, next) => {
 
   let finalRemindAt = remindAt ? new Date(remindAt) : null;
 
-  if (!type) {
-    if (!finalRemindAt || finalRemindAt <= new Date()) {
-      return next(
-        new AppError("Geçmiş bir zamana hatırlatıcı oluşturamazsınız.", 400)
-      );
-    }
-  }
-
-  if (type && !propertyId) {
-    return next(new AppError("Bu hatırlatıcı bir mülke bağlı olmalıdır.", 400));
-  }
-
-  if (!message || !remindAt) {
-    return next(new AppError("Eksik alanlar mevcut.", 400));
-  }
-
   let property = null;
   if (propertyId) {
     property = await Property.findById(propertyId);
@@ -34,14 +18,6 @@ exports.createReminder = catchAsync(async (req, res, next) => {
   }
 
   if (type === "monthlyPayment") {
-    if (!dayOfMonth || dayOfMonth < 1 || dayOfMonth > 31) {
-      return next(new AppError("Gün değeri 1 ile 31 arasında olmalıdır.", 400));
-    }
-
-    if (!finalRemindAt || finalRemindAt <= new Date()) {
-      return next(new AppError("Geçmiş tarihe hatırlatıcı eklenemez.", 400));
-    }
-
     if (new Date(finalRemindAt) > new Date(property.endDate)) {
       return next(
         new AppError(
@@ -62,17 +38,7 @@ exports.createReminder = catchAsync(async (req, res, next) => {
   }
 
   if (type === "contractEnd") {
-    if (!monthsBeforeEnd || monthsBeforeEnd < 1 || monthsBeforeEnd > 24) {
-      return next(new AppError("Ay değeri 1 ile 24 arasında olmalıdır.", 400));
-    }
-
     finalRemindAt = new Date(remindAt);
-
-    if (finalRemindAt <= new Date()) {
-      return next(
-        new AppError("Bu hatırlatma geçmiş bir tarihe denk geliyor.", 400)
-      );
-    }
   }
 
   const reminder = await Reminder.create({

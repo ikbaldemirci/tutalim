@@ -12,13 +12,6 @@ const AppError = require("../utils/AppError");
 
 exports.createAssignment = catchAsync(async (req, res, next) => {
   const { propertyId, targetMail, role } = req.body;
-  if (!propertyId || !targetMail || !role) {
-    return next(new AppError("Eksik alanlar", 400));
-  }
-
-  if (!["owner", "realtor"].includes(role)) {
-    return next(new AppError("Geçersiz rol", 400));
-  }
 
   const property = await Property.findById(propertyId);
   if (!property) {
@@ -172,25 +165,21 @@ exports.rejectAssignment = catchAsync(async (req, res, next) => {
   invite.status = "rejected";
   await invite.save();
 
-  try {
-    const property = await Property.findById(invite.property);
-    const fromUser = await collection.findById(invite.fromUser);
+  const property = await Property.findById(invite.property);
+  const fromUser = await collection.findById(invite.fromUser);
 
-    if (fromUser?.mail) {
-      await sendMail({
-        to: fromUser.mail,
-        subject: "Tutalım | Davet Reddedildi",
-        html: assignmentRejectedHtml({
-          toName: `${req.user.name} ${req.user.surname}`,
-          propertyLocation: property ? property.location : "",
-          link: `${process.env.PUBLIC_BASE_URL}/realtor`,
-        }),
-        userId: fromUser._id,
-        propertyId: property._id,
-      });
-    }
-  } catch (mailErr) {
-    console.error("Mail gönderim hatası:", mailErr);
+  if (fromUser?.mail) {
+    await sendMail({
+      to: fromUser.mail,
+      subject: "Tutalım | Davet Reddedildi",
+      html: assignmentRejectedHtml({
+        toName: `${req.user.name} ${req.user.surname}`,
+        propertyLocation: property ? property.location : "",
+        link: `${process.env.PUBLIC_BASE_URL}/realtor`,
+      }),
+      userId: fromUser._id,
+      propertyId: property._id,
+    });
   }
   res.json({ status: "success", message: "Davet reddedildi." });
 });
