@@ -32,17 +32,22 @@ async function sendMail({
   replyTo = null,
   userId = null,
   propertyId = null,
+  from = null,
 }) {
   try {
     const info = await transporter.sendMail({
-      from: `"Tutalım İletişim" <${SMTP_USER}>`,
+      from: from || SMTP_FROM,
       to,
       subject,
       text,
       html,
       replyTo,
-      replyTo: replyTo || undefined,
-      messageId: `<tutalim-${Date.now()}@${SMTP_HOST}>`,
+      messageId: `<tutalim-${Date.now()}@tutalim.com>`,
+      headers: {
+        "X-Mailer": "Tutalim-System",
+        "X-Auto-Response-Suppress": "All",
+        "X-Priority": "3",
+      },
     });
 
     setImmediate(async () => {
@@ -223,14 +228,25 @@ Tarih: ${formatted}`;
 
 function contactMailHtml({ name, email, subject, message }) {
   return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
-      <h2>Yeni İletişim Mesajı</h2>
-      <p><b>Ad Soyad:</b> ${name}</p>
-      <p><b>E-posta:</b> ${email}</p>
-      <p><b>Konu:</b> ${subject || "Belirtilmemiş"}</p>
-      <hr />
-      <p style="white-space: pre-wrap">${message}</p>
-    </div>
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin:auto; padding:20px; border:1px solid #eee; border-radius:8px;">
+    <h2 style="margin-top:0;">Yeni İletişim Talebi</h2>
+
+    <p><strong>Ad Soyad:</strong> ${name}</p>
+    <p><strong>E-posta:</strong> ${email}</p>
+    <p><strong>Konu:</strong> ${subject || "Genel"}</p>
+
+    <hr style="margin:20px 0;" />
+
+    <p style="white-space:pre-wrap; line-height:1.5; font-size:15px;">
+      ${message}
+    </p>
+
+    <hr style="margin:20px 0;" />
+
+    <p style="color:#666; font-size:12px; text-align:center;">
+      Bu mesaj Tutalım.com iletişim formu üzerinden gönderilmiştir.
+    </p>
+  </div>
   `;
 }
 

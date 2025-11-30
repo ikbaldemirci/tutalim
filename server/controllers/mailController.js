@@ -45,10 +45,18 @@ exports.sendContactMail = async (req, res) => {
 
     await sendMail({
       to: process.env.CONTACT_RECEIVER,
-      subject: `Yeni İletişim Mesajı (${subject || "Genel"})`,
-
+      from: `Tutalım İletişim <no-reply@tutalim.com>`,
+      subject: `Yeni İletişim Talebi (${subject || "Genel"})`,
       html: contactMailHtml({ name, email, subject, message }),
+      text: `
+Yeni iletişim mesajı
 
+Ad Soyad: ${name}
+E-posta: ${email}
+Konu: ${subject || "Belirtilmemiş"}
+Mesaj:
+${message}
+      `,
       replyTo: email,
     });
 
