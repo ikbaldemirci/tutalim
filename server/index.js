@@ -52,5 +52,9 @@ app.use("/api/reminders", reminderRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api", mailRoutes);
 
+// Global Error Handler
+const globalErrorHandler = require("./middleware/errorHandler");
+app.use(globalErrorHandler);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

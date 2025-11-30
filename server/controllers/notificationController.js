@@ -1,26 +1,19 @@
 const Notification = require("../models/Notification");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/AppError");
 
-exports.getNotifications = async (req, res) => {
-  try {
-    const { userId } = req.params;
+exports.getNotifications = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
 
-    if (req.user.id !== userId) {
-      return res.status(403).json({
-        status: "fail",
-        message: "Kendi bildirim geçmişinizi görüntüleyebilirsiniz.",
-      });
-    }
-
-    const list = await Notification.find({ userId })
-      .sort({ createdAt: -1 })
-      .limit(30);
-
-    res.json({ status: "success", notifications: list });
-  } catch (err) {
-    console.error("Bildirim geçmişi hatası:", err);
-    res.status(500).json({
-      status: "error",
-      message: "Bildirim geçmişi alınamadı.",
-    });
+  if (req.user.id !== userId) {
+    return next(
+      new AppError("Kendi bildirim geçmişinizi görüntüleyebilirsiniz.", 403)
+    );
   }
-};
+
+  const list = await Notification.find({ userId })
+    .sort({ createdAt: -1 })
+    .limit(30);
+
+  res.json({ status: "success", notifications: list });
+});

@@ -1,54 +1,41 @@
 const { sendMail, contactMailHtml } = require("../utils/mailer");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/AppError");
 
-exports.sendMail = async (req, res) => {
-  try {
-    const { to, subject, html, text } = req.body;
+exports.sendMail = catchAsync(async (req, res, next) => {
+  const { to, subject, html, text } = req.body;
 
-    if (!to || !subject || !html) {
-      return res.status(400).json({
-        status: "error",
-        message: "Eksik alanlar var (to, subject, html)",
-      });
-    }
-
-    const info = await sendMail({
-      to,
-      subject,
-      html,
-      text: text || html.replace(/<[^>]+>/g, ""),
-    });
-
-    return res.json({
-      status: "success",
-      message: "E-posta başarıyla gönderildi",
-      messageId: info.messageId,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      status: "error",
-      message: "Mail gönderilemedi",
-      error: err.message,
-    });
+  if (!to || !subject || !html) {
+    return next(new AppError("Eksik alanlar var (to, subject, html)", 400));
   }
-};
 
-exports.sendContactMail = async (req, res) => {
-  try {
-    const { name, email, subject, message } = req.body;
+  const info = await sendMail({
+    to,
+    subject,
+    html,
+    text: text || html.replace(/<[^>]+>/g, ""),
+  });
 
-    if (!name || !email || !message) {
-      return res.status(400).json({
-        status: "error",
-        message: "Lütfen tüm zorunlu alanları doldurun.",
-      });
-    }
+  return res.json({
+    status: "success",
+    message: "E-posta başarıyla gönderildi",
+    messageId: info.messageId,
+  });
+});
 
-    await sendMail({
-      to: process.env.CONTACT_RECEIVER,
-      from: `Tutalım İletişim <no-reply@tutalim.com>`,
-      subject: `Yeni İletişim Talebi (${subject || "Genel"})`,
-      html: contactMailHtml({ name, email, subject, message }),
-      text: `
+exports.sendContactMail = catchAsync(async (req, res, next) => {
+  const { name, email, subject, message } = req.body;
+
+  if (!name || !email || !message) {
+    return next(new AppError("Lütfen tüm zorunlu alanları doldurun.", 400));
+  }
+
+  await sendMail({
+    to: process.env.CONTACT_RECEIVER,
+    from: `Tutalım İletişim <no-reply@tutalim.com>`,
+    subject: `Yeni İletişim Talebi (${subject || "Genel"})`,
+    html: contactMailHtml({ name, email, subject, message }),
+    text: `
 Yeni iletişim mesajı
 
 Ad Soyad: ${name}
@@ -57,18 +44,11 @@ Konu: ${subject || "Belirtilmemiş"}
 Mesaj:
 ${message}
       `,
-      replyTo: email,
-    });
+    replyTo: email,
+  });
 
-    return res.json({
-      status: "success",
-      message: "Mesajınız başarıyla gönderildi.",
-    });
-  } catch (err) {
-    console.error("İletişim formu hatası:", err);
-    return res.status(500).json({
-      status: "error",
-      message: "Sunucu hatası, mesaj gönderilemedi.",
-    });
-  }
-};
+  return res.json({
+    status: "success",
+    message: "Mesajınız başarıyla gönderildi.",
+  });
+});

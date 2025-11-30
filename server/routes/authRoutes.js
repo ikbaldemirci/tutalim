@@ -1,15 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
+const validate = require("../middleware/validate");
+const {
+    signup,
+    login,
+    forgotPassword,
+    resetPassword,
+    verifyEmail,
+} = require("../validations/authValidation");
 
-router.post("/signup", authController.signup);
-router.post("/login", authController.login);
+router.post("/signup", validate(signup), authController.signup);
+router.post("/login", validate(login), authController.login);
 router.post("/refresh", authController.refresh);
 router.post("/logout", authController.logout);
 
-router.post("/forgot-password", authController.forgotPassword);
-router.post("/reset-password/:token", authController.resetPassword);
-router.get("/verify/:token", authController.verifyEmail);
+router.post("/forgot-password", validate(forgotPassword), authController.forgotPassword);
+router.post("/reset-password/:token", validate(resetPassword), authController.resetPassword);
+router.get("/verify/:token", validate(verifyEmail), authController.verifyEmail);
 router.post("/verify/resend", authController.resendVerification);
 
 module.exports = router;
