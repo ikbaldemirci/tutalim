@@ -5,13 +5,10 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const fs = require("fs");
 
-// Database Connection
 require("./config");
 
-// Cron Jobs
 require("./utils/cronJobs");
 
-// Routes
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
@@ -46,15 +43,14 @@ app.use(express.urlencoded({ limit: "25mb", extended: true }));
 
 app.use("/uploads", express.static("uploads"));
 
-// Mount Routes
-app.use("/api", authRoutes); // /api/signup, /api/login, etc.
+app.use("/api", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reminders", reminderRoutes);
 app.use("/api/stats", statsRoutes);
-app.use("/api", mailRoutes); // /api/send-mail, /api/contact
+app.use("/api", mailRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
