@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api.js";
 import {
   TextField,
   Button,
@@ -42,34 +42,38 @@ export default function ContactForm() {
     e.preventDefault();
 
     if (form.name.trim().length < 3) {
-      setSnackbar({
+      return setSnackbar({
         open: true,
         message: "Lütfen en az 3 karakterlik bir ad-soyad girin",
         severity: "warning",
       });
-      return;
     }
 
     if (!validateEmail(form.email)) {
-      setSnackbar({
+      return setSnackbar({
         open: true,
         message: "Geçerli bir e-posta adresi girin",
         severity: "warning",
       });
-      return;
     }
 
     if (!form.message.trim()) {
-      setSnackbar({
+      return setSnackbar({
         open: true,
         message: "Mesaj alanı boş bırakılamaz",
         severity: "warning",
       });
-      return;
     }
 
+    const safeForm = {
+      ...form,
+      subject: form.subject || "Genel Bilgi",
+    };
+
     try {
-      const res = await axios.post("https://tutalim.com/api/contact", form);
+      const res = await api.post("/contact", safeForm, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (res.data?.status === "success") {
         setSnackbar({
@@ -81,7 +85,7 @@ export default function ContactForm() {
       } else {
         throw new Error();
       }
-    } catch {
+    } catch (err) {
       setSnackbar({
         open: true,
         message: "Bir hata oluştu. Lütfen tekrar deneyin",
