@@ -11,6 +11,7 @@ import {
   Snackbar,
   Alert,
   Slide,
+  CircularProgress,
 } from "@mui/material";
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import BasicTable from "../components/BasicTable";
@@ -24,6 +25,7 @@ function RealtorHome() {
 
   const [properties, setProperties] = useState([]);
   const [loadingState, setLoadingState] = useState({});
+  const [loading, setLoading] = useState(true);
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
@@ -45,7 +47,10 @@ function RealtorHome() {
   const didFetchPropsRef = useRef(false);
   useEffect(() => {
     if (didFetchPropsRef.current) return;
-    if (!token || !decoded?.id) return;
+    if (!token || !decoded?.id) {
+      setLoading(false);
+      return;
+    }
     didFetchPropsRef.current = true;
     api
       .get("/properties")
@@ -54,7 +59,8 @@ function RealtorHome() {
           setProperties(res.data.properties);
         }
       })
-      .catch((err) => console.error("Veri çekme hatası:", err));
+      .catch((err) => console.error("Veri çekme hatası:", err))
+      .finally(() => setLoading(false));
   }, []);
 
   const didFetchInvitesRef = useRef(false);
@@ -263,8 +269,18 @@ function RealtorHome() {
         </Box>
       </Paper>
 
-      {/* Tablo */}
-      {properties.length > 0 ? (
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            py: 5,
+          }}
+        >
+          <CircularProgress color="primary" />
+        </Box>
+      ) : properties.length > 0 ? (
         <BasicTable
           data={properties}
           onUpdate={(updated) => {

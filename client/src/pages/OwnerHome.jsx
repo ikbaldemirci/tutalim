@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import api from "../api";
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
-import { CircularProgress, Box, Typography } from "@mui/material";
+import { CircularProgress, Box } from "@mui/material";
 import BasicTable from "../components/BasicTable";
 import WelcomeHeader from "../components/WelcomeHeader";
 import InviteList from "../components/InviteList";
@@ -22,6 +22,10 @@ function OwnerHome() {
   const didFetchPropsRef = useRef(false);
   useEffect(() => {
     if (didFetchPropsRef.current) return;
+    if (!token || !decoded?.id) {
+      setLoading(false);
+      return;
+    }
     didFetchPropsRef.current = true;
     api
       .get("/properties")
