@@ -551,6 +551,14 @@ export default function BasicTable({
     setEndDate("");
   };
 
+  function toISODate(d) {
+    if (!d) return "";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
   return (
     <>
       <Box sx={{ mb: 6, display: "flow-root" }}>
@@ -608,23 +616,21 @@ export default function BasicTable({
                 onChange={(e) => setEndDate(e.target.value)}
               /> */}
               <DatePicker
-                format="dd/MM/yyyy"
                 label="Başlangıç"
-                value={startDate ? new Date(startDate + "T00:00:00") : null}
+                format="dd/MM/yyyy"
+                value={startDate ? new Date(startDate) : null}
                 onChange={(date) => {
-                  const iso = date ? date.toISOString().split("T")[0] : "";
-                  setStartDate(iso);
+                  setStartDate(toISODate(date));
                 }}
                 slotProps={{ textField: { size: "small" } }}
               />
 
               <DatePicker
-                format="dd/MM/yyyy"
                 label="Bitiş"
-                value={endDate ? new Date(endDate + "T00:00:00") : null}
+                format="dd/MM/yyyy"
+                value={endDate ? new Date(endDate) : null}
                 onChange={(date) => {
-                  const iso = date ? date.toISOString().split("T")[0] : "";
-                  setEndDate(iso);
+                  setEndDate(toISODate(date));
                 }}
                 slotProps={{ textField: { size: "small" } }}
               />
