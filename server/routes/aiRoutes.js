@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const fs = require("fs");
 const OpenAI = require("openai");
+const { fromPath } = require("pdf2pic");
 
 const upload = multer({ dest: "uploads/" });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
@@ -78,6 +79,108 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 //   }
 // });
 
+//PDF Lİ HALİ
+// router.post("/extract-property", upload.single("file"), async (req, res) => {
+//   let filePath = null;
+
+//   try {
+//     if (!req.file) {
+//       return res.json({ status: "error", message: "Dosya yüklenemedi." });
+//     }
+
+//     filePath = req.file.path;
+
+//     if (req.file.size > 25 * 1024 * 1024) {
+//       return res.json({
+//         status: "error",
+//         message: "Dosya boyutu 25MB'dan büyük olamaz.",
+//       });
+//     }
+
+//     const mimetype = req.file.mimetype;
+//     let messageContent = [];
+
+//     if (mimetype === "application/pdf") {
+//       const pdfParse = require("pdf-parse");
+//       const buffer = fs.readFileSync(filePath);
+//       const pdfData = await pdfParse(buffer);
+
+//       messageContent = [
+//         {
+//           type: "text",
+//           text: `
+// Bu bir kira sözleşmesi metnidir.
+
+// Aşağıdaki alanları JSON formatında çıkar:
+
+// - tenantName
+// - rentPrice (sadece rakam)
+// - rentDate (DD.MM.YYYY)
+// - endDate (DD.MM.YYYY)
+// - location
+
+// METİN:
+// ${pdfData.text}
+
+// Sadece JSON döndür. Açıklama yazma.
+//           `,
+//         },
+//       ];
+//     } else {
+//       const fileBase64 = fs.readFileSync(filePath, "base64");
+
+//       messageContent = [
+//         {
+//           type: "image_url",
+//           image_url: {
+//             url: `data:${mimetype};base64,${fileBase64}`,
+//           },
+//         },
+//         {
+//           type: "text",
+//           text: `
+// Bu bir kira sözleşmesi görselidir.
+
+// Aşağıdaki alanları JSON olarak çıkar:
+
+// - tenantName
+// - rentPrice (sadece rakam)
+// - rentDate (DD.MM.YYYY)
+// - endDate (DD.MM.YYYY)
+// - location
+
+// Sadece JSON döndür. Açıklama yazma.
+//           `,
+//         },
+//       ];
+//     }
+
+//     const result = await openai.chat.completions.create({
+//       model: "gpt-4o-mini",
+//       messages: [{ role: "user", content: messageContent }],
+//     });
+
+//     let raw = result.choices[0].message.content;
+//     console.log("AI RAW:", raw);
+
+//     let cleaned = raw
+//       .replace(/```json/gi, "")
+//       .replace(/```/g, "")
+//       .trim();
+
+//     console.log("CLEAN:", cleaned);
+
+//     let fields = JSON.parse(cleaned);
+
+//     return res.json({ status: "success", fields });
+//   } catch (err) {
+//     console.error("AI ERROR:", err);
+//     return res.json({ status: "error", message: "Belge okunamadı." });
+//   } finally {
+//     if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+//   }
+// });
+
 router.post("/extract-property", upload.single("file"), async (req, res) => {
   let filePath = null;
 
@@ -88,57 +191,44 @@ router.post("/extract-property", upload.single("file"), async (req, res) => {
 
     filePath = req.file.path;
 
-    if (req.file.size > 25 * 1024 * 1024) {
-      return res.json({
-        status: "error",
-        message: "Dosya boyutu 25MB'dan büyük olamaz.",
+    const isPDF = req.file.mimetype === "application/pdf";
+
+    let imageBase64 = null;
+
+    if (isPDF) {
+      const converter = fromPath(filePath, {
+        density: 150,
+        saveFilename: "page",
+        savePath: "/tmp",
+        format: "jpg",
+        width: 1200,
+        height: 1600,
       });
+
+      const result = await converter(1);
+      const jpgPath = result.path;
+
+      imageBase64 = fs.readFileSync(jpgPath, "base64");
+
+      if (fs.existsSync(jpgPath)) fs.unlinkSync(jpgPath);
+    } else {
+      imageBase64 = fs.readFileSync(filePath, "base64");
     }
 
-    const mimetype = req.file.mimetype;
-    let messageContent = [];
-
-    if (mimetype === "application/pdf") {
-      const pdfParse = require("pdf-parse");
-      const buffer = fs.readFileSync(filePath);
-      const pdfData = await pdfParse(buffer);
-
-      messageContent = [
-        {
-          type: "text",
-          text: `
-Bu bir kira sözleşmesi metnidir.
-
-Aşağıdaki alanları JSON formatında çıkar:
-
-- tenantName
-- rentPrice (sadece rakam)
-- rentDate (DD.MM.YYYY)
-- endDate (DD.MM.YYYY)
-- location
-
-METİN:
-${pdfData.text}
-
-Sadece JSON döndür. Açıklama yazma.
-          `,
-        },
-      ];
-    } else {
-      const fileBase64 = fs.readFileSync(filePath, "base64");
-
-      messageContent = [
-        {
-          type: "image_url",
-          image_url: {
-            url: `data:${mimetype};base64,${fileBase64}`,
+    const messages = [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image_url",
+            image_url: {
+              url: `data:image/jpeg;base64,${imageBase64}`,
+            },
           },
-        },
-        {
-          type: "text",
-          text: `
-Bu bir kira sözleşmesi görselidir.
-
+          {
+            type: "text",
+            text: `
+Bu bir kira sözleşmesi görüntüsüdür.
 Aşağıdaki alanları JSON olarak çıkar:
 
 - tenantName
@@ -147,15 +237,16 @@ Aşağıdaki alanları JSON olarak çıkar:
 - endDate (DD.MM.YYYY)
 - location
 
-Sadece JSON döndür. Açıklama yazma.
-          `,
-        },
-      ];
-    }
+Sadece JSON döndür, açıklama yazma.
+              `,
+          },
+        ],
+      },
+    ];
 
     const result = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [{ role: "user", content: messageContent }],
+      messages,
     });
 
     let raw = result.choices[0].message.content;
@@ -165,8 +256,6 @@ Sadece JSON döndür. Açıklama yazma.
       .replace(/```json/gi, "")
       .replace(/```/g, "")
       .trim();
-
-    console.log("CLEAN:", cleaned);
 
     let fields = JSON.parse(cleaned);
 
