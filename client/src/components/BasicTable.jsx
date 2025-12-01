@@ -593,6 +593,7 @@ export default function BasicTable({
                 type="date"
                 label="Başlangıç"
                 InputLabelProps={{ shrink: true }}
+                inputProps={{ placeholder: "dd/mm/yyyy" }}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
@@ -601,6 +602,7 @@ export default function BasicTable({
                 type="date"
                 label="Bitiş"
                 InputLabelProps={{ shrink: true }}
+                inputProps={{ placeholder: "dd/mm/yyyy" }}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
@@ -652,26 +654,6 @@ export default function BasicTable({
                     },
                   }}
                 >
-                  {/* Hatırlatıcı */}
-                  {/* <TableCell align="center">
-                    <IconButton
-                      color="primary"
-                      onClick={() => {
-                        setSelectedPropertyId(row._id);
-                        setOpenReminderModal(true);
-                      }}
-                      sx={{
-                        backgroundColor: "rgba(46,134,193,0.1)",
-                        "&:hover": { backgroundColor: "rgba(46,134,193,0.2)" },
-                      }}
-                    >
-                      {propertyReminders[row._id]?.length > 0 ? (
-                        <AlarmOnIcon color="success" />
-                      ) : (
-                        <AlarmAddIcon />
-                      )}
-                    </IconButton>
-                  </TableCell> */}
                   <TableCell align="center">
                     <IconButton
                       onClick={() => {

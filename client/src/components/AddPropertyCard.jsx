@@ -169,6 +169,7 @@ export default function AddPropertyCard({ onCreate }) {
             value={form.rentDate}
             onChange={handleChange}
             InputLabelProps={{ shrink: true }}
+            inputProps={{ placeholder: "dd/mm/yyyy" }}
             size="small"
             sx={{ flex: "1 1 160px" }}
           />
@@ -180,6 +181,7 @@ export default function AddPropertyCard({ onCreate }) {
             value={form.endDate}
             onChange={handleChange}
             InputLabelProps={{ shrink: true }}
+            inputProps={{ placeholder: "dd/mm/yyyy" }}
             size="small"
             sx={{ flex: "1 1 160px" }}
           />
