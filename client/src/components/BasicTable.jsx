@@ -533,15 +533,29 @@ export default function BasicTable({
     };
   }, []);
 
+  function normalize(dateStr) {
+    const d = new Date(dateStr);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
   const filteredData = data.filter((row) => {
     const s = search.toLowerCase();
+
     const matchSearch =
       row.tenantName?.toLowerCase().includes(s) ||
       row.location?.toLowerCase().includes(s) ||
       row.rentPrice?.toString().includes(search);
+
+    const start = startDate ? normalize(startDate) : null;
+    const end = endDate ? normalize(endDate) : null;
+
+    const rentStart = normalize(row.rentDate);
+    const rentEnd = normalize(row.endDate);
+
     const matchDate =
-      (!startDate || new Date(row.rentDate) >= new Date(startDate)) &&
-      (!endDate || new Date(row.endDate) <= new Date(endDate));
+      (!start || rentStart >= start) && (!end || rentEnd <= end);
+
     return matchSearch && matchDate;
   });
 
