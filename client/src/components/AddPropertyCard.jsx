@@ -119,6 +119,10 @@ export default function AddPropertyCard({ onCreate }) {
           fields.endDate = trToISO(fields.endDate);
         }
 
+        if (fields.rentPrice) {
+          fields.rentPrice = fields.rentPrice.replace(/\D/g, "");
+        }
+
         setForm((prev) => ({ ...prev, ...fields }));
 
         setSnackbar({
