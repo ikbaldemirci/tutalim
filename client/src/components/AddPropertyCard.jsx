@@ -101,7 +101,25 @@ export default function AddPropertyCard({ onCreate }) {
       });
 
       if (res.data?.status === "success") {
-        setForm((prev) => ({ ...prev, ...res.data.fields }));
+        let fields = { ...res.data.fields };
+
+        const trToISO = (dateStr) => {
+          if (!dateStr) return "";
+          const parts = dateStr.split(".");
+          if (parts.length !== 3) return dateStr;
+          const [dd, mm, yyyy] = parts;
+          return `${yyyy}-${mm}-${dd}`;
+        };
+
+        if (fields.rentDate) {
+          fields.rentDate = trToISO(fields.rentDate);
+        }
+
+        if (fields.endDate) {
+          fields.endDate = trToISO(fields.endDate);
+        }
+
+        setForm((prev) => ({ ...prev, ...fields }));
 
         setSnackbar({
           open: true,
