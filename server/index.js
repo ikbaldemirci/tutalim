@@ -54,7 +54,6 @@ app.use("/api/stats", statsRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api", mailRoutes);
 
-// Global Error Handler
 const globalErrorHandler = require("./middleware/errorHandler");
 app.use(globalErrorHandler);
 
