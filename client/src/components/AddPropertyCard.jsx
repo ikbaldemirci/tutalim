@@ -91,7 +91,6 @@ export default function AddPropertyCard({ onCreate }) {
   const handleExtract = async (file) => {
     if (!file) return;
 
-    // Dosya boyutu kontrolü (25MB)
     const maxSize = 25 * 1024 * 1024;
     if (file.size > maxSize) {
       showError("Dosya boyutu 25MB'dan büyük olamaz.");
@@ -139,10 +138,13 @@ export default function AddPropertyCard({ onCreate }) {
           severity: "success",
         });
       } else {
-        showError(res.data?.message || "Belge okunamadı. Farklı bir dosya deneyin.");
+        showError(
+          res.data?.message || "Belge okunamadı. Farklı bir dosya deneyin."
+        );
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Belgeden okuma sırasında hata oluştu.";
+      const errorMsg =
+        err.response?.data?.message || "Belgeden okuma sırasında hata oluştu.";
       showError(errorMsg);
     } finally {
       setExtractLoading(false);
