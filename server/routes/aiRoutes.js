@@ -20,7 +20,9 @@ router.post("/extract-property", upload.single("file"), async (req, res) => {
           content: [
             {
               type: "image_url",
-              image_url: `data:${req.file.mimetype};base64,${fileBase64}`,
+              image_url: {
+                url: `data:${req.file.mimetype};base64,${fileBase64}`,
+              },
             },
             {
               type: "text",
@@ -35,7 +37,7 @@ Bu bir kira sözleşmesi veya kira ekran görüntüsü.
 - location
 
 Sadece JSON döndür. Açıklama yazma.
-              `,
+            `,
             },
           ],
         },
