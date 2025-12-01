@@ -88,6 +88,76 @@ export default function AddPropertyCard({ onCreate }) {
     }
   };
 
+  //   const handleExtract = async (file) => {
+  //     if (!file) return;
+
+  //     const maxSize = 25 * 1024 * 1024;
+  //     if (file.size > maxSize) {
+  //       showError("Dosya boyutu 25MB'dan büyük olamaz.");
+  //       return;
+  //     }
+
+  //     setExtractLoading(true);
+
+  //     const formData = new FormData();
+  //     formData.append("file", file);
+
+  //     try {
+  //       const res = await api.post("/ai/extract-property", formData, {
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       });
+
+  //       if (res.data?.status !== "success") {
+  //         showError(res.data?.message || "Belge okunamadı.");
+  //         return;
+  //       }
+
+  //       let fields = { ...res.data.fields };
+
+  //       const trToISO = (dateStr) => {
+  //         if (typeof dateStr !== "string") return "";
+  //         const parts = dateStr.split(".");
+  //         if (parts.length !== 3) return "";
+  //         const [dd, mm, yyyy] = parts;
+  //         return `${yyyy}-${mm}-${dd}`;
+  //       };
+
+  //       if (
+  //         typeof fields.rentDate === "string" &&
+  //         fields.rentDate.includes(".")
+  //       ) {
+  //         fields.rentDate = trToISO(fields.rentDate);
+  //       } else {
+  //         fields.rentDate = "";
+  //       }
+
+  //       if (typeof fields.endDate === "string" && fields.endDate.includes(".")) {
+  //         fields.endDate = trToISO(fields.endDate);
+  //       } else {
+  //         fields.endDate = "";
+  //       }
+
+  //       if (fields.rentPrice !== undefined && fields.rentPrice !== null) {
+  //         fields.rentPrice = fields.rentPrice.toString().replace(/\D/g, "");
+  //       } else {
+  //         fields.rentPrice = "";
+  //       }
+
+  //       setForm((prev) => ({ ...prev, ...fields }));
+
+  //       setSnackbar({
+  //         open: true,
+  //         message: "Belgeden bilgiler başarıyla okundu!",
+  //         severity: "success",
+  //       });
+  //     } catch (err) {
+  //       console.error(err);
+  //       showError("Belgeden okuma sırasında hata oluştu.");
+  //     } finally {
+  //       setExtractLoading(false);
+  //     }
+  //   };
+
   const handleExtract = async (file) => {
     if (!file) return;
 
@@ -107,52 +177,46 @@ export default function AddPropertyCard({ onCreate }) {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (res.data?.status !== "success") {
-        showError(res.data?.message || "Belge okunamadı.");
-        return;
-      }
+      if (res.data?.status === "success") {
+        let fields = { ...res.data.fields };
 
-      let fields = { ...res.data.fields };
+        const trToISO = (dateStr) => {
+          if (!dateStr) return "";
+          const parts = dateStr.split(".");
+          if (parts.length !== 3) return dateStr;
+          const [dd, mm, yyyy] = parts;
+          return `${yyyy}-${mm}-${dd}`;
+        };
 
-      const trToISO = (dateStr) => {
-        if (typeof dateStr !== "string") return "";
-        const parts = dateStr.split(".");
-        if (parts.length !== 3) return "";
-        const [dd, mm, yyyy] = parts;
-        return `${yyyy}-${mm}-${dd}`;
-      };
+        if (fields.rentDate) {
+          fields.rentDate = trToISO(fields.rentDate);
+        }
 
-      if (
-        typeof fields.rentDate === "string" &&
-        fields.rentDate.includes(".")
-      ) {
-        fields.rentDate = trToISO(fields.rentDate);
+        if (fields.endDate) {
+          fields.endDate = trToISO(fields.endDate);
+        }
+
+        if (fields.rentPrice !== undefined && fields.rentPrice !== null) {
+          const numeric = String(fields.rentPrice).replace(/[^\d]/g, "");
+          fields.rentPrice = numeric;
+        }
+
+        setForm((prev) => ({ ...prev, ...fields }));
+
+        setSnackbar({
+          open: true,
+          message: "Belgeden bilgiler başarıyla okundu!",
+          severity: "success",
+        });
       } else {
-        fields.rentDate = "";
+        showError(
+          res.data?.message || "Belge okunamadı. Farklı bir dosya deneyin."
+        );
       }
-
-      if (typeof fields.endDate === "string" && fields.endDate.includes(".")) {
-        fields.endDate = trToISO(fields.endDate);
-      } else {
-        fields.endDate = "";
-      }
-
-      if (fields.rentPrice !== undefined && fields.rentPrice !== null) {
-        fields.rentPrice = fields.rentPrice.toString().replace(/\D/g, "");
-      } else {
-        fields.rentPrice = "";
-      }
-
-      setForm((prev) => ({ ...prev, ...fields }));
-
-      setSnackbar({
-        open: true,
-        message: "Belgeden bilgiler başarıyla okundu!",
-        severity: "success",
-      });
     } catch (err) {
-      console.error(err);
-      showError("Belgeden okuma sırasında hata oluştu.");
+      const errorMsg =
+        err.response?.data?.message || "Belgeden okuma sırasında hata oluştu.";
+      showError(errorMsg);
     } finally {
       setExtractLoading(false);
     }

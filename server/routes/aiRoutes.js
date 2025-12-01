@@ -96,39 +96,78 @@ router.post("/extract-property", upload.single("file"), async (req, res) => {
       });
     }
 
-    const fileBuffer = fs.readFileSync(filePath);
-    const base64File = fileBuffer.toString("base64");
+    const isPDF = req.file.mimetype === "application/pdf";
 
-    const messageContent = [
-      {
-        type: "input_file",
-        input_file: {
-          mime_type: req.file.mimetype,
-          data: base64File,
+    let messages;
+
+    if (isPDF) {
+      const uploaded = await openai.files.create({
+        file: fs.createReadStream(filePath),
+        purpose: "assistants",
+      });
+
+      messages = [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `
+Bu bir kira sözleşmesi PDF dosyasıdır.
+Aşağıdaki alanları JSON formatında çıkar:
+
+- tenantName (kiracının adı soyadı)
+- rentPrice (kira bedeli, sadece rakam)
+- rentDate (başlangıç tarihi, DD.MM.YYYY formatında)
+- endDate (bitiş tarihi, DD.MM.YYYY formatında, yoksa null bırak)
+- location (konum/adres)
+
+Sadece JSON döndür. Açıklama yazma.
+              `.trim(),
+            },
+            {
+              type: "file",
+              file_id: uploaded.id,
+            },
+          ],
         },
-      },
-      {
-        type: "text",
-        text: `
-Bu bir kira sözleşmesi (PDF veya görsel).
-Aşağıdaki alanları JSON olarak çıkar:
+      ];
+    } else {
+      const fileBase64 = fs.readFileSync(filePath, "base64");
 
-- tenantName
-- rentPrice (sadece rakam)
-- rentDate (DD.MM.YYYY formatında)
-- endDate (DD.MM.YYYY formatında)
-- location
+      messages = [
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:${req.file.mimetype};base64,${fileBase64}`,
+              },
+            },
+            {
+              type: "text",
+              text: `
+Bu bir kira sözleşmesi veya kira ekran görüntüsü.
+Aşağıdaki alanları JSON formatında çıkar:
 
-Sadece JSON döndür.
-Kod bloğu, açıklama, markdown, \`\`\`json gibi şeyler kullanma.
-Sadece saf JSON döndür.
-        `,
-      },
-    ];
+- tenantName (kiracının adı soyadı)
+- rentPrice (kira bedeli, sadece rakam)
+- rentDate (başlangıç tarihi, DD.MM.YYYY formatında)
+- endDate (bitiş tarihi, DD.MM.YYYY formatında, yoksa null bırak)
+- location (konum/adres)
+
+Sadece JSON döndür. Açıklama yazma.
+              `.trim(),
+            },
+          ],
+        },
+      ];
+    }
 
     const result = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [{ role: "user", content: messageContent }],
+      messages,
     });
 
     let raw = result.choices[0].message.content;
@@ -136,8 +175,7 @@ Sadece saf JSON döndür.
 
     let cleaned = raw
       .replace(/```json/gi, "")
-      .replace(/```/gi, "")
-      .replace(/[\u0000-\u001F]+/g, "")
+      .replace(/```/g, "")
       .trim();
 
     console.log("CLEANED JSON:", cleaned);
