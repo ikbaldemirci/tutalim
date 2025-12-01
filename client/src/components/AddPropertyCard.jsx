@@ -171,7 +171,6 @@ export default function AddPropertyCard({ onCreate }) {
             sx={{ flex: "1 1 140px" }}
           />
 
-          {/* ⭐ GÜN KAYDIRMAYAN DatePicker */}
           <DatePicker
             label="Başlangıç"
             format="dd/MM/yyyy"

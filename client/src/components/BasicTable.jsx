@@ -610,31 +610,25 @@ export default function BasicTable({
               <DatePicker
                 format="dd/MM/yyyy"
                 label="Başlangıç"
-                value={editForm.rentDate ? new Date(editForm.rentDate) : null}
-                onChange={(date) =>
-                  handleEditChange({
-                    target: {
-                      name: "rentDate",
-                      value: date ? date.toISOString().split("T")[0] : "",
-                    },
-                  })
-                }
+                value={startDate ? new Date(startDate + "T00:00:00") : null}
+                onChange={(date) => {
+                  const iso = date ? date.toISOString().split("T")[0] : "";
+                  setStartDate(iso);
+                }}
                 slotProps={{ textField: { size: "small" } }}
               />
+
               <DatePicker
                 format="dd/MM/yyyy"
                 label="Bitiş"
-                value={editForm.endDate ? new Date(editForm.endDate) : null}
-                onChange={(date) =>
-                  handleEditChange({
-                    target: {
-                      name: "endDate",
-                      value: date ? date.toISOString().split("T")[0] : "",
-                    },
-                  })
-                }
+                value={endDate ? new Date(endDate + "T00:00:00") : null}
+                onChange={(date) => {
+                  const iso = date ? date.toISOString().split("T")[0] : "";
+                  setEndDate(iso);
+                }}
                 slotProps={{ textField: { size: "small" } }}
               />
+
               <Button variant="outlined" onClick={handleClearFilters}>
                 Filtreleri Temizle
               </Button>
