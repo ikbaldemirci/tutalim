@@ -19,7 +19,7 @@ router.post("/extract-property", upload.single("file"), async (req, res) => {
           role: "user",
           content: [
             {
-              type: "input_image",
+              type: "image_url",
               image_url: `data:${req.file.mimetype};base64,${fileBase64}`,
             },
             {
