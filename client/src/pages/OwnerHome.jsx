@@ -107,11 +107,17 @@ function OwnerHome() {
       ) : properties.length > 0 ? (
         <BasicTable
           data={properties}
-          onUpdate={(updated) =>
-            setProperties((prev) =>
-              prev.map((p) => (p._id === updated._id ? updated : p))
-            )
-          }
+          onUpdate={(updated) => {
+            if (updated.deleted) {
+              setProperties((prev) =>
+                prev.filter((p) => p._id !== updated._id)
+              );
+            } else {
+              setProperties((prev) =>
+                prev.map((p) => (p._id === updated._id ? updated : p))
+              );
+            }
+          }}
           loadingState={loadingState}
           setLoadingState={setLoadingState}
         />
