@@ -110,7 +110,7 @@ router.post("/extract-property", upload.single("file"), async (req, res) => {
       {
         type: "text",
         text: `
-Bu bir kira sözleşmesi PDF veya görselidir.
+Bu bir kira sözleşmesi (PDF veya görsel).
 Aşağıdaki alanları JSON olarak çıkar:
 
 - tenantName
@@ -119,7 +119,9 @@ Aşağıdaki alanları JSON olarak çıkar:
 - endDate (DD.MM.YYYY formatında)
 - location
 
-Sadece JSON döndür. Kod bloğu kullanma.
+Sadece JSON döndür.
+Kod bloğu, açıklama, markdown, \`\`\`json gibi şeyler kullanma.
+Sadece saf JSON döndür.
         `,
       },
     ];
@@ -132,9 +134,24 @@ Sadece JSON döndür. Kod bloğu kullanma.
     let raw = result.choices[0].message.content;
     console.log("AI RAW RESULT:", raw);
 
-    const cleaned = raw.replace(/```json|```/gi, "").trim();
+    let cleaned = raw
+      .replace(/```json/gi, "")
+      .replace(/```/gi, "")
+      .replace(/[\u0000-\u001F]+/g, "")
+      .trim();
 
-    const fields = JSON.parse(cleaned);
+    console.log("CLEANED JSON:", cleaned);
+
+    let fields;
+    try {
+      fields = JSON.parse(cleaned);
+    } catch (err) {
+      console.error("JSON PARSE ERROR:", err);
+      return res.json({
+        status: "error",
+        message: "Belge okunamadı: JSON parse edilemedi.",
+      });
+    }
 
     return res.json({ status: "success", fields });
   } catch (err) {
