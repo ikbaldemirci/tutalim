@@ -88,117 +88,94 @@ router.post("/extract-property", upload.single("file"), async (req, res) => {
 
     filePath = req.file.path;
 
-    const maxSize = 25 * 1024 * 1024;
-    if (req.file.size > maxSize) {
+    if (req.file.size > 25 * 1024 * 1024) {
       return res.json({
         status: "error",
         message: "Dosya boyutu 25MB'dan büyük olamaz.",
       });
     }
 
-    const isPDF = req.file.mimetype === "application/pdf";
+    const mimetype = req.file.mimetype;
+    let messageContent = [];
 
-    let messages;
+    if (mimetype === "application/pdf") {
+      const pdfParse = require("pdf-parse");
+      const buffer = fs.readFileSync(filePath);
+      const pdfData = await pdfParse(buffer);
 
-    if (isPDF) {
-      const uploaded = await openai.files.create({
-        file: fs.createReadStream(filePath),
-        purpose: "assistants",
-      });
-
-      messages = [
+      messageContent = [
         {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `
-Bu bir kira sözleşmesi PDF dosyasıdır.
+          type: "text",
+          text: `
+Bu bir kira sözleşmesi metnidir.
+
 Aşağıdaki alanları JSON formatında çıkar:
 
-- tenantName (kiracının adı soyadı)
-- rentPrice (kira bedeli, sadece rakam)
-- rentDate (başlangıç tarihi, DD.MM.YYYY formatında)
-- endDate (bitiş tarihi, DD.MM.YYYY formatında, yoksa null bırak)
-- location (konum/adres)
+- tenantName
+- rentPrice (sadece rakam)
+- rentDate (DD.MM.YYYY)
+- endDate (DD.MM.YYYY)
+- location
+
+METİN:
+${pdfData.text}
 
 Sadece JSON döndür. Açıklama yazma.
-              `.trim(),
-            },
-            {
-              type: "file",
-              file_id: uploaded.id,
-            },
-          ],
+          `,
         },
       ];
     } else {
       const fileBase64 = fs.readFileSync(filePath, "base64");
 
-      messages = [
+      messageContent = [
         {
-          role: "user",
-          content: [
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:${req.file.mimetype};base64,${fileBase64}`,
-              },
-            },
-            {
-              type: "text",
-              text: `
-Bu bir kira sözleşmesi veya kira ekran görüntüsü.
-Aşağıdaki alanları JSON formatında çıkar:
+          type: "image_url",
+          image_url: {
+            url: `data:${mimetype};base64,${fileBase64}`,
+          },
+        },
+        {
+          type: "text",
+          text: `
+Bu bir kira sözleşmesi görselidir.
 
-- tenantName (kiracının adı soyadı)
-- rentPrice (kira bedeli, sadece rakam)
-- rentDate (başlangıç tarihi, DD.MM.YYYY formatında)
-- endDate (bitiş tarihi, DD.MM.YYYY formatında, yoksa null bırak)
-- location (konum/adres)
+Aşağıdaki alanları JSON olarak çıkar:
+
+- tenantName
+- rentPrice (sadece rakam)
+- rentDate (DD.MM.YYYY)
+- endDate (DD.MM.YYYY)
+- location
 
 Sadece JSON döndür. Açıklama yazma.
-              `.trim(),
-            },
-          ],
+          `,
         },
       ];
     }
 
     const result = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages,
+      messages: [{ role: "user", content: messageContent }],
     });
 
     let raw = result.choices[0].message.content;
-    console.log("AI RAW RESULT:", raw);
+    console.log("AI RAW:", raw);
 
     let cleaned = raw
       .replace(/```json/gi, "")
       .replace(/```/g, "")
       .trim();
 
-    console.log("CLEANED JSON:", cleaned);
+    console.log("CLEAN:", cleaned);
 
-    let fields;
-    try {
-      fields = JSON.parse(cleaned);
-    } catch (err) {
-      console.error("JSON PARSE ERROR:", err);
-      return res.json({
-        status: "error",
-        message: "Belge okunamadı: JSON parse edilemedi.",
-      });
-    }
+    let fields = JSON.parse(cleaned);
 
     return res.json({ status: "success", fields });
   } catch (err) {
     console.error("AI ERROR:", err);
     return res.json({ status: "error", message: "Belge okunamadı." });
   } finally {
-    if (filePath && fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 });
 
