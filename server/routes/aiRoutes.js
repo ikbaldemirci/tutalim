@@ -144,7 +144,7 @@ router.post("/extract-property", upload.single("file"), async (req, res) => {
     let messageContent;
 
     if (isPDF) {
-      const pdfParse = require("pdf-parse");
+      const pdfParse = require("pdf-parse/lib/pdf-parse.js");
       const dataBuffer = fs.readFileSync(filePath);
       const pdfData = await pdfParse(dataBuffer);
 
