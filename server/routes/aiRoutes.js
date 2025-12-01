@@ -28,7 +28,7 @@ router.post("/extract-property", upload.single("file"), async (req, res) => {
               type: "text",
               text: `
 Bu bir kira sözleşmesi veya kira ekran görüntüsü.
-Şu alanları JSON formatında çıkar:
+Bu alanları JSON formatında çıkar:
 
 - tenantName
 - rentPrice
@@ -37,19 +37,29 @@ Bu bir kira sözleşmesi veya kira ekran görüntüsü.
 - location
 
 Sadece JSON döndür. Açıklama yazma.
-            `,
+              `,
             },
           ],
         },
       ],
     });
-    console.log("AI RAW RESULT:", result.choices[0].message.content);
+
+    let raw = result.choices[0].message.content;
+    console.log("AI RAW RESULT:", raw);
+
+    let cleaned = raw
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+
+    console.log("CLEANED JSON:", cleaned);
 
     let fields = {};
-
     try {
-      fields = JSON.parse(result.choices[0].message.content);
-    } catch {
+      fields = JSON.parse(cleaned);
+    } catch (err) {
+      console.error("JSON PARSE ERROR:", err);
+      fs.unlinkSync(filePath);
       return res.json({
         status: "error",
         message: "Belge okunamadı: JSON parse edilemedi.",
