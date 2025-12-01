@@ -24,6 +24,7 @@ import {
   Typography,
   GlobalStyles,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -588,7 +589,7 @@ export default function BasicTable({
                 }}
                 sx={{ width: 250 }}
               />
-              <TextField
+              {/* <TextField
                 size="small"
                 type="date"
                 label="Başlangıç"
@@ -605,6 +606,34 @@ export default function BasicTable({
                 inputProps={{ placeholder: "dd/mm/yyyy" }}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+              /> */}
+              <DatePicker
+                format="dd/MM/yyyy"
+                label="Başlangıç"
+                value={editForm.rentDate ? new Date(editForm.rentDate) : null}
+                onChange={(date) =>
+                  handleEditChange({
+                    target: {
+                      name: "rentDate",
+                      value: date ? date.toISOString().split("T")[0] : "",
+                    },
+                  })
+                }
+                slotProps={{ textField: { size: "small" } }}
+              />
+              <DatePicker
+                format="dd/MM/yyyy"
+                label="Bitiş"
+                value={editForm.endDate ? new Date(editForm.endDate) : null}
+                onChange={(date) =>
+                  handleEditChange({
+                    target: {
+                      name: "endDate",
+                      value: date ? date.toISOString().split("T")[0] : "",
+                    },
+                  })
+                }
+                slotProps={{ textField: { size: "small" } }}
               />
               <Button variant="outlined" onClick={handleClearFilters}>
                 Filtreleri Temizle

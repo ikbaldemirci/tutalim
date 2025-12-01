@@ -9,6 +9,7 @@ import {
   Alert,
 } from "@mui/material";
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
+import { DatePicker } from "@mui/x-date-pickers";
 import api from "../api";
 
 export default function AddPropertyCard({ onCreate }) {
@@ -162,7 +163,7 @@ export default function AddPropertyCard({ onCreate }) {
             sx={{ flex: "1 1 140px" }}
           />
 
-          <TextField
+          {/* <TextField
             label="Başlangıç"
             type="date"
             name="rentDate"
@@ -183,6 +184,30 @@ export default function AddPropertyCard({ onCreate }) {
             InputLabelProps={{ shrink: true }}
             inputProps={{ placeholder: "dd/mm/yyyy" }}
             size="small"
+            sx={{ flex: "1 1 160px" }}
+          /> */}
+
+          <DatePicker
+            label="Başlangıç"
+            format="dd/MM/yyyy"
+            value={form.rentDate ? new Date(form.rentDate) : null}
+            onChange={(date) => {
+              const iso = date ? date.toISOString().split("T")[0] : "";
+              setForm((prev) => ({ ...prev, rentDate: iso }));
+            }}
+            slotProps={{ textField: { size: "small" } }}
+            sx={{ flex: "1 1 160px" }}
+          />
+
+          <DatePicker
+            label="Bitiş"
+            format="dd/MM/yyyy"
+            value={form.endDate ? new Date(form.endDate) : null}
+            onChange={(date) => {
+              const iso = date ? date.toISOString().split("T")[0] : "";
+              setForm((prev) => ({ ...prev, endDate: iso }));
+            }}
+            slotProps={{ textField: { size: "small" } }}
             sx={{ flex: "1 1 160px" }}
           />
 

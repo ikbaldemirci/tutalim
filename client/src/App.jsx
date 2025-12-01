@@ -4,6 +4,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Fade } from "@mui/material";
 import { lazy, Suspense, useState, useEffect } from "react";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { tr } from "date-fns/locale";
 
 import ProtectedRoute from "./ProtectedRoute";
 import LoadingScreen from "./components/LoadingScreen";
@@ -61,56 +64,61 @@ function App() {
         <Fade in timeout={700}>
           <main>
             <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <BrowserRouter>
-                <ScrollToTop />
-                <Suspense fallback={<LoadingScreen />}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route
-                      path="/reset-password/:token"
-                      element={<ResetPassword />}
-                    />
-                    <Route path="/reset-success" element={<ResetSuccess />} />
-                    <Route path="/check-mail" element={<CheckMail />} />
-                    <Route
-                      path="/check-mail-verify"
-                      element={<CheckMailVerify />}
-                    />
-                    <Route path="/verify/:token" element={<VerifyResult />} />
-                    <Route path="/resend-verify" element={<ResendVerify />} />
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={tr}
+              >
+                <CssBaseline />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <Suspense fallback={<LoadingScreen />}>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup" element={<Signup />} />
+                      <Route
+                        path="/reset-password/:token"
+                        element={<ResetPassword />}
+                      />
+                      <Route path="/reset-success" element={<ResetSuccess />} />
+                      <Route path="/check-mail" element={<CheckMail />} />
+                      <Route
+                        path="/check-mail-verify"
+                        element={<CheckMailVerify />}
+                      />
+                      <Route path="/verify/:token" element={<VerifyResult />} />
+                      <Route path="/resend-verify" element={<ResendVerify />} />
 
-                    <Route
-                      path="/owner"
-                      element={
-                        <ProtectedRoute role="owner">
-                          <OwnerHome />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/realtor"
-                      element={
-                        <ProtectedRoute role="realtor">
-                          <RealtorHome />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/profile"
-                      element={
-                        <ProtectedRoute>
-                          <Profile />
-                        </ProtectedRoute>
-                      }
-                    />
-                  </Routes>
-                </Suspense>
-              </BrowserRouter>
+                      <Route
+                        path="/owner"
+                        element={
+                          <ProtectedRoute role="owner">
+                            <OwnerHome />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/realtor"
+                        element={
+                          <ProtectedRoute role="realtor">
+                            <RealtorHome />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/profile"
+                        element={
+                          <ProtectedRoute>
+                            <Profile />
+                          </ProtectedRoute>
+                        }
+                      />
+                    </Routes>
+                  </Suspense>
+                </BrowserRouter>
+              </LocalizationProvider>
             </ThemeProvider>
           </main>
         </Fade>

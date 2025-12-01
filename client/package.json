@@ -10,15 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@date-io/date-fns": "^3.2.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.1",
     "@mui/material": "^7.1.1",
     "@mui/x-date-pickers": "^8.19.0",
+    "@mui/x-date-pickers-pro": "^8.19.0",
     "@vitejs/plugin-react": "^5.1.0",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.3",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "framer-motion": "^12.23.24",
     "gsap": "^3.13.0",
     "jwt-decode": "^4.0.0",
