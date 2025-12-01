@@ -43,6 +43,7 @@ Sadece JSON döndür. Açıklama yazma.
         },
       ],
     });
+    console.log("AI RAW RESULT:", result.choices[0].message.content);
 
     let fields = {};
 
