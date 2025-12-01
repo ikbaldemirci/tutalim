@@ -36,6 +36,14 @@ export default function AddPropertyCard({ onCreate }) {
   const showError = (msg) =>
     setSnackbar({ open: true, message: msg, severity: "warning" });
 
+  const toISODate = (d) => {
+    if (!d) return "";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const handleSubmit = async () => {
     if (!form.rentPrice || !form.rentDate || !form.endDate || !form.location) {
       return showError("Lütfen tüm zorunlu alanları doldurun!");
@@ -163,38 +171,14 @@ export default function AddPropertyCard({ onCreate }) {
             sx={{ flex: "1 1 140px" }}
           />
 
-          {/* <TextField
-            label="Başlangıç"
-            type="date"
-            name="rentDate"
-            value={form.rentDate}
-            onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-            inputProps={{ placeholder: "dd/mm/yyyy" }}
-            size="small"
-            sx={{ flex: "1 1 160px" }}
-          />
-
-          <TextField
-            label="Bitiş"
-            type="date"
-            name="endDate"
-            value={form.endDate}
-            onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-            inputProps={{ placeholder: "dd/mm/yyyy" }}
-            size="small"
-            sx={{ flex: "1 1 160px" }}
-          /> */}
-
+          {/* ⭐ GÜN KAYDIRMAYAN DatePicker */}
           <DatePicker
             label="Başlangıç"
             format="dd/MM/yyyy"
             value={form.rentDate ? new Date(form.rentDate) : null}
-            onChange={(date) => {
-              const iso = date ? date.toISOString().split("T")[0] : "";
-              setForm((prev) => ({ ...prev, rentDate: iso }));
-            }}
+            onChange={(date) =>
+              setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
+            }
             slotProps={{ textField: { size: "small" } }}
             sx={{ flex: "1 1 160px" }}
           />
@@ -203,10 +187,9 @@ export default function AddPropertyCard({ onCreate }) {
             label="Bitiş"
             format="dd/MM/yyyy"
             value={form.endDate ? new Date(form.endDate) : null}
-            onChange={(date) => {
-              const iso = date ? date.toISOString().split("T")[0] : "";
-              setForm((prev) => ({ ...prev, endDate: iso }));
-            }}
+            onChange={(date) =>
+              setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
+            }
             slotProps={{ textField: { size: "small" } }}
             sx={{ flex: "1 1 160px" }}
           />
