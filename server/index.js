@@ -17,6 +17,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const reminderRoutes = require("./routes/reminderRoutes");
 const statsRoutes = require("./routes/statsRoutes");
 const mailRoutes = require("./routes/mailRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/api/assignments", assignmentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reminders", reminderRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api", mailRoutes);
 
 // Global Error Handler

@@ -21,6 +21,7 @@ export default function AddPropertyCard({ onCreate }) {
   });
 
   const [loading, setLoading] = useState(false);
+  const [extractLoading, setExtractLoading] = useState(false);
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -75,6 +76,36 @@ export default function AddPropertyCard({ onCreate }) {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExtract = async (file) => {
+    if (!file) return;
+    setExtractLoading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await api.post("/ai/extract-property", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data?.status === "success") {
+        setForm((prev) => ({ ...prev, ...res.data.fields }));
+
+        setSnackbar({
+          open: true,
+          message: "Belgeden bilgiler başarıyla okundu!",
+          severity: "success",
+        });
+      } else {
+        showError("Belge okunamadı. Farklı bir dosya deneyin.");
+      }
+    } catch (err) {
+      showError("Belgeden okuma sırasında hata oluştu.");
+    } finally {
+      setExtractLoading(false);
     }
   };
 
@@ -182,6 +213,33 @@ export default function AddPropertyCard({ onCreate }) {
             }}
           >
             {loading ? "Ekleniyor..." : "Ekle"}
+          </Button>
+
+          <Button
+            variant="outlined"
+            component="label"
+            size="medium"
+            disabled={extractLoading}
+            sx={{
+              fontWeight: 600,
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              minWidth: "110px",
+              boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+              "&:hover": {
+                backgroundColor: "#1f5fa3",
+                boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+              },
+            }}
+          >
+            {extractLoading ? "Okunuyor..." : "Belgeden Oku"}
+            <input
+              type="file"
+              hidden
+              accept="image/*,application/pdf"
+              onChange={(e) => handleExtract(e.target.files?.[0])}
+            />
           </Button>
         </Box>
       </Paper>
