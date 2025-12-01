@@ -611,24 +611,6 @@ export default function BasicTable({
                 }}
                 sx={{ width: 250 }}
               />
-              {/* <TextField
-                size="small"
-                type="date"
-                label="Başlangıç"
-                InputLabelProps={{ shrink: true }}
-                inputProps={{ placeholder: "dd/mm/yyyy" }}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              <TextField
-                size="small"
-                type="date"
-                label="Bitiş"
-                InputLabelProps={{ shrink: true }}
-                inputProps={{ placeholder: "dd/mm/yyyy" }}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              /> */}
               <DatePicker
                 label="Başlangıç"
                 format="dd/MM/yyyy"

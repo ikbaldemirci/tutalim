@@ -247,7 +247,7 @@ export default function AddPropertyCard({ onCreate }) {
           </Button>
 
           <Button
-            variant="outlined"
+            variant="contained"
             component="label"
             size="medium"
             disabled={extractLoading}
