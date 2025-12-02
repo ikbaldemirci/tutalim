@@ -134,7 +134,7 @@ export default function BasicTable({
           });
           setSentInvitesMap(map);
         }
-      } catch (e) {}
+      } catch (e) { }
     };
     loadSent();
   }, [data?.length]);
@@ -220,11 +220,20 @@ export default function BasicTable({
           severity: "success",
         });
       }
-    } catch {
+    } catch (err) {
+      let msg = "Güncelleme sırasında hata oluştu";
+      if (
+        err.response?.data?.message?.includes(
+          '"endDate" must be greater than "ref:rentDate"'
+        )
+      ) {
+        msg = "Bitiş tarihi başlangıç tarihinden önce olamaz!";
+      }
+
       setSnackbar({
         key: Date.now(),
         open: true,
-        message: "Güncelleme sırasında hata oluştu",
+        message: msg,
         severity: "error",
       });
     }

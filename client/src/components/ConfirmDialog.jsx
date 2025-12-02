@@ -13,7 +13,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { motion } from "framer-motion";
 
 const iconMap = {
-  info: <InfoOutlinedIcon sx={{ fontSize: 38, color: "#3498DB" }} />,
+  info: <InfoOutlinedIcon sx={{ fontSize: 38, color: "#96D8E6" }} />,
   warning: <WarningAmberIcon sx={{ fontSize: 38, color: "#F1C40F" }} />,
   danger: <ErrorOutlineIcon sx={{ fontSize: 38, color: "#E74C3C" }} />,
   success: <CheckCircleOutlineIcon sx={{ fontSize: 38, color: "#2ECC71" }} />,

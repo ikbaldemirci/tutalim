@@ -78,9 +78,18 @@ export default function AddPropertyCard({ onCreate }) {
         });
       }
     } catch (err) {
+      let msg = "İlan eklenemedi. Lütfen tekrar deneyin.";
+      if (
+        err.response?.data?.message?.includes(
+          '"endDate" must be greater than "ref:rentDate"'
+        )
+      ) {
+        msg = "Bitiş tarihi başlangıç tarihinden önce olamaz!";
+      }
+
       setSnackbar({
         open: true,
-        message: "İlan eklenemedi. Lütfen tekrar deneyin.",
+        message: msg,
         severity: "error",
       });
     } finally {
