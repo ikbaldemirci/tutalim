@@ -283,7 +283,7 @@ export default function AddPropertyCard({ onCreate }) {
             <DatePicker
               label="Bitiş"
               format="dd/MM/yyyy"
-              value={form.end.endDate ? new Date(form.endDate) : null}
+              value={form.endDate ? new Date(form.endDate) : null}
               onChange={(date) =>
                 setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
               }
