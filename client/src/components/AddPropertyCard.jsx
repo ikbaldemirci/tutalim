@@ -267,7 +267,7 @@ export default function AddPropertyCard({ onCreate }) {
             {loading ? "Ekleniyor..." : "Ekle"}
           </Button>
 
-          <Button
+          {/* <Button
             variant="contained"
             component="label"
             size="medium"
@@ -290,6 +290,44 @@ export default function AddPropertyCard({ onCreate }) {
               type="file"
               hidden
               accept="image/*,application/pdf"
+              onChange={(e) => handleExtract(e.target.files?.[0])}
+            />
+          </Button> */}
+          <Button
+            variant="contained"
+            component="label"
+            size="medium"
+            sx={{
+              fontWeight: 600,
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              minWidth: "150px",
+              backgroundColor: "#2E86C1",
+              color: "#fff",
+              boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+              "&:hover": {
+                backgroundColor: "#1f5fa3",
+                boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+              },
+              opacity: extractLoading ? 0.8 : 1,
+              cursor: extractLoading ? "not-allowed" : "pointer",
+            }}
+          >
+            {extractLoading ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={18} sx={{ color: "white" }} />
+                Okunuyor...
+              </Box>
+            ) : (
+              "Belgeden Oku"
+            )}
+
+            <input
+              type="file"
+              hidden
+              accept="image/*,application/pdf"
+              disabled={extractLoading}
               onChange={(e) => handleExtract(e.target.files?.[0])}
             />
           </Button>
