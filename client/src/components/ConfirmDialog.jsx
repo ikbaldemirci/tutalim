@@ -5,7 +5,6 @@ import {
   DialogActions,
   Button,
   Typography,
-  Box,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -42,13 +41,16 @@ export default function ConfirmDialog({
     if (!open) return;
 
     const handleKey = (e) => {
-      if (e.key === "Enter") onConfirm();
-      if (!disableEscape && e.key === "Escape") onCancel();
+      if (!disableEscape && e.key === "Escape") {
+        e.stopPropagation();
+        e.preventDefault();
+        onCancel();
+      }
     };
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [open, disableEscape, onConfirm, onCancel]);
+  }, [open, disableEscape, onCancel]);
 
   return (
     <Dialog

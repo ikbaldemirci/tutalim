@@ -81,13 +81,12 @@ export default function ReminderModal({
   };
 
   const handleDelete = async (id) => {
-    if (
-      !(await confirm(
-        "Hatırlatıcıyı Sil",
-        "Bu hatırlatıcıyı silmek istiyor musun?"
-      ))
-    )
-      return;
+    const ok = await confirm({
+      title: "Hatırlatıcıyı Sil",
+      message: "Bu hatırlatıcıyı silmek istiyor musun? Bu işlem geri alınamaz.",
+      severity: "danger",
+    });
+    if (!ok) return;
 
     try {
       await api.delete(`/reminders/${id}`);
@@ -146,7 +145,6 @@ export default function ReminderModal({
             <Typography fontWeight={600} mb={1}>
               Bu mülke ait mevcut hatırlatıcılar:
             </Typography>
-
 
             {existingReminders.map((r, i) => {
               const dateStr = new Date(r.remindAt).toLocaleString("tr-TR");

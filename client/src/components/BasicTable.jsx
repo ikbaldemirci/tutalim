@@ -902,9 +902,8 @@ export default function BasicTable({
                                   severity: "danger",
                                 });
                                 if (!ok) return;
-                                {
-                                  handleAssign(row._id, { realtorMail: null });
-                                }
+
+                                handleAssign(row._id, { realtorMail: null });
                               }}
                             >
                               Kaldır
