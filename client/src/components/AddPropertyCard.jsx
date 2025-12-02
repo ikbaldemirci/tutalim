@@ -28,13 +28,6 @@ export default function AddPropertyCard({ onCreate }) {
 
   const [aiFilled, setAiFilled] = useState({});
 
-  useEffect(() => {
-    if (Object.keys(aiFilled).length > 0) {
-      const timer = setTimeout(() => setAiFilled({}), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [aiFilled]);
-
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -81,6 +74,8 @@ export default function AddPropertyCard({ onCreate }) {
           location: "",
           tenantName: "",
         });
+
+        setAiFilled({});
 
         setSnackbar({
           open: true,
