@@ -201,95 +201,105 @@ export default function AddPropertyCard({ onCreate }) {
             alignItems: "center",
           }}
         >
-          <TextField
-            label="Kiracı Adı Soyadı"
-            name="tenantName"
-            value={form.tenantName}
-            onChange={handleChange}
-            size="small"
-            sx={{ flex: "1 1 180px" }}
-          />
-          {aiFilled.tenantName && (
-            <Chip
-              label="AI"
-              color="success"
+          <Box sx={{ position: "relative" }}>
+            <TextField
+              label="Kiracı Adı Soyadı"
+              name="tenantName"
+              value={form.tenantName}
+              onChange={handleChange}
               size="small"
-              sx={{ position: "absolute", top: -10, right: -10 }}
+              sx={{ flex: "1 1 180px" }}
             />
-          )}
+            {aiFilled.tenantName && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
-          <TextField
-            label="Fiyat (₺)"
-            name="rentPrice"
-            type="number"
-            value={form.rentPrice}
-            onChange={handleChange}
-            size="small"
-            sx={{ flex: "1 1 140px" }}
-          />
-          {aiFilled.rentPrice && (
-            <Chip
-              label="AI"
-              color="success"
+          <Box sx={{ position: "relative" }}>
+            <TextField
+              label="Fiyat (₺)"
+              name="rentPrice"
+              type="number"
+              value={form.rentPrice}
+              onChange={handleChange}
               size="small"
-              sx={{ position: "absolute", top: -10, right: -10 }}
+              sx={{ flex: "1 1 140px" }}
             />
-          )}
+            {aiFilled.rentPrice && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
-          <DatePicker
-            label="Başlangıç"
-            format="dd/MM/yyyy"
-            value={form.rentDate ? new Date(form.rentDate) : null}
-            onChange={(date) =>
-              setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
-            }
-            slotProps={{ textField: { size: "small" } }}
-            sx={{ flex: "1 1 160px" }}
-          />
-          {aiFilled.rentDate && (
-            <Chip
-              label="AI"
-              color="success"
-              size="small"
-              sx={{ position: "absolute", top: -10, right: -10 }}
+          <Box sx={{ position: "relative" }}>
+            <DatePicker
+              label="Başlangıç"
+              format="dd/MM/yyyy"
+              value={form.rentDate ? new Date(form.rentDate) : null}
+              onChange={(date) =>
+                setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
+              }
+              slotProps={{ textField: { size: "small" } }}
+              sx={{ flex: "1 1 160px" }}
             />
-          )}
+            {aiFilled.rentDate && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
-          <DatePicker
-            label="Bitiş"
-            format="dd/MM/yyyy"
-            value={form.endDate ? new Date(form.endDate) : null}
-            onChange={(date) =>
-              setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
-            }
-            slotProps={{ textField: { size: "small" } }}
-            sx={{ flex: "1 1 160px" }}
-          />
-          {aiFilled.endDate && (
-            <Chip
-              label="AI"
-              color="success"
-              size="small"
-              sx={{ position: "absolute", top: -10, right: -10 }}
+          <Box sx={{ position: "relative" }}>
+            <DatePicker
+              label="Bitiş"
+              format="dd/MM/yyyy"
+              value={form.endDate ? new Date(form.endDate) : null}
+              onChange={(date) =>
+                setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
+              }
+              slotProps={{ textField: { size: "small" } }}
+              sx={{ flex: "1 1 160px" }}
             />
-          )}
+            {aiFilled.endDate && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
-          <TextField
-            label="Konum"
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            size="small"
-            sx={{ flex: "1 1 180px" }}
-          />
-          {aiFilled.location && (
-            <Chip
-              label="AI"
-              color="success"
+          <Box sx={{ position: "relative" }}>
+            <TextField
+              label="Konum"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
               size="small"
-              sx={{ position: "absolute", top: -10, right: -10 }}
+              sx={{ flex: "1 1 180px" }}
             />
-          )}
+            {aiFilled.location && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
           <Button
             variant="contained"
