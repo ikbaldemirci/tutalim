@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Paper,
   Typography,
@@ -8,69 +8,25 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
+  Chip,
 } from "@mui/material";
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import { DatePicker } from "@mui/x-date-pickers";
 import api from "../api";
 
-const AiBadge = () => (
-  <Box
-    sx={{
-      position: "absolute",
-      top: -10,
-      right: 10,
-      background: "linear-gradient(135deg, #27AE60, #2ECC71)",
-      color: "white",
-      fontSize: "10px",
-      fontWeight: 700,
-      px: 1.2,
-      py: 0.3,
-      borderRadius: "6px",
-      boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-      zIndex: 10,
-      letterSpacing: "0.5px",
-    }}
-  >
-    AI
-  </Box>
-);
-
-const AiWrapper = ({ active, children }) => (
-  <Box
-    sx={{
-      position: "relative",
-      borderRadius: "12px",
-      transition: "0.35s ease",
-      p: "4px",
-      boxShadow: active
-        ? "0 0 0 2px #2ECC71 inset, 0 0 10px rgba(46, 204, 113, 0.6)"
-        : "none",
-    }}
-  >
-    {active && <AiBadge />}
-    {children}
-  </Box>
-);
-
 export default function AddPropertyCard({ onCreate }) {
   const [form, setForm] = useState({
-    tenantName: "",
     rentPrice: "",
     rentDate: "",
     endDate: "",
     location: "",
+    tenantName: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [extractLoading, setExtractLoading] = useState(false);
 
-  const [aiFilled, setAiFilled] = useState({
-    tenantName: false,
-    rentPrice: false,
-    rentDate: false,
-    endDate: false,
-    location: false,
-  });
+  const [aiFilled, setAiFilled] = useState({});
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -78,11 +34,11 @@ export default function AddPropertyCard({ onCreate }) {
     severity: "success",
   });
 
-  const showError = (msg) =>
-    setSnackbar({ open: true, message: msg, severity: "warning" });
-
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
+
+  const showError = (msg) =>
+    setSnackbar({ open: true, message: msg, severity: "warning" });
 
   const toISODate = (d) => {
     if (!d) return "";
@@ -112,20 +68,14 @@ export default function AddPropertyCard({ onCreate }) {
         onCreate?.(res.data.property);
 
         setForm({
-          tenantName: "",
           rentPrice: "",
           rentDate: "",
           endDate: "",
           location: "",
+          tenantName: "",
         });
 
-        setAiFilled({
-          tenantName: false,
-          rentPrice: false,
-          rentDate: false,
-          endDate: false,
-          location: false,
-        });
+        setAiFilled({});
 
         setSnackbar({
           open: true,
@@ -157,7 +107,8 @@ export default function AddPropertyCard({ onCreate }) {
   const handleExtract = async (file) => {
     if (!file) return;
 
-    if (file.size > 25 * 1024 * 1024) {
+    const maxSize = 25 * 1024 * 1024;
+    if (file.size > maxSize) {
       showError("Dosya boyutu 25MB'dan büyük olamaz.");
       return;
     }
@@ -173,14 +124,7 @@ export default function AddPropertyCard({ onCreate }) {
       });
 
       if (res.data?.status === "success") {
-        const fields = { ...res.data.fields };
-        const updated = {};
-
-        Object.keys(fields).forEach((key) => {
-          if (fields[key]) updated[key] = true;
-        });
-
-        setAiFilled((prev) => ({ ...prev, ...updated }));
+        let fields = { ...res.data.fields };
 
         const trToISO = (dateStr) => {
           if (!dateStr) return "";
@@ -192,10 +136,19 @@ export default function AddPropertyCard({ onCreate }) {
 
         if (fields.rentDate) fields.rentDate = trToISO(fields.rentDate);
         if (fields.endDate) fields.endDate = trToISO(fields.endDate);
-        if (fields.rentPrice)
-          fields.rentPrice = String(fields.rentPrice).replace(/[^\d]/g, "");
+
+        if (fields.rentPrice !== undefined && fields.rentPrice !== null) {
+          const numeric = String(fields.rentPrice).replace(/[^\d]/g, "");
+          fields.rentPrice = numeric;
+        }
 
         setForm((prev) => ({ ...prev, ...fields }));
+
+        const filledMap = {};
+        Object.keys(fields).forEach((key) => {
+          if (fields[key]) filledMap[key] = true;
+        });
+        setAiFilled(filledMap);
 
         setSnackbar({
           open: true,
@@ -206,7 +159,9 @@ export default function AddPropertyCard({ onCreate }) {
         showError("Belge okunamadı. Farklı bir dosya deneyin.");
       }
     } catch (err) {
-      showError("Belgeden okuma sırasında hata oluştu.");
+      const errorMsg =
+        err.response?.data?.message || "Belgeden okuma sırasında hata oluştu.";
+      showError(errorMsg);
     } finally {
       setExtractLoading(false);
     }
@@ -221,6 +176,7 @@ export default function AddPropertyCard({ onCreate }) {
           margin: "1.5rem auto",
           p: 3,
           borderRadius: 3,
+          backgroundColor: "#ffffff",
         }}
       >
         <Typography
@@ -239,77 +195,120 @@ export default function AddPropertyCard({ onCreate }) {
 
         <Box
           sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+            display: "flex",
+            flexWrap: "wrap",
             gap: 2,
+            alignItems: "center",
           }}
         >
-          <AiWrapper active={aiFilled.tenantName}>
-            <TextField
-              label="Kiracı Adı Soyadı"
-              name="tenantName"
-              value={form.tenantName}
-              onChange={handleChange}
+          <TextField
+            label="Kiracı Adı Soyadı"
+            name="tenantName"
+            value={form.tenantName}
+            onChange={handleChange}
+            size="small"
+            sx={{ flex: "1 1 180px" }}
+          />
+          {aiFilled.tenantName && (
+            <Chip
+              label="AI"
+              color="success"
               size="small"
-              fullWidth
+              sx={{ position: "absolute", top: -10, right: -10 }}
             />
-          </AiWrapper>
+          )}
 
-          <AiWrapper active={aiFilled.rentPrice}>
-            <TextField
-              label="Fiyat (₺)"
-              name="rentPrice"
-              type="number"
-              value={form.rentPrice}
-              onChange={handleChange}
+          <TextField
+            label="Fiyat (₺)"
+            name="rentPrice"
+            type="number"
+            value={form.rentPrice}
+            onChange={handleChange}
+            size="small"
+            sx={{ flex: "1 1 140px" }}
+          />
+          {aiFilled.rentPrice && (
+            <Chip
+              label="AI"
+              color="success"
               size="small"
-              fullWidth
+              sx={{ position: "absolute", top: -10, right: -10 }}
             />
-          </AiWrapper>
+          )}
 
-          <AiWrapper active={aiFilled.rentDate}>
-            <DatePicker
-              label="Başlangıç"
-              format="dd/MM/yyyy"
-              value={form.rentDate ? new Date(form.rentDate) : null}
-              onChange={(date) =>
-                setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
-              }
-              slotProps={{ textField: { size: "small", fullWidth: true } }}
-            />
-          </AiWrapper>
-
-          <AiWrapper active={aiFilled.endDate}>
-            <DatePicker
-              label="Bitiş"
-              format="dd/MM/yyyy"
-              value={form.endDate ? new Date(form.endDate) : null}
-              onChange={(date) =>
-                setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
-              }
-              slotProps={{ textField: { size: "small", fullWidth: true } }}
-            />
-          </AiWrapper>
-
-          <AiWrapper active={aiFilled.location}>
-            <TextField
-              label="Konum"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
+          <DatePicker
+            label="Başlangıç"
+            format="dd/MM/yyyy"
+            value={form.rentDate ? new Date(form.rentDate) : null}
+            onChange={(date) =>
+              setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
+            }
+            slotProps={{ textField: { size: "small" } }}
+            sx={{ flex: "1 1 160px" }}
+          />
+          {aiFilled.rentDate && (
+            <Chip
+              label="AI"
+              color="success"
               size="small"
-              fullWidth
+              sx={{ position: "absolute", top: -10, right: -10 }}
             />
-          </AiWrapper>
-        </Box>
+          )}
 
-        <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
+          <DatePicker
+            label="Bitiş"
+            format="dd/MM/yyyy"
+            value={form.endDate ? new Date(form.endDate) : null}
+            onChange={(date) =>
+              setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
+            }
+            slotProps={{ textField: { size: "small" } }}
+            sx={{ flex: "1 1 160px" }}
+          />
+          {aiFilled.endDate && (
+            <Chip
+              label="AI"
+              color="success"
+              size="small"
+              sx={{ position: "absolute", top: -10, right: -10 }}
+            />
+          )}
+
+          <TextField
+            label="Konum"
+            name="location"
+            value={form.location}
+            onChange={handleChange}
+            size="small"
+            sx={{ flex: "1 1 180px" }}
+          />
+          {aiFilled.location && (
+            <Chip
+              label="AI"
+              color="success"
+              size="small"
+              sx={{ position: "absolute", top: -10, right: -10 }}
+            />
+          )}
+
           <Button
             variant="contained"
             color="primary"
             onClick={handleSubmit}
+            size="medium"
             disabled={loading}
-            sx={{ minWidth: 120 }}
+            sx={{
+              fontWeight: 600,
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              minWidth: "110px",
+              boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+              "&:hover": {
+                backgroundColor: "#1f5fa3",
+                boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+              },
+            }}
           >
             {loading ? "Ekleniyor..." : "Ekle"}
           </Button>
@@ -317,11 +316,22 @@ export default function AddPropertyCard({ onCreate }) {
           <Button
             variant="contained"
             component="label"
-            disabled={extractLoading}
+            size="medium"
             sx={{
-              minWidth: 150,
+              fontWeight: 600,
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              minWidth: "150px",
               backgroundColor: "#2E86C1",
-              "&:hover": { backgroundColor: "#1f5fa3" },
+              color: "#fff",
+              boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+              "&:hover": {
+                backgroundColor: "#1f5fa3",
+                boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+              },
+              opacity: extractLoading ? 0.8 : 1,
+              cursor: extractLoading ? "not-allowed" : "pointer",
             }}
           >
             {extractLoading ? (
@@ -334,9 +344,10 @@ export default function AddPropertyCard({ onCreate }) {
             )}
 
             <input
-              hidden
               type="file"
+              hidden
               accept="image/*,application/pdf"
+              disabled={extractLoading}
               onChange={(e) => handleExtract(e.target.files?.[0])}
             />
           </Button>
@@ -346,7 +357,7 @@ export default function AddPropertyCard({ onCreate }) {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
-        onClose={() => setSnackbar((p) => ({ ...p, open: false }))}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
         <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
       </Snackbar>
