@@ -10,6 +10,7 @@ import { tr } from "date-fns/locale";
 
 import ProtectedRoute from "./ProtectedRoute";
 import LoadingScreen from "./components/LoadingScreen";
+import { ConfirmDialogProvider } from "./context/ConfirmDialogContext";
 
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
@@ -69,55 +70,66 @@ function App() {
                 adapterLocale={tr}
               >
                 <CssBaseline />
-                <BrowserRouter>
-                  <ScrollToTop />
-                  <Suspense fallback={<LoadingScreen />}>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/signup" element={<Signup />} />
-                      <Route
-                        path="/reset-password/:token"
-                        element={<ResetPassword />}
-                      />
-                      <Route path="/reset-success" element={<ResetSuccess />} />
-                      <Route path="/check-mail" element={<CheckMail />} />
-                      <Route
-                        path="/check-mail-verify"
-                        element={<CheckMailVerify />}
-                      />
-                      <Route path="/verify/:token" element={<VerifyResult />} />
-                      <Route path="/resend-verify" element={<ResendVerify />} />
+                <ConfirmDialogProvider>
+                  <BrowserRouter>
+                    <ScrollToTop />
+                    <Suspense fallback={<LoadingScreen />}>
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
+                        <Route
+                          path="/reset-password/:token"
+                          element={<ResetPassword />}
+                        />
+                        <Route
+                          path="/reset-success"
+                          element={<ResetSuccess />}
+                        />
+                        <Route path="/check-mail" element={<CheckMail />} />
+                        <Route
+                          path="/check-mail-verify"
+                          element={<CheckMailVerify />}
+                        />
+                        <Route
+                          path="/verify/:token"
+                          element={<VerifyResult />}
+                        />
+                        <Route
+                          path="/resend-verify"
+                          element={<ResendVerify />}
+                        />
 
-                      <Route
-                        path="/owner"
-                        element={
-                          <ProtectedRoute role="owner">
-                            <OwnerHome />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/realtor"
-                        element={
-                          <ProtectedRoute role="realtor">
-                            <RealtorHome />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/profile"
-                        element={
-                          <ProtectedRoute>
-                            <Profile />
-                          </ProtectedRoute>
-                        }
-                      />
-                    </Routes>
-                  </Suspense>
-                </BrowserRouter>
+                        <Route
+                          path="/owner"
+                          element={
+                            <ProtectedRoute role="owner">
+                              <OwnerHome />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/realtor"
+                          element={
+                            <ProtectedRoute role="realtor">
+                              <RealtorHome />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/profile"
+                          element={
+                            <ProtectedRoute>
+                              <Profile />
+                            </ProtectedRoute>
+                          }
+                        />
+                      </Routes>
+                    </Suspense>
+                  </BrowserRouter>
+                </ConfirmDialogProvider>
               </LocalizationProvider>
             </ThemeProvider>
           </main>

@@ -25,11 +25,13 @@ import HistoryIcon from "@mui/icons-material/History";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import ReminderModal from "../components/ReminderModal";
+import { useConfirm } from "../context/ConfirmDialogContext";
 
 function Profile() {
   const token = localStorage.getItem("token");
   const [decoded, setDecoded] = useState(token ? jwtDecode(token) : null);
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
 
   const [tab, setTab] = useState(0);
   const [form, setForm] = useState({
@@ -191,7 +193,11 @@ function Profile() {
   };
 
   const handleDeleteReminder = async (id) => {
-    const ok = window.confirm("Bu hatırlatıcıyı silmek istiyor musun?");
+    const ok = await confirm({
+      title: "Hatırlatıcıyı Sil",
+      message: "Bu hatırlatıcıyı silmek istiyor musun? Bu işlem geri alınamaz.",
+      severity: "danger",
+    });
     if (!ok) return;
 
     try {

@@ -41,6 +41,7 @@ import AlarmOnIcon from "@mui/icons-material/AlarmOn";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import ReminderModal from "./ReminderModal";
+import { useConfirm } from "../context/ConfirmDialogContext";
 
 export default function BasicTable({
   data = [],
@@ -77,6 +78,8 @@ export default function BasicTable({
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
   const userRole = decoded?.role;
+
+  const { confirm } = useConfirm();
 
   const [openReminderModal, setOpenReminderModal] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
@@ -228,7 +231,14 @@ export default function BasicTable({
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bu mülkü silmek istediğinize emin misiniz?")) return;
+    const ok = await confirm({
+      title: "Mülkü Sil",
+      message:
+        "Bu mülkü silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+      severity: "danger",
+    });
+    if (!ok) return;
+
     try {
       const res = await api.delete(`/properties/${id}`);
       if (res.data.status === "success") {
@@ -405,8 +415,13 @@ export default function BasicTable({
   };
 
   const handleDeleteContract = async (id) => {
-    if (!window.confirm("Bu sözleşmeyi silmek istediğinize emin misiniz?"))
-      return;
+    const ok = await confirm({
+      title: "Sözleşme Sil",
+      message:
+        "Bu sözleşmeyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+      severity: "danger",
+    });
+    if (!ok) return;
 
     setLoadingState((prev) => ({ ...prev, [id]: "delete" }));
 
@@ -880,12 +895,14 @@ export default function BasicTable({
                                   borderColor: "#d32f2f",
                                 },
                               }}
-                              onClick={() => {
-                                if (
-                                  window.confirm(
-                                    "Yetki kaldırılacak. Emin misin?"
-                                  )
-                                ) {
+                              onClick={async () => {
+                                const ok = await confirm({
+                                  title: "Yetki Kaldır",
+                                  message: "Yetki kaldırılacak. Emin misin?",
+                                  severity: "danger",
+                                });
+                                if (!ok) return;
+                                {
                                   handleAssign(row._id, { realtorMail: null });
                                 }
                               }}

@@ -17,8 +17,7 @@ import trLocale from "date-fns/locale/tr";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import IconButton from "@mui/material/IconButton";
 import api from "../api";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { useConfirm } from "../context/ConfirmDialogContext";
 
 export default function ReminderModal({
   open,
@@ -28,6 +27,7 @@ export default function ReminderModal({
   isGeneral = false,
   existingReminders = [],
 }) {
+  const { confirm } = useConfirm();
   const [form, setForm] = useState({
     message: "",
     remindAt: null,
@@ -81,8 +81,13 @@ export default function ReminderModal({
   };
 
   const handleDelete = async (id) => {
-    const ok = window.confirm("Bu hatırlatıcıyı silmek istiyor musun?");
-    if (!ok) return;
+    if (
+      !(await confirm(
+        "Hatırlatıcıyı Sil",
+        "Bu hatırlatıcıyı silmek istiyor musun?"
+      ))
+    )
+      return;
 
     try {
       await api.delete(`/reminders/${id}`);
@@ -142,29 +147,6 @@ export default function ReminderModal({
               Bu mülke ait mevcut hatırlatıcılar:
             </Typography>
 
-            {/* {existingReminders.map((r, i) => {
-              const dateStr = new Date(r.remindAt).toLocaleString("tr-TR");
-              if (r.type === "monthlyPayment") {
-                return (
-                  <Typography key={i} sx={{ mb: 0.5 }}>
-                    • <b>Her ay {r.dayOfMonth}. gün hatırlatma</b> — {dateStr}
-                  </Typography>
-                );
-              }
-              if (r.type === "contractEnd") {
-                return (
-                  <Typography key={i} sx={{ mb: 0.5 }}>
-                    • <b>Sözleşme bitmeden {r.monthsBeforeEnd} ay önce</b> —
-                    {dateStr}
-                  </Typography>
-                );
-              }
-              return (
-                <Typography key={i} sx={{ mb: 0.5 }}>
-                  • <b>Hatırlatma</b> — {dateStr}
-                </Typography>
-              );
-            })} */}
 
             {existingReminders.map((r, i) => {
               const dateStr = new Date(r.remindAt).toLocaleString("tr-TR");
