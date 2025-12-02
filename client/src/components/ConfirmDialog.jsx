@@ -11,7 +11,6 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { motion } from "framer-motion";
-import { useEffect, useRef } from "react";
 
 const iconMap = {
   info: <InfoOutlinedIcon sx={{ fontSize: 38, color: "#3498DB" }} />,
@@ -25,37 +24,13 @@ export default function ConfirmDialog({
   title,
   message,
   severity = "info",
-  disableEscape = false,
   onConfirm,
   onCancel,
 }) {
-  const confirmBtnRef = useRef(null);
-
-  useEffect(() => {
-    if (open && confirmBtnRef.current) {
-      confirmBtnRef.current.focus();
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const handleKey = (e) => {
-      if (!disableEscape && e.key === "Escape") {
-        e.stopPropagation();
-        e.preventDefault();
-        onCancel();
-      }
-    };
-
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [open, disableEscape, onCancel]);
-
   return (
     <Dialog
       open={open}
-      onClose={disableEscape ? undefined : onCancel}
+      onClose={onCancel}
       maxWidth="xs"
       fullWidth
       PaperProps={{
@@ -90,7 +65,7 @@ export default function ConfirmDialog({
         </Button>
 
         <Button
-          ref={confirmBtnRef}
+          autoFocus
           onClick={onConfirm}
           variant="contained"
           color={severity === "danger" ? "error" : "primary"}
