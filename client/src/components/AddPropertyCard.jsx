@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Paper,
   Typography,
@@ -8,6 +8,7 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
+  Chip,
 } from "@mui/material";
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -24,6 +25,15 @@ export default function AddPropertyCard({ onCreate }) {
 
   const [loading, setLoading] = useState(false);
   const [extractLoading, setExtractLoading] = useState(false);
+
+  const [aiFilled, setAiFilled] = useState({});
+
+  useEffect(() => {
+    if (Object.keys(aiFilled).length > 0) {
+      const timer = setTimeout(() => setAiFilled({}), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [aiFilled]);
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -80,6 +90,7 @@ export default function AddPropertyCard({ onCreate }) {
       }
     } catch (err) {
       let msg = "İlan eklenemedi. Lütfen tekrar deneyin.";
+
       if (
         err.response?.data?.message?.includes(
           '"endDate" must be greater than "ref:rentDate"'
@@ -128,13 +139,8 @@ export default function AddPropertyCard({ onCreate }) {
           return `${yyyy}-${mm}-${dd}`;
         };
 
-        if (fields.rentDate) {
-          fields.rentDate = trToISO(fields.rentDate);
-        }
-
-        if (fields.endDate) {
-          fields.endDate = trToISO(fields.endDate);
-        }
+        if (fields.rentDate) fields.rentDate = trToISO(fields.rentDate);
+        if (fields.endDate) fields.endDate = trToISO(fields.endDate);
 
         if (fields.rentPrice !== undefined && fields.rentPrice !== null) {
           const numeric = String(fields.rentPrice).replace(/[^\d]/g, "");
@@ -143,15 +149,19 @@ export default function AddPropertyCard({ onCreate }) {
 
         setForm((prev) => ({ ...prev, ...fields }));
 
+        const filledMap = {};
+        Object.keys(fields).forEach((key) => {
+          if (fields[key]) filledMap[key] = true;
+        });
+        setAiFilled(filledMap);
+
         setSnackbar({
           open: true,
           message: "Belgeden bilgiler başarıyla okundu!",
           severity: "success",
         });
       } else {
-        showError(
-          res.data?.message || "Belge okunamadı. Farklı bir dosya deneyin."
-        );
+        showError("Belge okunamadı. Farklı bir dosya deneyin.");
       }
     } catch (err) {
       const errorMsg =
@@ -161,6 +171,15 @@ export default function AddPropertyCard({ onCreate }) {
       setExtractLoading(false);
     }
   };
+
+  const highlightStyle = (field) =>
+    aiFilled[field]
+      ? {
+          transition: "box-shadow 0.3s ease",
+          boxShadow: "0 0 0 2px rgba(46,204,113,0.7)",
+          borderRadius: "6px",
+        }
+      : {};
 
   return (
     <>
@@ -196,55 +215,105 @@ export default function AddPropertyCard({ onCreate }) {
             alignItems: "center",
           }}
         >
-          <TextField
-            label="Kiracı Adı Soyadı"
-            name="tenantName"
-            value={form.tenantName}
-            onChange={handleChange}
-            size="small"
-            sx={{ flex: "1 1 180px" }}
-          />
+          <Box sx={{ position: "relative" }}>
+            <TextField
+              label="Kiracı Adı Soyadı"
+              name="tenantName"
+              value={form.tenantName}
+              onChange={handleChange}
+              size="small"
+              sx={{ flex: "1 1 180px", ...highlightStyle("tenantName") }}
+            />
+            {aiFilled.tenantName && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
-          <TextField
-            label="Fiyat (₺)"
-            name="rentPrice"
-            type="number"
-            value={form.rentPrice}
-            onChange={handleChange}
-            size="small"
-            sx={{ flex: "1 1 140px" }}
-          />
+          <Box sx={{ position: "relative" }}>
+            <TextField
+              label="Fiyat (₺)"
+              name="rentPrice"
+              type="number"
+              value={form.rentPrice}
+              onChange={handleChange}
+              size="small"
+              sx={{ flex: "1 1 140px", ...highlightStyle("rentPrice") }}
+            />
+            {aiFilled.rentPrice && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
-          <DatePicker
-            label="Başlangıç"
-            format="dd/MM/yyyy"
-            value={form.rentDate ? new Date(form.rentDate) : null}
-            onChange={(date) =>
-              setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
-            }
-            slotProps={{ textField: { size: "small" } }}
-            sx={{ flex: "1 1 160px" }}
-          />
+          <Box sx={{ position: "relative" }}>
+            <DatePicker
+              label="Başlangıç"
+              format="dd/MM/yyyy"
+              value={form.rentDate ? new Date(form.rentDate) : null}
+              onChange={(date) =>
+                setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
+              }
+              slotProps={{ textField: { size: "small" } }}
+              sx={{ flex: "1 1 160px", ...highlightStyle("rentDate") }}
+            />
+            {aiFilled.rentDate && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
-          <DatePicker
-            label="Bitiş"
-            format="dd/MM/yyyy"
-            value={form.endDate ? new Date(form.endDate) : null}
-            onChange={(date) =>
-              setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
-            }
-            slotProps={{ textField: { size: "small" } }}
-            sx={{ flex: "1 1 160px" }}
-          />
+          <Box sx={{ position: "relative" }}>
+            <DatePicker
+              label="Bitiş"
+              format="dd/MM/yyyy"
+              value={form.endDate ? new Date(form.endDate) : null}
+              onChange={(date) =>
+                setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
+              }
+              slotProps={{ textField: { size: "small" } }}
+              sx={{ flex: "1 1 160px", ...highlightStyle("endDate") }}
+            />
+            {aiFilled.endDate && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
-          <TextField
-            label="Konum"
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            size="small"
-            sx={{ flex: "1 1 180px" }}
-          />
+          <Box sx={{ position: "relative" }}>
+            <TextField
+              label="Konum"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              size="small"
+              sx={{ flex: "1 1 180px", ...highlightStyle("location") }}
+            />
+            {aiFilled.location && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -10, right: -10 }}
+              />
+            )}
+          </Box>
 
           <Button
             variant="contained"
@@ -268,32 +337,6 @@ export default function AddPropertyCard({ onCreate }) {
             {loading ? "Ekleniyor..." : "Ekle"}
           </Button>
 
-          {/* <Button
-            variant="contained"
-            component="label"
-            size="medium"
-            disabled={extractLoading}
-            sx={{
-              fontWeight: 600,
-              borderRadius: "8px",
-              px: 3,
-              py: 1,
-              minWidth: "110px",
-              boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
-              "&:hover": {
-                backgroundColor: "#1f5fa3",
-                boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
-              },
-            }}
-          >
-            {extractLoading ? "Okunuyor..." : "Belgeden Oku"}
-            <input
-              type="file"
-              hidden
-              accept="image/*,application/pdf"
-              onChange={(e) => handleExtract(e.target.files?.[0])}
-            />
-          </Button> */}
           <Button
             variant="contained"
             component="label"
