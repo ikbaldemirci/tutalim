@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const Property = require("../propertyModel");
+const Property = require("../models/Property");
 const collection = require("../config");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
@@ -83,7 +83,10 @@ exports.updateProperty = catchAsync(async (req, res, next) => {
     property.realtor?.toString() !== userId.toString()
   ) {
     return next(
-      new AppError("Bu ilana yalnızca kendi ilan sahibi (emlakçı) erişebilir.", 403)
+      new AppError(
+        "Bu ilana yalnızca kendi ilan sahibi (emlakçı) erişebilir.",
+        403
+      )
     );
   }
 
@@ -92,7 +95,10 @@ exports.updateProperty = catchAsync(async (req, res, next) => {
     property.owner?.toString() !== userId.toString()
   ) {
     return next(
-      new AppError("Bu ilana yalnızca kendi sahibi (ev sahibi) erişebilir.", 403)
+      new AppError(
+        "Bu ilana yalnızca kendi sahibi (ev sahibi) erişebilir.",
+        403
+      )
     );
   }
 
@@ -166,11 +172,9 @@ exports.assignProperty = catchAsync(async (req, res, next) => {
     updateData.realtor = user._id;
   }
 
-  const property = await Property.findByIdAndUpdate(
-    req.params.id,
-    updateData,
-    { new: true }
-  )
+  const property = await Property.findByIdAndUpdate(req.params.id, updateData, {
+    new: true,
+  })
     .populate("realtor", "name mail")
     .populate("owner", "name mail");
 
@@ -194,8 +198,7 @@ exports.deleteProperty = catchAsync(async (req, res, next) => {
   const isAuthorized =
     (userRole === "realtor" &&
       property.realtor?.toString() === userId.toString()) ||
-    (userRole === "owner" &&
-      property.owner?.toString() === userId.toString());
+    (userRole === "owner" && property.owner?.toString() === userId.toString());
 
   if (!isAuthorized) {
     return next(
@@ -260,8 +263,7 @@ exports.deleteContract = catchAsync(async (req, res, next) => {
   const isAuthorized =
     (userRole === "realtor" &&
       property.realtor?.toString() === userId.toString()) ||
-    (userRole === "owner" &&
-      property.owner?.toString() === userId.toString());
+    (userRole === "owner" && property.owner?.toString() === userId.toString());
 
   if (!isAuthorized) {
     return next(

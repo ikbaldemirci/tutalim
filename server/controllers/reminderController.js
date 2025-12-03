@@ -1,5 +1,5 @@
 const Reminder = require("../models/Reminder");
-const Property = require("../propertyModel");
+const Property = require("../models/Property");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 

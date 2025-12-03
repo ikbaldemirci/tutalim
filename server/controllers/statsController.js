@@ -1,4 +1,4 @@
-const Property = require("../propertyModel");
+const Property = require("../models/Property");
 const collection = require("../config");
 const catchAsync = require("../utils/catchAsync");
 

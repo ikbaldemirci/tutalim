@@ -1,5 +1,5 @@
 const Assignment = require("../models/Assignment");
-const Property = require("../propertyModel");
+const Property = require("../models/Property");
 const collection = require("../config");
 const {
   sendMail,
