@@ -53,7 +53,7 @@ function OwnerHome() {
 
   const acceptInvite = async (id) => {
     try {
-      const res = await api.post(`/assignments/${id}/accept`);
+      const res = await api.put(`/assignments/${id}/accept`);
       if (res.data.status === "success") {
         setInvites((prev) => prev.filter((i) => i._id !== id));
         if (res.data.property) {
@@ -67,7 +67,7 @@ function OwnerHome() {
 
   const rejectInvite = async (id) => {
     try {
-      const res = await api.post(`/assignments/${id}/reject`);
+      const res = await api.put(`/assignments/${id}/reject`);
       if (res.data.status === "success") {
         setInvites((prev) => prev.filter((i) => i._id !== id));
       }
