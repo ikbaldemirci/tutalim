@@ -194,7 +194,7 @@ export default function AddPropertyCard({ onCreate }) {
           <AddHomeWorkIcon /> Yeni İlan Ekle
         </Typography>
 
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} md={3} sx={{ position: "relative" }}>
             <TextField
               label="Kiracı Adı Soyadı"
@@ -214,7 +214,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={6} md={2} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={2} sx={{ position: "relative" }}>
             <TextField
               label="Fiyat (₺)"
               name="rentPrice"
@@ -234,7 +234,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={6} md={3} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={3} sx={{ position: "relative" }}>
             <TextField
               label="Konum"
               name="location"
@@ -253,7 +253,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={6} md={2} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={2} sx={{ position: "relative" }}>
             <DatePicker
               label="Başlangıç"
               format="dd/MM/yyyy"
@@ -273,7 +273,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={6} md={2} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={2} sx={{ position: "relative" }}>
             <DatePicker
               label="Bitiş"
               format="dd/MM/yyyy"
@@ -293,7 +293,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={12} md={12} sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
+          <Grid item xs={12} md={12} sx={{ display: "flex", gap: 2, justifyContent: { xs: "center", md: "flex-end" } }}>
             <Button
               variant="contained"
               component="label"
@@ -313,7 +313,7 @@ export default function AddPropertyCard({ onCreate }) {
                 },
                 opacity: extractLoading ? 0.8 : 1,
                 cursor: extractLoading ? "not-allowed" : "pointer",
-                flex: { xs: 1, md: "initial" }
+                width: { xs: "auto", md: "auto" }
               }}
             >
               {extractLoading ? (
@@ -322,7 +322,7 @@ export default function AddPropertyCard({ onCreate }) {
                   Okunuyor...
                 </Box>
               ) : (
-                "Belgeden Oku"
+                "AI ile Ekle"
               )}
 
               <input
@@ -351,7 +351,7 @@ export default function AddPropertyCard({ onCreate }) {
                   backgroundColor: "#1f5fa3",
                   boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
                 },
-                flex: { xs: 1, md: "initial" }
+                width: { xs: "auto", md: "auto" }
               }}
             >
               {loading ? "Ekleniyor..." : "Ekle"}
