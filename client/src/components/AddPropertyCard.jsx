@@ -379,9 +379,10 @@ export default function AddPropertyCard({ onCreate }) {
               component="label"
               size="medium"
               sx={{
+                minWidth: 135,
                 fontWeight: 600,
                 borderRadius: "8px",
-                px: 1,
+                px: 2,
                 py: 1,
                 backgroundColor: "#2E86C1",
                 color: "#fff",
@@ -393,8 +394,6 @@ export default function AddPropertyCard({ onCreate }) {
                 },
                 opacity: extractLoading ? 0.8 : 1,
                 cursor: extractLoading ? "not-allowed" : "pointer",
-                width: { xs: "135px", md: "auto" },
-                flex: { md: 1 },
               }}
             >
               {extractLoading ? (
@@ -422,9 +421,10 @@ export default function AddPropertyCard({ onCreate }) {
               size="medium"
               disabled={loading}
               sx={{
+                minWidth: 135,
                 fontWeight: 600,
                 borderRadius: "8px",
-                px: 1,
+                px: 2,
                 py: 1,
                 textTransform: "none",
                 boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
@@ -432,8 +432,6 @@ export default function AddPropertyCard({ onCreate }) {
                   backgroundColor: "#1f5fa3",
                   boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
                 },
-                width: { xs: "135px", md: "auto" },
-                flex: { md: 1 },
               }}
             >
               {loading ? "Ekleniyor..." : "Ekle"}
