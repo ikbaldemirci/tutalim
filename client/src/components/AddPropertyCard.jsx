@@ -9,6 +9,7 @@ import {
   Alert,
   CircularProgress,
   Chip,
+  Grid,
 } from "@mui/material";
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -193,34 +194,27 @@ export default function AddPropertyCard({ onCreate }) {
           <AddHomeWorkIcon /> Yeni İlan Ekle
         </Typography>
 
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
-            alignItems: "center",
-          }}
-        >
-          <Box sx={{ position: "relative" }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={3} sx={{ position: "relative" }}>
             <TextField
               label="Kiracı Adı Soyadı"
               name="tenantName"
               value={form.tenantName}
               onChange={handleChange}
               size="small"
-              sx={{ flex: "1 1 180px" }}
+              fullWidth
             />
             {aiFilled.tenantName && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -10, right: -10 }}
+                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
               />
             )}
-          </Box>
+          </Grid>
 
-          <Box sx={{ position: "relative" }}>
+          <Grid item xs={6} md={2} sx={{ position: "relative" }}>
             <TextField
               label="Fiyat (₺)"
               name="rentPrice"
@@ -228,19 +222,38 @@ export default function AddPropertyCard({ onCreate }) {
               value={form.rentPrice}
               onChange={handleChange}
               size="small"
-              sx={{ flex: "1 1 140px" }}
+              fullWidth
             />
             {aiFilled.rentPrice && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -10, right: -10 }}
+                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
               />
             )}
-          </Box>
+          </Grid>
 
-          <Box sx={{ position: "relative" }}>
+          <Grid item xs={6} md={3} sx={{ position: "relative" }}>
+            <TextField
+              label="Konum"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              size="small"
+              fullWidth
+            />
+            {aiFilled.location && (
+              <Chip
+                label="AI"
+                color="success"
+                size="small"
+                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
+              />
+            )}
+          </Grid>
+
+          <Grid item xs={6} md={2} sx={{ position: "relative" }}>
             <DatePicker
               label="Başlangıç"
               format="dd/MM/yyyy"
@@ -248,20 +261,19 @@ export default function AddPropertyCard({ onCreate }) {
               onChange={(date) =>
                 setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
               }
-              slotProps={{ textField: { size: "small" } }}
-              sx={{ flex: "1 1 160px" }}
+              slotProps={{ textField: { size: "small", fullWidth: true } }}
             />
             {aiFilled.rentDate && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -10, right: -10 }}
+                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
               />
             )}
-          </Box>
+          </Grid>
 
-          <Box sx={{ position: "relative" }}>
+          <Grid item xs={6} md={2} sx={{ position: "relative" }}>
             <DatePicker
               label="Bitiş"
               format="dd/MM/yyyy"
@@ -269,99 +281,83 @@ export default function AddPropertyCard({ onCreate }) {
               onChange={(date) =>
                 setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
               }
-              slotProps={{ textField: { size: "small" } }}
-              sx={{ flex: "1 1 160px" }}
+              slotProps={{ textField: { size: "small", fullWidth: true } }}
             />
             {aiFilled.endDate && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -10, right: -10 }}
+                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
               />
             )}
-          </Box>
+          </Grid>
 
-          <Box sx={{ position: "relative" }}>
-            <TextField
-              label="Konum"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
-              size="small"
-              sx={{ flex: "1 1 180px" }}
-            />
-            {aiFilled.location && (
-              <Chip
-                label="AI"
-                color="success"
-                size="small"
-                sx={{ position: "absolute", top: -10, right: -10 }}
+          <Grid item xs={12} md={12} sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
+            <Button
+              variant="contained"
+              component="label"
+              size="medium"
+              sx={{
+                fontWeight: 600,
+                borderRadius: "8px",
+                px: 3,
+                py: 1,
+                backgroundColor: "#2E86C1",
+                color: "#fff",
+                textTransform: "none",
+                boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+                "&:hover": {
+                  backgroundColor: "#1f5fa3",
+                  boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+                },
+                opacity: extractLoading ? 0.8 : 1,
+                cursor: extractLoading ? "not-allowed" : "pointer",
+                flex: { xs: 1, md: "initial" }
+              }}
+            >
+              {extractLoading ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CircularProgress size={18} sx={{ color: "white" }} />
+                  Okunuyor...
+                </Box>
+              ) : (
+                "Belgeden Oku"
+              )}
+
+              <input
+                type="file"
+                hidden
+                accept="image/*,application/pdf"
+                disabled={extractLoading}
+                onChange={(e) => handleExtract(e.target.files?.[0])}
               />
-            )}
-          </Box>
+            </Button>
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            size="medium"
-            disabled={loading}
-            sx={{
-              fontWeight: 600,
-              borderRadius: "8px",
-              px: 3,
-              py: 1,
-              minWidth: "110px",
-              boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
-              "&:hover": {
-                backgroundColor: "#1f5fa3",
-                boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
-              },
-            }}
-          >
-            {loading ? "Ekleniyor..." : "Ekle"}
-          </Button>
-
-          <Button
-            variant="contained"
-            component="label"
-            size="medium"
-            sx={{
-              fontWeight: 600,
-              borderRadius: "8px",
-              px: 3,
-              py: 1,
-              minWidth: "150px",
-              backgroundColor: "#2E86C1",
-              color: "#fff",
-              boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
-              "&:hover": {
-                backgroundColor: "#1f5fa3",
-                boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
-              },
-              opacity: extractLoading ? 0.8 : 1,
-              cursor: extractLoading ? "not-allowed" : "pointer",
-            }}
-          >
-            {extractLoading ? (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <CircularProgress size={18} sx={{ color: "white" }} />
-                Okunuyor...
-              </Box>
-            ) : (
-              "Belgeden Oku"
-            )}
-
-            <input
-              type="file"
-              hidden
-              accept="image/*,application/pdf"
-              disabled={extractLoading}
-              onChange={(e) => handleExtract(e.target.files?.[0])}
-            />
-          </Button>
-        </Box>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+              size="medium"
+              disabled={loading}
+              sx={{
+                fontWeight: 600,
+                borderRadius: "8px",
+                px: 4,
+                py: 1,
+                textTransform: "none",
+                boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+                "&:hover": {
+                  backgroundColor: "#1f5fa3",
+                  boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+                },
+                flex: { xs: 1, md: "initial" }
+              }}
+            >
+              {loading ? "Ekleniyor..." : "Ekle"}
+            </Button>
+          </Grid>
+        </Grid>
       </Paper>
 
       <Snackbar
