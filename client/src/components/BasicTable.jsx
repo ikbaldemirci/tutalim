@@ -134,7 +134,7 @@ export default function BasicTable({
           });
           setSentInvitesMap(map);
         }
-      } catch (e) { }
+      } catch (e) {}
     };
     loadSent();
   }, [data?.length]);
@@ -796,16 +796,29 @@ export default function BasicTable({
                   </TableCell>
 
                   {/* Konum */}
-                  <TableCell>
+                  <TableCell sx={{ maxWidth: 140 }}>
                     {editingRow === row._id ? (
                       <TextField
                         name="location"
                         value={editForm.location}
                         onChange={handleEditChange}
                         size="small"
+                        fullWidth
                       />
                     ) : (
-                      row.location
+                      <Typography
+                        sx={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          maxWidth: 140,
+                          fontSize: "0.9rem",
+                          cursor: "pointer",
+                        }}
+                        title={row.location}
+                      >
+                        {row.location}
+                      </Typography>
                     )}
                   </TableCell>
 
