@@ -23,6 +23,8 @@ import {
   DialogContent,
   Typography,
   GlobalStyles,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -49,6 +51,8 @@ export default function BasicTable({
   loadingState,
   setLoadingState,
 }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [editingRow, setEditingRow] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [ownerInput, setOwnerInput] = useState({});
@@ -796,7 +800,7 @@ export default function BasicTable({
                   </TableCell>
 
                   {/* Konum */}
-                  <TableCell sx={{ maxWidth: 140 }}>
+                  <TableCell>
                     {editingRow === row._id ? (
                       <TextField
                         name="location"
@@ -807,15 +811,17 @@ export default function BasicTable({
                       />
                     ) : (
                       <Typography
+                        onClick={() =>
+                          isMobile && handleShowFullLocation(row.location)
+                        }
                         sx={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          maxWidth: 140,
-                          fontSize: "0.9rem",
-                          cursor: "pointer",
+                          cursor: isMobile ? "pointer" : "default",
+                          whiteSpace: isMobile ? "nowrap" : "normal",
+                          overflow: isMobile ? "hidden" : "visible",
+                          textOverflow: isMobile ? "ellipsis" : "unset",
+                          maxWidth: isMobile ? 120 : "none",
                         }}
-                        title={row.location}
+                        title={!isMobile ? row.location : undefined}
                       >
                         {row.location}
                       </Typography>
