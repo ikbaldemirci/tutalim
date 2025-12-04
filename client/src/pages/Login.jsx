@@ -52,7 +52,7 @@ function Login({ onSwitch }) {
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Sunucu hatası",
+        message: err.response?.data?.message || "Sunucu hatası",
         severity: "error",
       });
     }

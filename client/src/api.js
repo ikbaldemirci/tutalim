@@ -25,7 +25,11 @@ api.interceptors.response.use(
 
     if (!originalRequest) return Promise.reject(err);
 
-    if (err.response?.status === 401 && !originalRequest._retry) {
+    if (
+      err.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/login")
+    ) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
