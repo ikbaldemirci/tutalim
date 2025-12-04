@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import api from "../api";
 import {
   Paper,
   Typography,
@@ -11,9 +12,10 @@ import {
   Chip,
   Grid,
 } from "@mui/material";
-import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import { DatePicker } from "@mui/x-date-pickers";
-import api from "../api";
+
+import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 export default function AddPropertyCard({ onCreate }) {
   const [form, setForm] = useState({
@@ -378,6 +380,7 @@ export default function AddPropertyCard({ onCreate }) {
               variant="contained"
               component="label"
               size="medium"
+              startIcon={!extractLoading ? <AutoAwesomeIcon /> : null}
               sx={{
                 minWidth: 135,
                 fontWeight: 600,
@@ -402,7 +405,7 @@ export default function AddPropertyCard({ onCreate }) {
                   Okunuyor...
                 </Box>
               ) : (
-                "AI ile Ekle"
+                "Belgeden Otomatik Doldur"
               )}
 
               <input
