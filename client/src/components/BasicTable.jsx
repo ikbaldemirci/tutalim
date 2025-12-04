@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../api";
 import {
   Table,
@@ -17,7 +17,6 @@ import {
   Chip,
   Box,
   Slide,
-  Zoom,
   Dialog,
   DialogActions,
   DialogContent,
@@ -91,10 +90,6 @@ export default function BasicTable({
   const [propertyReminders, setPropertyReminders] = useState({});
 
   const [expandedLocationRow, setExpandedLocationRow] = useState(null);
-
-  const Transition = React.forwardRef((props, ref) => (
-    <Zoom ref={ref} {...props} timeout={400} />
-  ));
 
   useEffect(() => {
     const updateWidth = () => {
