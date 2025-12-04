@@ -174,6 +174,7 @@ export default function AddPropertyCard({ onCreate }) {
         elevation={3}
         sx={{
           maxWidth: 1000,
+          width: { xs: "fit-content", md: "100%" },
           margin: "1.5rem auto",
           p: 3,
           borderRadius: 3,
@@ -188,6 +189,7 @@ export default function AddPropertyCard({ onCreate }) {
             color: "#2E86C1",
             display: "flex",
             alignItems: "center",
+            justifyContent: { xs: "center", md: "flex-start" },
             gap: 1,
           }}
         >
@@ -195,26 +197,26 @@ export default function AddPropertyCard({ onCreate }) {
         </Typography>
 
         <Grid container spacing={2} justifyContent="center">
-          <Grid item xs={12} md={3} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={3} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
             <TextField
               label="Kiracı Adı Soyadı"
               name="tenantName"
               value={form.tenantName}
               onChange={handleChange}
               size="small"
-              fullWidth
+              sx={{ width: { xs: "280px", md: "100%" } }}
             />
             {aiFilled.tenantName && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
+                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={2} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={2} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
             <TextField
               label="Fiyat (₺)"
               name="rentPrice"
@@ -222,38 +224,38 @@ export default function AddPropertyCard({ onCreate }) {
               value={form.rentPrice}
               onChange={handleChange}
               size="small"
-              fullWidth
+              sx={{ width: { xs: "280px", md: "100%" } }}
             />
             {aiFilled.rentPrice && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
+                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={3} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={3} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
             <TextField
               label="Konum"
               name="location"
               value={form.location}
               onChange={handleChange}
               size="small"
-              fullWidth
+              sx={{ width: { xs: "280px", md: "100%" } }}
             />
             {aiFilled.location && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
+                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={2} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={2} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
             <DatePicker
               label="Başlangıç"
               format="dd/MM/yyyy"
@@ -262,18 +264,19 @@ export default function AddPropertyCard({ onCreate }) {
                 setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
               }
               slotProps={{ textField: { size: "small", fullWidth: true } }}
+              sx={{ width: { xs: "280px", md: "100%" } }}
             />
             {aiFilled.rentDate && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
+                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={2} sx={{ position: "relative" }}>
+          <Grid item xs={12} md={2} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
             <DatePicker
               label="Bitiş"
               format="dd/MM/yyyy"
@@ -282,13 +285,14 @@ export default function AddPropertyCard({ onCreate }) {
                 setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
               }
               slotProps={{ textField: { size: "small", fullWidth: true } }}
+              sx={{ width: { xs: "280px", md: "100%" } }}
             />
             {aiFilled.endDate && (
               <Chip
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: 0, zIndex: 1 }}
+                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
               />
             )}
           </Grid>
@@ -313,7 +317,7 @@ export default function AddPropertyCard({ onCreate }) {
                 },
                 opacity: extractLoading ? 0.8 : 1,
                 cursor: extractLoading ? "not-allowed" : "pointer",
-                width: { xs: "auto", md: "auto" }
+                width: { xs: "132px", md: "auto" }
               }}
             >
               {extractLoading ? (
@@ -351,7 +355,7 @@ export default function AddPropertyCard({ onCreate }) {
                   backgroundColor: "#1f5fa3",
                   boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
                 },
-                width: { xs: "auto", md: "auto" }
+                width: { xs: "132px", md: "auto" }
               }}
             >
               {loading ? "Ekleniyor..." : "Ekle"}
