@@ -197,8 +197,8 @@ export default function AddPropertyCard({ onCreate }) {
           <AddHomeWorkIcon /> Yeni İlan Ekle
         </Typography>
 
-        <Grid container spacing={2} justifyContent="center">
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
             <TextField
               label="Kiracı Adı Soyadı"
               name="tenantName"
@@ -217,7 +217,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
+          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
             <TextField
               label="Fiyat (₺)"
               name="rentPrice"
@@ -237,7 +237,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
+          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
             <TextField
               label="Konum"
               name="location"
@@ -256,7 +256,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
+          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
             <DatePicker
               label="Başlangıç"
               format="dd/MM/yyyy"
@@ -277,7 +277,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
+          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
             <DatePicker
               label="Bitiş"
               format="dd/MM/yyyy"
@@ -298,7 +298,7 @@ export default function AddPropertyCard({ onCreate }) {
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
+          <Grid item xs={12} md={4} sx={{ display: "flex", gap: 1, justifyContent: { xs: "center", md: "flex-start" } }}>
             <Button
               variant="contained"
               component="label"
