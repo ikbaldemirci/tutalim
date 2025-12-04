@@ -90,6 +90,8 @@ export default function BasicTable({
 
   const [propertyReminders, setPropertyReminders] = useState({});
 
+  const [expandedLocationRow, setExpandedLocationRow] = useState(null);
+
   const Transition = React.forwardRef((props, ref) => (
     <Zoom ref={ref} {...props} timeout={400} />
   ));
@@ -601,6 +603,10 @@ export default function BasicTable({
     return `${year}-${month}-${day}`;
   }
 
+  const toggleLocation = (rowId) => {
+    setExpandedLocationRow((prev) => (prev === rowId ? null : rowId));
+  };
+
   return (
     <>
       <Box sx={{ mb: 6, display: "flow-root" }}>
@@ -800,7 +806,7 @@ export default function BasicTable({
                   </TableCell>
 
                   {/* Konum */}
-                  <TableCell>
+                  <TableCell onClick={() => isMobile && toggleLocation(row_id)}>
                     {editingRow === row._id ? (
                       <TextField
                         name="location"
@@ -811,17 +817,23 @@ export default function BasicTable({
                       />
                     ) : (
                       <Typography
-                        onClick={() =>
-                          isMobile && handleShowFullLocation(row.location)
-                        }
                         sx={{
                           cursor: isMobile ? "pointer" : "default",
-                          whiteSpace: isMobile ? "nowrap" : "normal",
-                          overflow: isMobile ? "hidden" : "visible",
-                          textOverflow: isMobile ? "ellipsis" : "unset",
-                          maxWidth: isMobile ? 120 : "none",
+                          whiteSpace:
+                            isMobile && expandedLocationRow !== row._id
+                              ? "nowrap"
+                              : "normal",
+                          overflow:
+                            isMobile && expandedLocationRow !== row._id
+                              ? "hidden"
+                              : "visible",
+                          textOverflow:
+                            isMobile && expandedLocationRow !== row._id
+                              ? "ellipsis"
+                              : "unset",
+                          maxWidth: isMobile ? 150 : "none",
+                          transition: "0.2s ease",
                         }}
-                        title={!isMobile ? row.location : undefined}
                       >
                         {row.location}
                       </Typography>
