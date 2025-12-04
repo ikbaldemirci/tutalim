@@ -174,9 +174,8 @@ export default function AddPropertyCard({ onCreate }) {
         elevation={3}
         sx={{
           maxWidth: 1000,
-          width: { xs: "auto", md: "100%" },
-          mx: { xs: 2, md: "auto" },
-          my: 3,
+          width: { xs: "fit-content", md: "100%" },
+          margin: "1.5rem auto",
           p: 3,
           borderRadius: 3,
           backgroundColor: "#ffffff",
@@ -197,8 +196,17 @@ export default function AddPropertyCard({ onCreate }) {
           <AddHomeWorkIcon /> Yeni İlan Ekle
         </Typography>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid
+            item
+            xs={12}
+            md={3}
+            sx={{
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <TextField
               label="Kiracı Adı Soyadı"
               name="tenantName"
@@ -212,12 +220,26 @@ export default function AddPropertyCard({ onCreate }) {
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
+                sx={{
+                  position: "absolute",
+                  top: -8,
+                  right: { xs: 10, md: 0 },
+                  zIndex: 1,
+                }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
+          <Grid
+            item
+            xs={12}
+            md={2}
+            sx={{
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <TextField
               label="Fiyat (₺)"
               name="rentPrice"
@@ -232,12 +254,26 @@ export default function AddPropertyCard({ onCreate }) {
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
+                sx={{
+                  position: "absolute",
+                  top: -8,
+                  right: { xs: 10, md: 0 },
+                  zIndex: 1,
+                }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
+          <Grid
+            item
+            xs={12}
+            md={3}
+            sx={{
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <TextField
               label="Konum"
               name="location"
@@ -251,12 +287,26 @@ export default function AddPropertyCard({ onCreate }) {
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
+                sx={{
+                  position: "absolute",
+                  top: -8,
+                  right: { xs: 10, md: 0 },
+                  zIndex: 1,
+                }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
+          <Grid
+            item
+            xs={12}
+            md={2}
+            sx={{
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <DatePicker
               label="Başlangıç"
               format="dd/MM/yyyy"
@@ -272,12 +322,26 @@ export default function AddPropertyCard({ onCreate }) {
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
+                sx={{
+                  position: "absolute",
+                  top: -8,
+                  right: { xs: 10, md: 0 },
+                  zIndex: 1,
+                }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ position: "relative", display: { xs: "flex", md: "block" }, justifyContent: { xs: "center" } }}>
+          <Grid
+            item
+            xs={12}
+            md={2}
+            sx={{
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <DatePicker
               label="Bitiş"
               format="dd/MM/yyyy"
@@ -293,12 +357,26 @@ export default function AddPropertyCard({ onCreate }) {
                 label="AI"
                 color="success"
                 size="small"
-                sx={{ position: "absolute", top: -8, right: { xs: 10, md: 0 }, zIndex: 1 }}
+                sx={{
+                  position: "absolute",
+                  top: -8,
+                  right: { xs: 10, md: 0 },
+                  zIndex: 1,
+                }}
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ display: "flex", gap: 1, justifyContent: { xs: "center", md: "flex-start" } }}>
+          <Grid
+            item
+            xs={12}
+            md={12}
+            sx={{
+              display: "flex",
+              gap: 2,
+              justifyContent: { xs: "center", md: "flex-end" },
+            }}
+          >
             <Button
               variant="contained"
               component="label"
@@ -306,7 +384,7 @@ export default function AddPropertyCard({ onCreate }) {
               sx={{
                 fontWeight: 600,
                 borderRadius: "8px",
-                px: 1,
+                px: 3,
                 py: 1,
                 backgroundColor: "#2E86C1",
                 color: "#fff",
@@ -318,8 +396,7 @@ export default function AddPropertyCard({ onCreate }) {
                 },
                 opacity: extractLoading ? 0.8 : 1,
                 cursor: extractLoading ? "not-allowed" : "pointer",
-                width: { xs: "135px", md: "auto" },
-                flex: { md: 1 }
+                width: { xs: "132px", md: "auto" },
               }}
             >
               {extractLoading ? (
@@ -349,7 +426,7 @@ export default function AddPropertyCard({ onCreate }) {
               sx={{
                 fontWeight: 600,
                 borderRadius: "8px",
-                px: 1,
+                px: 4,
                 py: 1,
                 textTransform: "none",
                 boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
@@ -357,8 +434,7 @@ export default function AddPropertyCard({ onCreate }) {
                   backgroundColor: "#1f5fa3",
                   boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
                 },
-                width: { xs: "135px", md: "auto" },
-                flex: { md: 1 }
+                width: { xs: "132px", md: "auto" },
               }}
             >
               {loading ? "Ekleniyor..." : "Ekle"}
