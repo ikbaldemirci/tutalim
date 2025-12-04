@@ -405,7 +405,7 @@ export default function AddPropertyCard({ onCreate }) {
                   Okunuyor...
                 </Box>
               ) : (
-                "Belgeden Otomatik Doldur"
+                "Belgeden Oku"
               )}
 
               <input
