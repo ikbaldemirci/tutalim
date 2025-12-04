@@ -806,7 +806,9 @@ export default function BasicTable({
                   </TableCell>
 
                   {/* Konum */}
-                  <TableCell onClick={() => isMobile && toggleLocation(row_id)}>
+                  <TableCell
+                    onClick={() => isMobile && toggleLocation(row._id)}
+                  >
                     {editingRow === row._id ? (
                       <TextField
                         name="location"
