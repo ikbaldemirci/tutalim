@@ -174,8 +174,9 @@ export default function AddPropertyCard({ onCreate }) {
         elevation={3}
         sx={{
           maxWidth: 1000,
-          width: { xs: "fit-content", md: "100%" },
-          margin: "1.5rem auto",
+          width: { xs: "auto", md: "100%" },
+          mx: { xs: 2, md: "auto" },
+          my: 3,
           p: 3,
           borderRadius: 3,
           backgroundColor: "#ffffff",
@@ -200,7 +201,7 @@ export default function AddPropertyCard({ onCreate }) {
           <Grid
             item
             xs={12}
-            md={3}
+            md={4}
             sx={{
               position: "relative",
               display: "flex",
@@ -233,7 +234,7 @@ export default function AddPropertyCard({ onCreate }) {
           <Grid
             item
             xs={12}
-            md={2}
+            md={4}
             sx={{
               position: "relative",
               display: "flex",
@@ -267,7 +268,7 @@ export default function AddPropertyCard({ onCreate }) {
           <Grid
             item
             xs={12}
-            md={3}
+            md={4}
             sx={{
               position: "relative",
               display: "flex",
@@ -300,7 +301,7 @@ export default function AddPropertyCard({ onCreate }) {
           <Grid
             item
             xs={12}
-            md={2}
+            md={4}
             sx={{
               position: "relative",
               display: "flex",
@@ -335,7 +336,7 @@ export default function AddPropertyCard({ onCreate }) {
           <Grid
             item
             xs={12}
-            md={2}
+            md={4}
             sx={{
               position: "relative",
               display: "flex",
@@ -370,12 +371,8 @@ export default function AddPropertyCard({ onCreate }) {
           <Grid
             item
             xs={12}
-            md={12}
-            sx={{
-              display: "flex",
-              gap: 2,
-              justifyContent: { xs: "center", md: "flex-end" },
-            }}
+            md={4}
+            sx={{ display: "flex", gap: 1, justifyContent: "center" }}
           >
             <Button
               variant="contained"
@@ -384,7 +381,7 @@ export default function AddPropertyCard({ onCreate }) {
               sx={{
                 fontWeight: 600,
                 borderRadius: "8px",
-                px: 3,
+                px: 1,
                 py: 1,
                 backgroundColor: "#2E86C1",
                 color: "#fff",
@@ -396,7 +393,8 @@ export default function AddPropertyCard({ onCreate }) {
                 },
                 opacity: extractLoading ? 0.8 : 1,
                 cursor: extractLoading ? "not-allowed" : "pointer",
-                width: { xs: "132px", md: "auto" },
+                width: { xs: "135px", md: "auto" },
+                flex: { md: 1 },
               }}
             >
               {extractLoading ? (
@@ -426,7 +424,7 @@ export default function AddPropertyCard({ onCreate }) {
               sx={{
                 fontWeight: 600,
                 borderRadius: "8px",
-                px: 4,
+                px: 1,
                 py: 1,
                 textTransform: "none",
                 boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
@@ -434,7 +432,8 @@ export default function AddPropertyCard({ onCreate }) {
                   backgroundColor: "#1f5fa3",
                   boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
                 },
-                width: { xs: "132px", md: "auto" },
+                width: { xs: "135px", md: "auto" },
+                flex: { md: 1 },
               }}
             >
               {loading ? "Ekleniyor..." : "Ekle"}
