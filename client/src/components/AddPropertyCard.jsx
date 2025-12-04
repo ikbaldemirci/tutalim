@@ -372,70 +372,79 @@ export default function AddPropertyCard({ onCreate }) {
             item
             xs={12}
             md={4}
-            sx={{ display: "flex", gap: 1, justifyContent: "center" }}
+            sx={{ display: "flex", justifyContent: "center" }}
           >
-            <Button
-              variant="contained"
-              component="label"
-              size="medium"
+            <Box
               sx={{
-                minWidth: 135,
-                fontWeight: 600,
-                borderRadius: "8px",
-                px: 2,
-                py: 1,
-                backgroundColor: "#2E86C1",
-                color: "#fff",
-                textTransform: "none",
-                boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
-                "&:hover": {
-                  backgroundColor: "#1f5fa3",
-                  boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
-                },
-                opacity: extractLoading ? 0.8 : 1,
-                cursor: extractLoading ? "not-allowed" : "pointer",
+                width: "100%",
+                display: "flex",
+                gap: 1,
+                justifyContent: "flex-start",
               }}
             >
-              {extractLoading ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <CircularProgress size={18} sx={{ color: "white" }} />
-                  Okunuyor...
-                </Box>
-              ) : (
-                "AI ile Ekle"
-              )}
+              <Button
+                variant="contained"
+                component="label"
+                size="medium"
+                sx={{
+                  minWidth: 135,
+                  fontWeight: 600,
+                  borderRadius: "8px",
+                  px: 2,
+                  py: 1,
+                  backgroundColor: "#2E86C1",
+                  color: "#fff",
+                  textTransform: "none",
+                  boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+                  "&:hover": {
+                    backgroundColor: "#1f5fa3",
+                    boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+                  },
+                  opacity: extractLoading ? 0.8 : 1,
+                  cursor: extractLoading ? "not-allowed" : "pointer",
+                }}
+              >
+                {extractLoading ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CircularProgress size={18} sx={{ color: "white" }} />
+                    Okunuyor...
+                  </Box>
+                ) : (
+                  "AI ile Ekle"
+                )}
 
-              <input
-                type="file"
-                hidden
-                accept="image/*,application/pdf"
-                disabled={extractLoading}
-                onChange={(e) => handleExtract(e.target.files?.[0])}
-              />
-            </Button>
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*,application/pdf"
+                  disabled={extractLoading}
+                  onChange={(e) => handleExtract(e.target.files?.[0])}
+                />
+              </Button>
 
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit}
-              size="medium"
-              disabled={loading}
-              sx={{
-                minWidth: 135,
-                fontWeight: 600,
-                borderRadius: "8px",
-                px: 2,
-                py: 1,
-                textTransform: "none",
-                boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
-                "&:hover": {
-                  backgroundColor: "#1f5fa3",
-                  boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
-                },
-              }}
-            >
-              {loading ? "Ekleniyor..." : "Ekle"}
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+                size="medium"
+                disabled={loading}
+                sx={{
+                  minWidth: 135,
+                  fontWeight: 600,
+                  borderRadius: "8px",
+                  px: 2,
+                  py: 1,
+                  textTransform: "none",
+                  boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+                  "&:hover": {
+                    backgroundColor: "#1f5fa3",
+                    boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+                  },
+                }}
+              >
+                {loading ? "Ekleniyor..." : "Ekle"}
+              </Button>
+            </Box>
           </Grid>
         </Grid>
       </Paper>
