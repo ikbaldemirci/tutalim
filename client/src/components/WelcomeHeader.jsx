@@ -152,26 +152,62 @@ function WelcomeHeader({
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
-                gap: 1,
-                backgroundColor: "#2E86C1",
-                color: "#fff",
-                px: 2,
-                py: 0.7,
-                borderRadius: 2,
-                fontWeight: 600,
-                boxShadow: "0 2px 6px rgba(46,134,193,0.3)",
-                transition: "filter 0.2s ease",
-                "&:hover": { filter: "brightness(1.1)" },
+                flexDirection: "column",
+                alignItems: "flex-end",
+                gap: 0.5
               }}
             >
-              <HomeWorkOutlinedIcon sx={{ fontSize: 20 }} />
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, fontSize: { xs: "0.9rem", sm: "1rem" } }}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  backgroundColor: subscriptionPlan ? "#E8F5E9" : "#E3F2FD",
+                  color: subscriptionPlan ? "#2E7D32" : "#1565C0",
+                  px: 2,
+                  py: 0.7,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                  border: `1px solid ${subscriptionPlan ? "#C8E6C9" : "#BBDEFB"}`
+                }}
               >
-                {totalCount} İlan
-              </Typography>
+                <HomeWorkOutlinedIcon sx={{ fontSize: 20 }} />
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600, fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                >
+                  {subscriptionPlan ? (
+                    "Sınırsız İlan Hakkı"
+                  ) : (
+                    `${totalCount} / 10 İlan Hakkı`
+                  )}
+                </Typography>
+              </Box>
+
+              {!subscriptionPlan && (
+                <Box sx={{ width: '100%', maxWidth: 140, mt: 0.5 }}>
+                  <Box sx={{
+                    width: '100%',
+                    height: 4,
+                    bgcolor: '#E0E0E0',
+                    borderRadius: 2,
+                    overflow: 'hidden'
+                  }}>
+                    <Box sx={{
+                      width: `${Math.min((totalCount / 10) * 100, 100)}%`,
+                      height: '100%',
+                      bgcolor: totalCount >= 10 ? '#EF5350' : '#2E86C1',
+                      transition: 'width 0.5s ease'
+                    }} />
+                  </Box>
+                  {totalCount >= 10 && (
+                    <Typography variant="caption" color="error" sx={{ fontSize: '0.7rem', fontWeight: 700, display: 'block', textAlign: 'right' }}>
+                      Kota Doldu
+                    </Typography>
+                  )}
+                </Box>
+              )}
             </Box>
           )}
 
