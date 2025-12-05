@@ -21,6 +21,7 @@ function RealtorHome() {
   const [loadingInvites, setLoadingInvites] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscriptionPlan, setSubscriptionPlan] = useState(null);
   const { confirm } = useConfirm();
 
   const didFetchPropsRef = useRef(false);
@@ -61,6 +62,9 @@ function RealtorHome() {
       .then((res) => {
         if (res.data.status === "success") {
           setIsSubscribed(res.data.isSubscribed);
+          if (res.data.subscription) {
+            setSubscriptionPlan(res.data.subscription.planType);
+          }
         }
       })
       .catch((err) => console.error("Abonelik durumu alınamadı:", err));
@@ -113,6 +117,7 @@ function RealtorHome() {
         totalCount={properties.length}
         inviteCount={invites.length}
         onOpenInvites={() => setInviteModalOpen(true)}
+        subscriptionPlan={subscriptionPlan}
       />
 
       <InviteList

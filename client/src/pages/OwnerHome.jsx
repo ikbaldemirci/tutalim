@@ -19,6 +19,7 @@ function OwnerHome() {
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [subscriptionPlan, setSubscriptionPlan] = useState(null);
   const { confirm } = useConfirm();
 
   const didFetchPropsRef = useRef(false);
@@ -51,6 +52,16 @@ function OwnerHome() {
           setInvites(res.data.assignments || []);
       })
       .finally(() => setLoadingInvites(false));
+
+    // Fetch subscription status
+    api
+      .get("/payment/status")
+      .then((res) => {
+        if (res.data.status === "success" && res.data.subscription) {
+          setSubscriptionPlan(res.data.subscription.planType);
+        }
+      })
+      .catch((err) => console.error("Abonelik durumu alınamadı:", err));
   }, []);
 
   const acceptInvite = async (id) => {
@@ -99,6 +110,7 @@ function OwnerHome() {
         totalCount={properties.length}
         inviteCount={invites.length}
         onOpenInvites={() => setInviteModalOpen(true)}
+        subscriptionPlan={subscriptionPlan}
       />
 
       <InviteList

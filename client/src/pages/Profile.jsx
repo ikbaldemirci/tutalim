@@ -53,6 +53,7 @@ function Profile() {
   const [reminders, setReminders] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [newReminder, setNewReminder] = useState({ message: "", remindAt: "" });
+  const [subscriptionPlan, setSubscriptionPlan] = useState(null);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -153,6 +154,16 @@ function Profile() {
     if (decoded) {
       handleFetchReminders();
       handleFetchNotifications();
+
+      // Fetch subscription status
+      api
+        .get("/payment/status")
+        .then((res) => {
+          if (res.data.status === "success" && res.data.subscription) {
+            setSubscriptionPlan(res.data.subscription.planType);
+          }
+        })
+        .catch((err) => console.error("Abonelik durumu alınamadı:", err));
     }
   }, [decoded]);
 
@@ -223,6 +234,7 @@ function Profile() {
       <WelcomeHeader
         name={`${decoded?.name || ""} ${decoded?.surname || ""}`}
         show={false}
+        subscriptionPlan={subscriptionPlan}
       />
       <Box>
         <Paper

@@ -1,14 +1,63 @@
-import { Paper, Typography, Box, Fade, Badge, IconButton } from "@mui/material";
+import { Paper, Typography, Box, Fade, Badge, IconButton, Chip } from "@mui/material";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import StarIcon from "@mui/icons-material/Star";
+
+function getPlanBadge(plan) {
+  if (!plan) return null;
+  let label = "Standart Üye";
+  let color = "#757575";
+  let iconColor = "#fff";
+
+  switch (plan) {
+    case "1_MONTH":
+      label = "Bronz Üye";
+      color = "#CD7F32"; // Bronze
+      break;
+    case "2_MONTHS":
+      label = "Gümüş Üye";
+      color = "#607D8B"; // Silver/Blue Grey
+      break;
+    case "6_MONTHS":
+      label = "Altın Üye";
+      color = "#FFC107"; // Gold (Amber)
+      break;
+    case "12_MONTHS":
+      label = "Platin Üye";
+      color = "#9C27B0"; // Purple
+      break;
+    default:
+      return null;
+  }
+
+  return (
+    <Chip
+      icon={<StarIcon style={{ color: iconColor }} />}
+      label={label}
+      size="small"
+      sx={{
+        bgcolor: color,
+        color: '#fff',
+        fontWeight: 700,
+        ml: { xs: 0, sm: 2 },
+        mt: { xs: 1, sm: 0 },
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+        '& .MuiChip-icon': {
+          color: '#fff'
+        }
+      }}
+    />
+  );
+}
 
 function WelcomeHeader({
   name,
   totalCount = 0,
   show = true,
   inviteCount = 0,
-  onOpenInvites = () => {},
+  onOpenInvites = () => { },
+  subscriptionPlan = null
 }) {
   const today = new Date().toLocaleDateString("tr-TR", {
     weekday: "long",
@@ -50,18 +99,21 @@ function WelcomeHeader({
           },
         }}
       >
-        <Typography
-          variant="h5"
-          fontWeight={700}
-          color="primary"
-          sx={{
-            fontSize: { xs: "1.4rem", sm: "1.7rem" },
-            letterSpacing: 0.3,
-            textAlign: { xs: "left", sm: "left" },
-          }}
-        >
-          Hoş geldin, {name || "Kullanıcı"}
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' } }}>
+          <Typography
+            variant="h5"
+            fontWeight={700}
+            color="primary"
+            sx={{
+              fontSize: { xs: "1.4rem", sm: "1.7rem" },
+              letterSpacing: 0.3,
+              textAlign: { xs: "left", sm: "left" },
+            }}
+          >
+            Hoş geldin, {name || "Kullanıcı"}
+          </Typography>
+          {getPlanBadge(subscriptionPlan)}
+        </Box>
 
         <Box
           sx={{
