@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const Property = require("../models/Property");
+const Subscription = require("../models/Subscription");
 const collection = require("../config");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
@@ -18,6 +19,29 @@ exports.createProperty = catchAsync(async (req, res, next) => {
 
   if (userRole !== "realtor") {
     return next(new AppError("Sadece emlakçılar ilan ekleyebilir.", 403));
+  }
+
+  const currentPropertyCount = await Property.countDocuments({
+    realtor: userId,
+  });
+
+  const FREE_LIMIT = 10;
+
+  if (currentPropertyCount >= FREE_LIMIT) {
+    const activeSubscription = await Subscription.findOne({
+      userId: userId,
+      status: "ACTIVE",
+      endDate: { $gt: new Date() },
+    });
+
+    if (!activeSubscription) {
+      return next(
+        new AppError(
+          "LIMIT_REACHED: Ücretsiz ilan limitine (10) ulaştınız. Devam etmek için abone olun.",
+          403
+        )
+      );
+    }
   }
 
   if (!rentPrice || !rentDate || !endDate || !location) {

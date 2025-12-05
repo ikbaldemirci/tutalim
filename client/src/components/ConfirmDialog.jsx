@@ -71,7 +71,7 @@ export default function ConfirmDialog({
           color={severity === "danger" ? "error" : "primary"}
           sx={{ fontWeight: 600, borderRadius: 2 }}
         >
-          Yükselt
+          Onay
         </Button>
       </DialogActions>
     </Dialog>
