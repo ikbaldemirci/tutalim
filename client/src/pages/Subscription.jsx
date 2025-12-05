@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, Button, Paper, Grid, Container, CircularProgress } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import Navbar from "../components/Navbar";
 import api from "../api";
 
 const PLANS = [
@@ -105,17 +106,9 @@ const Subscription = () => {
         try {
             const res = await api.post("/payment/subscribe", { planType: planId });
             if (res.data.status === "success") {
-                // Iyzico'nun verdiği HTML içeriğini bir sayfaya yazdırıp oraya yönlendirebiliriz
-                // veya direkt link varsa oraya gidebiliriz.
-                // Iyzico checkout form genellikle bir script veya iframe döner.
-                // Ancak API yanıtında paymentPageUrl varsa direkt oraya yönlendirmek en kolayıdır.
-
                 if (res.data.paymentPageUrl) {
                     window.location.href = res.data.paymentPageUrl;
                 } else if (res.data.checkoutFormContent) {
-                    // HTML içeriği geldiyse (iframe/script), geçici bir div'e basıp formu submit edebiliriz
-                    // Ama genelde redirect url tercih edilir.
-                    // Şimdilik HTML içeriğini yeni pencerede açalım veya mevcut sayfaya basalım.
                     const newWindow = window.open();
                     newWindow.document.write(res.data.checkoutFormContent);
                 }
@@ -129,10 +122,16 @@ const Subscription = () => {
     };
 
     return (
-        <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa", py: 8 }}>
-            <Container maxWidth="lg">
-                <Box textAlign="center" mb={6}>
-                    {subscription && <ActiveSubscriptionCard subscription={subscription} />}
+        <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa" }}>
+            <Navbar />
+
+            <Container maxWidth="lg" sx={{ py: 8 }}>
+                <Box textAlign="center" mb={6} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    {subscription && (
+                        <Box sx={{ width: "100%", maxWidth: 800, mb: 4 }}>
+                            <ActiveSubscriptionCard subscription={subscription} />
+                        </Box>
+                    )}
 
                     <Typography variant="h3" fontWeight={700} color="primary" gutterBottom>
                         Abonelik Paketleri
