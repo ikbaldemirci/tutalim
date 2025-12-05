@@ -1,245 +1,152 @@
 const Iyzipay = require("iyzipay");
 const Subscription = require("../models/Subscription");
-const User = require("../config"); // User model imported from config.js
+const User = require("../config");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 
 const iyzipay = new Iyzipay({
-    apiKey: process.env.IYZICO_API_KEY,
-    secretKey: process.env.IYZICO_SECRET_KEY,
-    uri: process.env.IYZICO_URI || "https://sandbox-api.iyzipay.com",
+  apiKey: process.env.IYZICO_API_KEY,
+  secretKey: process.env.IYZICO_SECRET_KEY,
+  uri: process.env.IYZICO_URI || "https://sandbox-api.iyzipay.com",
 });
 
 const PLANS = {
-    "1_MONTH": { price: "300.00", name: "1 Aylık Abonelik", months: 1 },
-    "2_MONTHS": { price: "500.00", name: "2 Aylık Abonelik", months: 2 },
-    "6_MONTHS": { price: "1500.00", name: "6 Aylık Abonelik", months: 6 },
-    "12_MONTHS": { price: "3000.00", name: "12 Aylık Abonelik", months: 12 },
+  "1_MONTH": { price: "300.00", name: "1 Aylık Abonelik", months: 1 },
+  "2_MONTHS": { price: "500.00", name: "2 Aylık Abonelik", months: 2 },
+  "6_MONTHS": { price: "1500.00", name: "6 Aylık Abonelik", months: 6 },
+  "12_MONTHS": { price: "3000.00", name: "12 Aylık Abonelik", months: 12 },
 };
 
 exports.initializeSubscription = catchAsync(async (req, res, next) => {
-    const { planType } = req.body;
-    const user = req.user; // verifyToken middleware'inden gelir
+  const { planType } = req.body;
+  const user = req.user;
+  const selectedPlan = PLANS[planType];
+  if (!selectedPlan) {
+    return next(new AppError("Geçersiz plan tipi", 400));
+  }
 
-    const selectedPlan = PLANS[planType];
-    if (!selectedPlan) {
-        return next(new AppError("Geçersiz plan tipi", 400));
+  const conversationId = `${user.id}_${Date.now()}`;
+  const callbackUrl = `${
+    process.env.API_URL || "http://localhost:5000"
+  }/api/payment/callback`;
+
+  const request = {
+    locale: Iyzipay.LOCALE.TR,
+    conversationId: conversationId,
+    price: selectedPlan.price,
+    paidPrice: selectedPlan.price,
+    currency: Iyzipay.CURRENCY.TRY,
+    basketId: conversationId,
+    paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
+    callbackUrl: callbackUrl,
+    enabledInstallments: [1],
+    buyer: {
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      gsmNumber: "+905555555555",
+      email: user.mail,
+      identityNumber: "11111111111",
+      lastLoginDate: "2024-01-01 12:00:00",
+      registrationDate: "2024-01-01 12:00:00",
+      registrationAddress: "Istanbul",
+      ip: req.ip,
+      city: "Istanbul",
+      country: "Turkey",
+      zipCode: "34732",
+    },
+    billingAddress: {
+      contactName: `${user.name} ${user.surname}`,
+      city: "Istanbul",
+      country: "Turkey",
+      address: "Istanbul",
+      zipCode: "34732",
+    },
+    basketItems: [
+      {
+        id: planType,
+        name: selectedPlan.name,
+        category1: "Abonelik",
+        itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
+        price: selectedPlan.price,
+      },
+    ],
+  };
+
+  iyzipay.checkoutFormInitialize.create(request, async (err, result) => {
+    if (err) {
+      return next(new AppError("Iyzico başlatılamadı: " + err.message, 500));
     }
 
-    const conversationId = `${user.id}_${Date.now()}`;
-    const callbackUrl = `${process.env.API_URL || "http://localhost:5000"}/api/payment/callback`;
-
-    const request = {
-        locale: Iyzipay.LOCALE.TR,
-        conversationId: conversationId,
-        price: selectedPlan.price,
-        paidPrice: selectedPlan.price,
-        currency: Iyzipay.CURRENCY.TRY,
-        basketId: conversationId,
-        paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
-        callbackUrl: callbackUrl,
-        enabledInstallments: [1],
-        buyer: {
-            id: user.id,
-            name: user.name,
-            surname: user.surname,
-            gsmNumber: "+905555555555", // Kullanıcıdan alınabilir
-            email: user.mail,
-            identityNumber: "11111111111", // Sandbox için dummy
-            lastLoginDate: "2024-01-01 12:00:00",
-            registrationDate: "2024-01-01 12:00:00",
-            registrationAddress: "Istanbul",
-            ip: req.ip,
-            city: "Istanbul",
-            country: "Turkey",
-            zipCode: "34732",
-        },
-        billingAddress: {
-            contactName: `${user.name} ${user.surname}`,
-            city: "Istanbul",
-            country: "Turkey",
-            address: "Istanbul",
-            zipCode: "34732",
-        },
-        basketItems: [
-            {
-                id: planType,
-                name: selectedPlan.name,
-                category1: "Abonelik",
-                itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
-                price: selectedPlan.price,
-            },
-        ],
-    };
-
-    iyzipay.checkoutFormInitialize.create(request, async (err, result) => {
-        if (err) {
-            return next(new AppError("Iyzico başlatılamadı: " + err.message, 500));
-        }
-
-        if (result.status !== "success") {
-            return next(new AppError("Iyzico hatası: " + result.errorMessage, 400));
-        }
-
-        // Bekleyen abonelik oluştur
-        await Subscription.create({
-            userId: user.id,
-            planType: planType,
-            price: selectedPlan.price,
-            status: "PENDING",
-            iyzicoSubscriptionReferenceCode: result.token,
-            endDate: new Date(), // Başarılı olunca güncellenecek
-        });
-
-        res.status(200).json({
-            status: "success",
-            checkoutFormContent: result.checkoutFormContent,
-            token: result.token,
-```javascript
-const Iyzipay = require("iyzipay");
-const Subscription = require("../models/Subscription");
-const User = require("../config"); // User model imported from config.js
-const AppError = require("../utils/AppError");
-const catchAsync = require("../utils/catchAsync");
-
-const iyzipay = new Iyzipay({
-    apiKey: process.env.IYZICO_API_KEY,
-    secretKey: process.env.IYZICO_SECRET_KEY,
-    uri: process.env.IYZICO_URI || "https://sandbox-api.iyzipay.com",
-});
-
-const PLANS = {
-    "1_MONTH": { price: "300.00", name: "1 Aylık Abonelik", months: 1 },
-    "2_MONTHS": { price: "500.00", name: "2 Aylık Abonelik", months: 2 },
-    "6_MONTHS": { price: "1500.00", name: "6 Aylık Abonelik", months: 6 },
-    "12_MONTHS": { price: "3000.00", name: "12 Aylık Abonelik", months: 12 },
-};
-
-exports.initializeSubscription = catchAsync(async (req, res, next) => {
-    const { planType } = req.body;
-    const user = req.user; // verifyToken middleware'inden gelir
-
-    const selectedPlan = PLANS[planType];
-    if (!selectedPlan) {
-        return next(new AppError("Geçersiz plan tipi", 400));
+    if (result.status !== "success") {
+      return next(new AppError("Iyzico hatası: " + result.errorMessage, 400));
     }
 
-    const conversationId = `${ user.id }_${ Date.now() }`;
-    const callbackUrl = `${ process.env.API_URL || "http://localhost:5000" } / api / payment / callback`;
-
-    const request = {
-        locale: Iyzipay.LOCALE.TR,
-        conversationId: conversationId,
-        price: selectedPlan.price,
-        paidPrice: selectedPlan.price,
-        currency: Iyzipay.CURRENCY.TRY,
-        basketId: conversationId,
-        paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
-        callbackUrl: callbackUrl,
-        enabledInstallments: [1],
-        buyer: {
-            id: user.id,
-            name: user.name,
-            surname: user.surname,
-            gsmNumber: "+905555555555", // Kullanıcıdan alınabilir
-            email: user.mail,
-            identityNumber: "11111111111", // Sandbox için dummy
-            lastLoginDate: "2024-01-01 12:00:00",
-            registrationDate: "2024-01-01 12:00:00",
-            registrationAddress: "Istanbul",
-            ip: req.ip,
-            city: "Istanbul",
-            country: "Turkey",
-            zipCode: "34732",
-        },
-        billingAddress: {
-            contactName: `${ user.name } ${ user.surname }`,
-            city: "Istanbul",
-            country: "Turkey",
-            address: "Istanbul",
-            zipCode: "34732",
-        },
-        basketItems: [
-            {
-                id: planType,
-                name: selectedPlan.name,
-                category1: "Abonelik",
-                itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
-                price: selectedPlan.price,
-            },
-        ],
-    };
-
-    iyzipay.checkoutFormInitialize.create(request, async (err, result) => {
-        if (err) {
-            return next(new AppError("Iyzico başlatılamadı: " + err.message, 500));
-        }
-
-        if (result.status !== "success") {
-            return next(new AppError("Iyzico hatası: " + result.errorMessage, 400));
-        }
-
-        // Bekleyen abonelik oluştur
-        await Subscription.create({
-            userId: user.id,
-            planType: planType,
-            price: selectedPlan.price,
-            status: "PENDING",
-            iyzicoSubscriptionReferenceCode: result.token,
-            endDate: new Date(), // Başarılı olunca güncellenecek
-        });
-
-        res.status(200).json({
-            status: "success",
-            checkoutFormContent: result.checkoutFormContent,
-            token: result.token,
-            paymentPageUrl: result.paymentPageUrl,
-        });
+    await Subscription.create({
+      userId: user.id,
+      planType: planType,
+      price: selectedPlan.price,
+      status: "PENDING",
+      iyzicoSubscriptionReferenceCode: result.token,
+      endDate: new Date(),
     });
+
+    res.status(200).json({
+      status: "success",
+      checkoutFormContent: result.checkoutFormContent,
+      token: result.token,
+      paymentPageUrl: result.paymentPageUrl,
+    });
+  });
 });
 
 exports.handleCallback = catchAsync(async (req, res, next) => {
-    const { token } = req.body;
+  const { token } = req.body;
 
-    iyzipay.checkoutForm.retrieve(
-        {
-            locale: Iyzipay.LOCALE.TR,
-            conversationId: "123456789",
-            token: token,
-        },
-        async (err, result) => {
-            const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  iyzipay.checkoutForm.retrieve(
+    {
+      locale: Iyzipay.LOCALE.TR,
+      conversationId: "123456789",
+      token: token,
+    },
+    async (err, result) => {
+      const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
 
-            if (err || result.status !== "success" || result.paymentStatus !== "SUCCESS") {
-                return res.redirect(`${ clientUrl } / payment / fail`);
-            }
+      if (
+        err ||
+        result.status !== "success" ||
+        result.paymentStatus !== "SUCCESS"
+      ) {
+        return res.redirect(`${clientUrl}/payment/fail`);
+      }
 
-            // Başarılı ödeme
-            const subscription = await Subscription.findOne({
-                iyzicoSubscriptionReferenceCode: token,
-            });
+      // Başarılı ödeme
+      const subscription = await Subscription.findOne({
+        iyzicoSubscriptionReferenceCode: token,
+      });
 
-            if (subscription) {
-                subscription.status = "ACTIVE";
+      if (subscription) {
+        subscription.status = "ACTIVE";
 
-                // Bitiş tarihini hesapla
-                const plan = PLANS[subscription.planType];
-                const now = new Date();
-                const endDate = new Date(now.setMonth(now.getMonth() + (plan ? plan.months : 1)));
+        const plan = PLANS[subscription.planType];
+        const now = new Date();
+        const endDate = new Date(
+          now.setMonth(now.getMonth() + (plan ? plan.months : 1))
+        );
 
-                subscription.endDate = endDate;
-                subscription.startDate = new Date();
-                await subscription.save();
-            }
+        subscription.endDate = endDate;
+        subscription.startDate = new Date();
+        await subscription.save();
+      }
 
-            res.redirect(`${ clientUrl } / payment / success`);
-        }
-    );
+      res.redirect(`${clientUrl}/payment/success`);
+    }
+  );
 });
 
 exports.getSubscriptionStatus = catchAsync(async (req, res, next) => {
   const user = req.user;
-  
+
   const subscription = await Subscription.findOne({
     userId: user.id,
     status: "ACTIVE",
@@ -252,4 +159,3 @@ exports.getSubscriptionStatus = catchAsync(async (req, res, next) => {
     subscription: subscription || null,
   });
 });
-```
