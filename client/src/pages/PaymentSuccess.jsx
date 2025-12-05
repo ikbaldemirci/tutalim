@@ -1,9 +1,26 @@
-import { Container, Box, Typography, Button } from "@mui/material";
+import { Container, Box, Typography, Button, LinearProgress } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const PaymentSuccess = () => {
     const navigate = useNavigate();
+    const [countdown, setCountdown] = useState(5);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCountdown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    navigate("/subscription");
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [navigate]);
 
     return (
         <Container maxWidth="sm">
@@ -25,15 +42,23 @@ const PaymentSuccess = () => {
                     Ödeme Başarılı!
                 </Typography>
                 <Typography variant="body1" color="text.secondary" paragraph>
-                    Aboneliğiniz başarıyla başlatıldı. Artık sınırsız ilan yayınlayabilir ve yönetebilirsiniz.
+                    Aboneliğiniz başarıyla başlatıldı.
                 </Typography>
+
+                <Box sx={{ width: '100%', mt: 2, mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                        {countdown} saniye içinde yönlendiriliyorsunuz...
+                    </Typography>
+                    <LinearProgress variant="determinate" value={(5 - countdown) * 20} sx={{ height: 8, borderRadius: 4 }} />
+                </Box>
+
                 <Button
                     variant="contained"
                     size="large"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/subscription")}
                     sx={{ mt: 3 }}
                 >
-                    Ana Sayfaya Dön
+                    Abonelik Sayfasına Git
                 </Button>
             </Box>
         </Container>
