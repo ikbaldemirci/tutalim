@@ -53,6 +53,8 @@ app.use("/api/reminders", reminderRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api", mailRoutes);
+const paymentRoutes = require("./routes/paymentRoutes");
+app.use("/api/payment", paymentRoutes);
 
 const globalErrorHandler = require("./middleware/errorHandler");
 app.use(globalErrorHandler);

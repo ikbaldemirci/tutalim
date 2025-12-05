@@ -19,6 +19,7 @@ function RealtorHome() {
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const didFetchPropsRef = useRef(false);
   useEffect(() => {
@@ -51,6 +52,16 @@ function RealtorHome() {
           setInvites(res.data.assignments || []);
       })
       .finally(() => setLoadingInvites(false));
+
+    // Abonelik durumunu kontrol et
+    api
+      .get("/payment/status")
+      .then((res) => {
+        if (res.data.status === "success") {
+          setIsSubscribed(res.data.isSubscribed);
+        }
+      })
+      .catch((err) => console.error("Abonelik durumu alınamadı:", err));
   }, []);
 
   const acceptInvite = async (id) => {
@@ -64,6 +75,12 @@ function RealtorHome() {
       }
     } catch (err) {
       console.error("Davet kabul hatası:", err);
+      if (err.response?.data?.message?.includes("LIMIT_REACHED")) {
+        alert("Yönetim kotanız doldu (10 Mülk). Lütfen abone olun.");
+        // İsterseniz burada confirm dialog açıp yönlendirme yapabiliriz.
+        // Şimdilik basitçe yönlendiriyorum:
+        window.location.href = "/subscription";
+      }
     }
   };
 
@@ -99,6 +116,8 @@ function RealtorHome() {
         onCreate={(property) => {
           setProperties((prev) => [...prev, property]);
         }}
+        propertyCount={properties.length}
+        isSubscribed={isSubscribed}
       />
 
       {loading ? (

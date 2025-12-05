@@ -26,6 +26,7 @@ const CheckMail = lazy(() => import("./pages/CheckMail"));
 const CheckMailVerify = lazy(() => import("./pages/CheckMailVerify"));
 const VerifyResult = lazy(() => import("./pages/VerifyResult"));
 const ResendVerify = lazy(() => import("./pages/ResendVerify"));
+const Subscription = lazy(() => import("./pages/Subscription"));
 import ScrollToTop from "./components/ScrollToTop";
 
 const theme = createTheme({
@@ -123,6 +124,14 @@ function App() {
                           element={
                             <ProtectedRoute>
                               <Profile />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/subscription"
+                          element={
+                            <ProtectedRoute>
+                              <Subscription />
                             </ProtectedRoute>
                           }
                         />

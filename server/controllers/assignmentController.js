@@ -1,5 +1,6 @@
 const Assignment = require("../models/Assignment");
 const Property = require("../models/Property");
+const Subscription = require("../models/Subscription");
 const collection = require("../config");
 const {
   sendMail,
@@ -113,6 +114,24 @@ exports.acceptAssignment = catchAsync(async (req, res, next) => {
   if (invite.toUser.toString() !== req.user.id.toString()) {
     return next(new AppError("Bu daveti kabul etme yetkiniz yok", 403));
   }
+
+  // LIMIT CHECK START
+  const roleField = invite.role === "owner" ? "owner" : "realtor";
+  // Kullanıcının mevcut mülk sayısı
+  const currentCount = await Property.countDocuments({ [roleField]: req.user.id });
+
+  if (currentCount >= 10) {
+    const hasSubscription = await Subscription.findOne({
+      userId: req.user.id,
+      status: "ACTIVE",
+      endDate: { $gt: new Date() },
+    });
+
+    if (!hasSubscription) {
+      return next(new AppError("LIMIT_REACHED: Yönetim kotanız doldu (10 Mülk). Lütfen abone olun.", 403));
+    }
+  }
+  // LIMIT CHECK END
 
   const property = await Property.findById(invite.property);
   if (!property) {

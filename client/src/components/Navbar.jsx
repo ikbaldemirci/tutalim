@@ -123,19 +123,19 @@ function Navbar({ onLogout, bg }) {
   const navStyle = bg
     ? { background: bg, color: "#fff" }
     : {
-        background: "linear-gradient(135deg, #2E86C1, #5DADE2)",
-        color: "#fff",
-      };
+      background: "linear-gradient(135deg, #2E86C1, #5DADE2)",
+      color: "#fff",
+    };
 
   const computedNavStyle = scrolled
     ? {
-        ...navStyle,
-        background: "rgba(46,134,193,0.98)",
-        color: "#fff",
-        backdropFilter: "saturate(180%) blur(8px)",
-        transition: "background 0.3s ease, box-shadow 0.3s ease",
-        boxShadow: "0 6px 16px rgba(0,0,0,0.12)",
-      }
+      ...navStyle,
+      background: "rgba(46,134,193,0.98)",
+      color: "#fff",
+      backdropFilter: "saturate(180%) blur(8px)",
+      transition: "background 0.3s ease, box-shadow 0.3s ease",
+      boxShadow: "0 6px 16px rgba(0,0,0,0.12)",
+    }
     : navStyle;
 
   return (
@@ -287,6 +287,16 @@ function Navbar({ onLogout, bg }) {
                       sx={{ fontWeight: 500, gap: 1 }}
                     >
                       <PersonIcon fontSize="small" /> Profilim
+                    </MenuItem>
+
+                    <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate("/subscription");
+                      }}
+                      sx={{ fontWeight: 500, gap: 1, color: "#2E86C1" }}
+                    >
+                      <PersonIcon fontSize="small" /> Abonelik Paketleri
                     </MenuItem>
 
                     <Divider />

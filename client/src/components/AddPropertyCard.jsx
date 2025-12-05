@@ -13,11 +13,19 @@ import {
   Grid,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
+import { useNavigate } from "react-router-dom";
 
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import LockIcon from "@mui/icons-material/Lock";
 
-export default function AddPropertyCard({ onCreate }) {
+export default function AddPropertyCard({
+  onCreate,
+  propertyCount = 0,
+  isSubscribed = false,
+}) {
+  const navigate = useNavigate();
+  const isLimitReached = propertyCount >= 10 && !isSubscribed;
   const [form, setForm] = useState({
     rentPrice: "",
     rentDate: "",
@@ -199,248 +207,278 @@ export default function AddPropertyCard({ onCreate }) {
           <AddHomeWorkIcon /> Yeni İlan Ekle
         </Typography>
 
-        <Grid container spacing={2} justifyContent="center">
-          <Grid
-            item
-            xs={12}
-            md={4}
+        {isLimitReached ? (
+          <Box
             sx={{
-              position: "relative",
+              textAlign: "center",
+              py: 5,
               display: "flex",
-              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
             }}
           >
-            <TextField
-              label="Kiracı Adı Soyadı"
-              name="tenantName"
-              value={form.tenantName}
-              onChange={handleChange}
-              size="small"
-              sx={{ width: { xs: "280px", md: "100%" } }}
-            />
-            {aiFilled.tenantName && (
-              <Chip
-                label="AI"
-                color="success"
-                size="small"
-                sx={{
-                  position: "absolute",
-                  top: -8,
-                  right: { xs: 10, md: 0 },
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </Grid>
-
-          <Grid
-            item
-            xs={12}
-            md={4}
-            sx={{
-              position: "relative",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <TextField
-              label="Fiyat (₺)"
-              name="rentPrice"
-              type="number"
-              value={form.rentPrice}
-              onChange={handleChange}
-              size="small"
-              sx={{ width: { xs: "280px", md: "100%" } }}
-            />
-            {aiFilled.rentPrice && (
-              <Chip
-                label="AI"
-                color="success"
-                size="small"
-                sx={{
-                  position: "absolute",
-                  top: -8,
-                  right: { xs: 10, md: 0 },
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </Grid>
-
-          <Grid
-            item
-            xs={12}
-            md={4}
-            sx={{
-              position: "relative",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <TextField
-              label="Konum"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
-              size="small"
-              sx={{ width: { xs: "280px", md: "100%" } }}
-            />
-            {aiFilled.location && (
-              <Chip
-                label="AI"
-                color="success"
-                size="small"
-                sx={{
-                  position: "absolute",
-                  top: -8,
-                  right: { xs: 10, md: 0 },
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </Grid>
-
-          <Grid
-            item
-            xs={12}
-            md={4}
-            sx={{
-              position: "relative",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <DatePicker
-              label="Başlangıç"
-              format="dd/MM/yyyy"
-              value={form.rentDate ? new Date(form.rentDate) : null}
-              onChange={(date) =>
-                setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
-              }
-              slotProps={{ textField: { size: "small", fullWidth: true } }}
-              sx={{ width: { xs: "280px", md: "100%" } }}
-            />
-            {aiFilled.rentDate && (
-              <Chip
-                label="AI"
-                color="success"
-                size="small"
-                sx={{
-                  position: "absolute",
-                  top: -8,
-                  right: { xs: 10, md: 0 },
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </Grid>
-
-          <Grid
-            item
-            xs={12}
-            md={4}
-            sx={{
-              position: "relative",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <DatePicker
-              label="Bitiş"
-              format="dd/MM/yyyy"
-              value={form.endDate ? new Date(form.endDate) : null}
-              onChange={(date) =>
-                setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
-              }
-              slotProps={{ textField: { size: "small", fullWidth: true } }}
-              sx={{ width: { xs: "280px", md: "100%" } }}
-            />
-            {aiFilled.endDate && (
-              <Chip
-                label="AI"
-                color="success"
-                size="small"
-                sx={{
-                  position: "absolute",
-                  top: -8,
-                  right: { xs: 10, md: 0 },
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </Grid>
-
-          <Grid
-            item
-            xs={12}
-            md={4}
-            sx={{ display: "flex", gap: 1, justifyContent: "center" }}
-          >
-            <Button
-              variant="contained"
-              component="label"
-              size="medium"
-              startIcon={!extractLoading ? <AutoAwesomeIcon /> : null}
-              sx={{
-                minWidth: 135,
-                fontWeight: 600,
-                borderRadius: "8px",
-                px: 2,
-                py: 1,
-                backgroundColor: "#2E86C1",
-                color: "#fff",
-                textTransform: "none",
-                boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
-                "&:hover": {
-                  backgroundColor: "#1f5fa3",
-                  boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
-                },
-                opacity: extractLoading ? 0.8 : 1,
-                cursor: extractLoading ? "not-allowed" : "pointer",
-              }}
-            >
-              {extractLoading ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <CircularProgress size={18} sx={{ color: "white" }} />
-                  Okunuyor...
-                </Box>
-              ) : (
-                "Belgeden Oku"
-              )}
-
-              <input
-                type="file"
-                hidden
-                accept="image/*,application/pdf"
-                disabled={extractLoading}
-                onChange={(e) => handleExtract(e.target.files?.[0])}
-              />
-            </Button>
-
+            <LockIcon sx={{ fontSize: 60, color: "#f44336" }} />
+            <Typography variant="h6" fontWeight={600} color="error">
+              İlan Ekleme Limitine Ulaştınız!
+            </Typography>
+            <Typography color="text.secondary" maxWidth="sm">
+              Mevcut paketinizle en fazla 10 ilan ekleyebilirsiniz. Daha fazla ilan
+              eklemek için lütfen abonelik paketlerimizi inceleyin.
+            </Typography>
             <Button
               variant="contained"
               color="primary"
-              onClick={handleSubmit}
-              size="medium"
-              disabled={loading}
+              onClick={() => navigate("/subscription")}
+              sx={{ mt: 2, textTransform: "none", fontWeight: 600 }}
+            >
+              Premium'a Geç
+            </Button>
+          </Box>
+        ) : (
+          <Grid container spacing={2} justifyContent="center">
+            <Grid
+              item
+              xs={12}
+              md={4}
               sx={{
-                minWidth: 135,
-                fontWeight: 600,
-                borderRadius: "8px",
-                px: 2,
-                py: 1,
-                textTransform: "none",
-                boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
-                "&:hover": {
-                  backgroundColor: "#1f5fa3",
-                  boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
-                },
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
               }}
             >
-              {loading ? "Ekleniyor..." : "Ekle"}
-            </Button>
+              <TextField
+                label="Kiracı Adı Soyadı"
+                name="tenantName"
+                value={form.tenantName}
+                onChange={handleChange}
+                size="small"
+                sx={{ width: { xs: "280px", md: "100%" } }}
+              />
+              {aiFilled.tenantName && (
+                <Chip
+                  label="AI"
+                  color="success"
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    top: -8,
+                    right: { xs: 10, md: 0 },
+                    zIndex: 1,
+                  }}
+                />
+              )}
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              md={4}
+              sx={{
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <TextField
+                label="Fiyat (₺)"
+                name="rentPrice"
+                type="number"
+                value={form.rentPrice}
+                onChange={handleChange}
+                size="small"
+                sx={{ width: { xs: "280px", md: "100%" } }}
+              />
+              {aiFilled.rentPrice && (
+                <Chip
+                  label="AI"
+                  color="success"
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    top: -8,
+                    right: { xs: 10, md: 0 },
+                    zIndex: 1,
+                  }}
+                />
+              )}
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              md={4}
+              sx={{
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <TextField
+                label="Konum"
+                name="location"
+                value={form.location}
+                onChange={handleChange}
+                size="small"
+                sx={{ width: { xs: "280px", md: "100%" } }}
+              />
+              {aiFilled.location && (
+                <Chip
+                  label="AI"
+                  color="success"
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    top: -8,
+                    right: { xs: 10, md: 0 },
+                    zIndex: 1,
+                  }}
+                />
+              )}
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              md={4}
+              sx={{
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <DatePicker
+                label="Başlangıç"
+                format="dd/MM/yyyy"
+                value={form.rentDate ? new Date(form.rentDate) : null}
+                onChange={(date) =>
+                  setForm((prev) => ({ ...prev, rentDate: toISODate(date) }))
+                }
+                slotProps={{ textField: { size: "small", fullWidth: true } }}
+                sx={{ width: { xs: "280px", md: "100%" } }}
+              />
+              {aiFilled.rentDate && (
+                <Chip
+                  label="AI"
+                  color="success"
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    top: -8,
+                    right: { xs: 10, md: 0 },
+                    zIndex: 1,
+                  }}
+                />
+              )}
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              md={4}
+              sx={{
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <DatePicker
+                label="Bitiş"
+                format="dd/MM/yyyy"
+                value={form.endDate ? new Date(form.endDate) : null}
+                onChange={(date) =>
+                  setForm((prev) => ({ ...prev, endDate: toISODate(date) }))
+                }
+                slotProps={{ textField: { size: "small", fullWidth: true } }}
+                sx={{ width: { xs: "280px", md: "100%" } }}
+              />
+              {aiFilled.endDate && (
+                <Chip
+                  label="AI"
+                  color="success"
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    top: -8,
+                    right: { xs: 10, md: 0 },
+                    zIndex: 1,
+                  }}
+                />
+              )}
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              md={4}
+              sx={{ display: "flex", gap: 1, justifyContent: "center" }}
+            >
+              <Button
+                variant="contained"
+                component="label"
+                size="medium"
+                startIcon={!extractLoading ? <AutoAwesomeIcon /> : null}
+                sx={{
+                  minWidth: 135,
+                  fontWeight: 600,
+                  borderRadius: "8px",
+                  px: 2,
+                  py: 1,
+                  backgroundColor: "#2E86C1",
+                  color: "#fff",
+                  textTransform: "none",
+                  boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+                  "&:hover": {
+                    backgroundColor: "#1f5fa3",
+                    boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+                  },
+                  opacity: extractLoading ? 0.8 : 1,
+                  cursor: extractLoading ? "not-allowed" : "pointer",
+                }}
+              >
+                {extractLoading ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CircularProgress size={18} sx={{ color: "white" }} />
+                    Okunuyor...
+                  </Box>
+                ) : (
+                  "Belgeden Oku"
+                )}
+
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*,application/pdf"
+                  disabled={extractLoading}
+                  onChange={(e) => handleExtract(e.target.files?.[0])}
+                />
+              </Button>
+
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+                size="medium"
+                disabled={loading}
+                sx={{
+                  minWidth: 135,
+                  fontWeight: 600,
+                  borderRadius: "8px",
+                  px: 2,
+                  py: 1,
+                  textTransform: "none",
+                  boxShadow: "0 2px 6px rgba(46, 134, 193, 0.3)",
+                  "&:hover": {
+                    backgroundColor: "#1f5fa3",
+                    boxShadow: "0 3px 8px rgba(46, 134, 193, 0.5)",
+                  },
+                }}
+              >
+                {loading ? "Ekleniyor..." : "Ekle"}
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
+        )}
       </Paper>
 
       <Snackbar

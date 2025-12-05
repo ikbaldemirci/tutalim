@@ -62,6 +62,10 @@ function OwnerHome() {
       }
     } catch (err) {
       console.error("Davet kabul hatası:", err);
+      if (err.response?.data?.message?.includes("LIMIT_REACHED")) {
+        alert("Yönetim kotanız doldu (10 Mülk). Lütfen abone olun.");
+        window.location.href = "/subscription";
+      }
     }
   };
 

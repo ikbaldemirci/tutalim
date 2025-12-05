@@ -18,6 +18,8 @@ const LoginSchema = new mongoose.Schema(
     verifyToken: { type: String, index: true, default: null },
     verifyExpires: { type: Date, default: null },
     isVerified: { type: Boolean, default: false },
+    iyzicoCustomerReferenceCode: { type: String, default: null },
+    iyzicoCardUserKey: { type: String, default: null },
   },
   { timestamps: true }
 );
