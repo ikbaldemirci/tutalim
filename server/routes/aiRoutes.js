@@ -4,7 +4,7 @@ const multer = require("multer");
 const fs = require("fs");
 const OpenAI = require("openai");
 const { fromPath } = require("pdf2pic");
-const { protect } = require("../middleware/authMiddleware");
+const verifyToken = require("../middleware/verifyToken");
 const Subscription = require("../models/Subscription");
 
 const upload = multer({ dest: "uploads/" });
@@ -12,7 +12,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
 router.post(
   "/extract-property",
-  protect,
+  verifyToken,
   upload.single("file"),
   async (req, res) => {
     const activeSubscription = await Subscription.findOne({
