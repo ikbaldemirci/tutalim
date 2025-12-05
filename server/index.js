@@ -21,7 +21,12 @@ const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
-const allowedOrigins = ["https://tutalim.com", "https://www.tutalim.com"];
+const allowedOrigins = [
+  "https://tutalim.com",
+  "https://www.tutalim.com",
+  "https://sandbox-api.iyzipay.com",
+  "https://iyzipay.com",
+];
 app.use(
   cors({
     origin: (origin, callback) => {
