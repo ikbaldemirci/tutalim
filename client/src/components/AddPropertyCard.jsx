@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { useNavigate } from "react-router-dom";
+import { useConfirm } from "../context/ConfirmDialogContext";
 
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
@@ -25,6 +26,7 @@ export default function AddPropertyCard({
   isSubscribed = false,
 }) {
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
   const isLimitReached = propertyCount >= 10 && !isSubscribed;
   const [form, setForm] = useState({
     rentPrice: "",
@@ -223,8 +225,8 @@ export default function AddPropertyCard({
               İlan Ekleme Limitine Ulaştınız!
             </Typography>
             <Typography color="text.secondary" maxWidth="sm">
-              Mevcut paketinizle en fazla 10 ilan ekleyebilirsiniz. Daha fazla ilan
-              eklemek için lütfen abonelik paketlerimizi inceleyin.
+              Mevcut paketinizle en fazla 10 ilan ekleyebilirsiniz. Daha fazla
+              ilan eklemek için lütfen abonelik paketlerimizi inceleyin.
             </Typography>
             <Button
               variant="contained"
@@ -450,7 +452,40 @@ export default function AddPropertyCard({
                   hidden
                   accept="image/*,application/pdf"
                   disabled={extractLoading}
-                  onChange={(e) => handleExtract(e.target.files?.[0])}
+                  onChange={async (e) => {
+                    if (!isSubscribed) {
+                      e.target.value = "";
+                      const confirmed = await confirm({
+                        title: "Premium Özellik ✨",
+                        message:
+                          "Belgeden otomatik okuma özelliği sadece abonelerimiz içindir. Zaman kazanmak ve işinizi kolaylaştırmak için hemen abone olun!",
+                        severity: "info",
+                        confirmText: "Paketleri İncele",
+                        cancelText: "Belki Daha Sonra",
+                      });
+
+                      if (confirmed) {
+                        navigate("/subscription");
+                      }
+                      return;
+                    }
+                    handleExtract(e.target.files?.[0]);
+                  }}
+                  onClick={(e) => {
+                    if (!isSubscribed) {
+                      e.preventDefault();
+                      confirm({
+                        title: "Premium Özellik ✨",
+                        message:
+                          "Belgeden otomatik okuma özelliği sadece abonelerimiz içindir. Zaman kazanmak ve işinizi kolaylaştırmak için hemen abone olun!",
+                        severity: "info",
+                        confirmText: "Paketleri İncele",
+                        cancelText: "Belki Daha Sonra",
+                      }).then((confirmed) => {
+                        if (confirmed) navigate("/subscription");
+                      });
+                    }
+                  }}
                 />
               </Button>
 

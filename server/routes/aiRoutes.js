@@ -4,57 +4,79 @@ const multer = require("multer");
 const fs = require("fs");
 const OpenAI = require("openai");
 const { fromPath } = require("pdf2pic");
+const { protect } = require("../middleware/authMiddleware");
+const Subscription = require("../models/Subscription");
 
 const upload = multer({ dest: "uploads/" });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
-router.post("/extract-property", upload.single("file"), async (req, res) => {
-  let filePath = null;
+router.post(
+  "/extract-property",
+  protect,
+  upload.single("file"),
+  async (req, res) => {
+    const activeSubscription = await Subscription.findOne({
+      userId: req.user._id,
+      status: "ACTIVE",
+      endDate: { $gt: new Date() },
+    });
 
-  try {
-    if (!req.file) {
-      return res.json({ status: "error", message: "Dosya yüklenemedi." });
+    if (!activeSubscription) {
+      if (req.file && req.file.path) fs.unlinkSync(req.file.path); // Yüklenen dosyayı sil
+      return res
+        .status(403)
+        .json({
+          status: "error",
+          message: "Bu özellik sadece aboneler içindir.",
+        });
     }
 
-    filePath = req.file.path;
+    let filePath = null;
 
-    const isPDF = req.file.mimetype === "application/pdf";
+    try {
+      if (!req.file) {
+        return res.json({ status: "error", message: "Dosya yüklenemedi." });
+      }
 
-    let imageBase64 = null;
+      filePath = req.file.path;
 
-    if (isPDF) {
-      const converter = fromPath(filePath, {
-        density: 150,
-        saveFilename: "page",
-        savePath: "/tmp",
-        format: "jpg",
-        width: 1200,
-        height: 1600,
-      });
+      const isPDF = req.file.mimetype === "application/pdf";
 
-      const result = await converter(1);
-      const jpgPath = result.path;
+      let imageBase64 = null;
 
-      imageBase64 = fs.readFileSync(jpgPath, "base64");
+      if (isPDF) {
+        const converter = fromPath(filePath, {
+          density: 150,
+          saveFilename: "page",
+          savePath: "/tmp",
+          format: "jpg",
+          width: 1200,
+          height: 1600,
+        });
 
-      if (fs.existsSync(jpgPath)) fs.unlinkSync(jpgPath);
-    } else {
-      imageBase64 = fs.readFileSync(filePath, "base64");
-    }
+        const result = await converter(1);
+        const jpgPath = result.path;
 
-    const messages = [
-      {
-        role: "user",
-        content: [
-          {
-            type: "image_url",
-            image_url: {
-              url: `data:image/jpeg;base64,${imageBase64}`,
+        imageBase64 = fs.readFileSync(jpgPath, "base64");
+
+        if (fs.existsSync(jpgPath)) fs.unlinkSync(jpgPath);
+      } else {
+        imageBase64 = fs.readFileSync(filePath, "base64");
+      }
+
+      const messages = [
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${imageBase64}`,
+              },
             },
-          },
-          {
-            type: "text",
-            text: `
+            {
+              type: "text",
+              text: `
 Bu bir kira sözleşmesi görüntüsüdür.
 Aşağıdaki alanları JSON olarak çıkar:
 
@@ -66,33 +88,34 @@ Aşağıdaki alanları JSON olarak çıkar:
 
 Sadece JSON döndür, açıklama yazma.
               `,
-          },
-        ],
-      },
-    ];
+            },
+          ],
+        },
+      ];
 
-    const result = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages,
-    });
+      const result = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages,
+      });
 
-    let raw = result.choices[0].message.content;
-    console.log("AI RAW:", raw);
+      let raw = result.choices[0].message.content;
+      console.log("AI RAW:", raw);
 
-    let cleaned = raw
-      .replace(/```json/gi, "")
-      .replace(/```/g, "")
-      .trim();
+      let cleaned = raw
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
+        .trim();
 
-    let fields = JSON.parse(cleaned);
+      let fields = JSON.parse(cleaned);
 
-    return res.json({ status: "success", fields });
-  } catch (err) {
-    console.error("AI ERROR:", err);
-    return res.json({ status: "error", message: "Belge okunamadı." });
-  } finally {
-    if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      return res.json({ status: "success", fields });
+    } catch (err) {
+      console.error("AI ERROR:", err);
+      return res.json({ status: "error", message: "Belge okunamadı." });
+    } finally {
+      if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
   }
-});
+);
 
 module.exports = router;
