@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography, Button, Paper, Grid, Container, CircularProgress } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import api from "../api";
@@ -35,8 +35,70 @@ const PLANS = [
     },
 ];
 
+const ActiveSubscriptionCard = ({ subscription }) => {
+    if (!subscription) return null;
+
+    const plan = PLANS.find((p) => p.id === subscription.planType);
+    const endDate = new Date(subscription.endDate);
+    const today = new Date();
+    const diffTime = Math.abs(endDate - today);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return (
+        <Paper
+            elevation={3}
+            sx={{
+                p: 4,
+                mb: 6,
+                borderRadius: 4,
+                background: "linear-gradient(135deg, #2E86C1 0%, #3498DB 100%)",
+                color: "white",
+            }}
+        >
+            <Grid container alignItems="center" spacing={2}>
+                <Grid item xs={12} md={8}>
+                    <Typography variant="h6" sx={{ opacity: 0.9, mb: 1 }}>
+                        Mevcut Aboneliğiniz
+                    </Typography>
+                    <Typography variant="h3" fontWeight={700} gutterBottom>
+                        {plan ? plan.title : subscription.planType}
+                    </Typography>
+                    <Box display="flex" gap={3} mt={2}>
+                        <Box>
+                            <Typography variant="caption" sx={{ opacity: 0.8 }}>DURUM</Typography>
+                            <Typography variant="h6" fontWeight={600}>{subscription.status}</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="caption" sx={{ opacity: 0.8 }}>BİTİŞ TARİHİ</Typography>
+                            <Typography variant="h6" fontWeight={600}>{endDate.toLocaleDateString("tr-TR")}</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="caption" sx={{ opacity: 0.8 }}>KALAN SÜRE</Typography>
+                            <Typography variant="h6" fontWeight={600}>{diffDays} Gün</Typography>
+                        </Box>
+                    </Box>
+                </Grid>
+                <Grid item xs={12} md={4} textAlign="right">
+                    <CheckCircleIcon sx={{ fontSize: 100, opacity: 0.2 }} />
+                </Grid>
+            </Grid>
+        </Paper>
+    );
+};
+
 const Subscription = () => {
     const [loading, setLoading] = useState(false);
+    const [subscription, setSubscription] = useState(null);
+
+    useEffect(() => {
+        api.get("/payment/status")
+            .then(res => {
+                if (res.data.status === "success" && res.data.isSubscribed) {
+                    setSubscription(res.data.subscription);
+                }
+            })
+            .catch(err => console.error("Abonelik kontrol hatası:", err));
+    }, []);
 
     const handleSubscribe = async (planId) => {
         setLoading(true);
@@ -70,6 +132,8 @@ const Subscription = () => {
         <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa", py: 8 }}>
             <Container maxWidth="lg">
                 <Box textAlign="center" mb={6}>
+                    {subscription && <ActiveSubscriptionCard subscription={subscription} />}
+
                     <Typography variant="h3" fontWeight={700} color="primary" gutterBottom>
                         Abonelik Paketleri
                     </Typography>

@@ -7,6 +7,7 @@ import BasicTable from "../components/BasicTable";
 import WelcomeHeader from "../components/WelcomeHeader";
 import InviteList from "../components/InviteList";
 import InviteModal from "../components/InviteModal";
+import { useConfirm } from "../context/ConfirmDialogContext";
 
 function OwnerHome() {
   const token = localStorage.getItem("token");
@@ -18,6 +19,7 @@ function OwnerHome() {
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const { confirm } = useConfirm();
 
   const didFetchPropsRef = useRef(false);
   useEffect(() => {
@@ -63,8 +65,17 @@ function OwnerHome() {
     } catch (err) {
       console.error("Davet kabul hatası:", err);
       if (err.response?.data?.message?.includes("LIMIT_REACHED")) {
-        alert("Yönetim kotanız doldu (10 Mülk). Lütfen abone olun.");
-        window.location.href = "/subscription";
+        const confirmed = await confirm({
+          title: "Yönetim Kotası Doldu",
+          message: "Mevcut paketinizle en fazla 10 mülk yönetebilirsiniz. Devam etmek için aboneliğinizi yükseltin.",
+          severity: "warning",
+          confirmText: "Paketleri İncele",
+          cancelText: "İptal",
+        });
+
+        if (confirmed) {
+          window.location.href = "/subscription";
+        }
       }
     }
   };
