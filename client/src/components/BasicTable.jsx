@@ -135,7 +135,7 @@ export default function BasicTable({
           });
           setSentInvitesMap(map);
         }
-      } catch (e) {}
+      } catch (e) { }
     };
     loadSent();
   }, [data?.length]);
@@ -246,6 +246,8 @@ export default function BasicTable({
       message:
         "Bu mülkü silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
       severity: "danger",
+      confirmText: "Sil",
+      cancelText: "Vazgeç",
     });
     if (!ok) return;
 
@@ -430,6 +432,8 @@ export default function BasicTable({
       message:
         "Bu sözleşmeyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
       severity: "danger",
+      confirmText: "Sil",
+      cancelText: "Vazgeç",
     });
     if (!ok) return;
 

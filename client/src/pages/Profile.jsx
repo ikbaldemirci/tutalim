@@ -208,6 +208,8 @@ function Profile() {
       title: "Hatırlatıcıyı Sil",
       message: "Bu hatırlatıcıyı silmek istiyor musun? Bu işlem geri alınamaz.",
       severity: "danger",
+      confirmText: "Sil",
+      cancelText: "Vazgeç",
     });
     if (!ok) return;
 

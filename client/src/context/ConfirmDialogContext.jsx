@@ -55,6 +55,8 @@ export const ConfirmDialogProvider = ({ children }) => {
           title={current.title}
           message={current.message}
           severity={current.severity || "info"}
+          confirmText={current.confirmText}
+          cancelText={current.cancelText}
           disableEscape={current.disableEscape || false}
           onConfirm={handleConfirm}
           onCancel={handleCancel}

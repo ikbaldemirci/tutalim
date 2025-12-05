@@ -24,6 +24,8 @@ export default function ConfirmDialog({
   title,
   message,
   severity = "info",
+  confirmText = "Onay",
+  cancelText = "Vazgeç",
   onConfirm,
   onCancel,
 }) {
@@ -61,7 +63,7 @@ export default function ConfirmDialog({
 
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onCancel} color="inherit" sx={{ fontWeight: 600 }}>
-          Vazgeç
+          {cancelText}
         </Button>
 
         <Button
@@ -71,7 +73,7 @@ export default function ConfirmDialog({
           color={severity === "danger" ? "error" : "primary"}
           sx={{ fontWeight: 600, borderRadius: 2 }}
         >
-          Onay
+          {confirmText}
         </Button>
       </DialogActions>
     </Dialog>
