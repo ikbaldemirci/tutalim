@@ -10,12 +10,7 @@ const iyzipay = new Iyzipay({
   uri: process.env.IYZICO_URI || "https://sandbox-api.iyzipay.com",
 });
 
-const PLANS = {
-  "1_MONTH": { price: "300.00", name: "1 Aylık Abonelik", months: 1 },
-  "2_MONTHS": { price: "500.00", name: "2 Aylık Abonelik", months: 2 },
-  "6_MONTHS": { price: "1500.00", name: "6 Aylık Abonelik", months: 6 },
-  "12_MONTHS": { price: "3000.00", name: "12 Aylık Abonelik", months: 12 },
-};
+const PLANS = require("../config/plans");
 
 exports.initializeSubscription = catchAsync(async (req, res, next) => {
   const { planType } = req.body;
@@ -156,18 +151,21 @@ exports.handleCallback = catchAsync(async (req, res, next) => {
   );
 });
 
-exports.getSubscriptionStatus = catchAsync(async (req, res, next) => {
-  const user = req.user;
+const subscription = await Subscription.findOne({
+  userId: user.id,
+  status: "ACTIVE",
+  endDate: { $gt: new Date() },
+}).sort({ endDate: -1 });
 
-  const subscription = await Subscription.findOne({
-    userId: user.id,
-    status: "ACTIVE",
-    endDate: { $gt: new Date() },
-  }).sort({ endDate: -1 });
+res.json({
+  status: "success",
+  isSubscribed: !!subscription,
+  subscription: subscription || null,
+});
 
-  res.json({
+exports.getPlans = catchAsync(async (req, res, next) => {
+  res.status(200).json({
     status: "success",
-    isSubscribed: !!subscription,
-    subscription: subscription || null,
+    plans: Object.values(PLANS),
   });
 });
