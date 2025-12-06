@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import api from "../api";
 import {
   Paper,
@@ -13,7 +13,7 @@ import {
   Grid,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useConfirm } from "../context/ConfirmDialogContext";
 
 import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
@@ -26,7 +26,10 @@ export default function AddPropertyCard({
   isSubscribed = false,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { confirm } = useConfirm();
+  const fileInputRef = useRef(null);
+
   const isLimitReached = propertyCount >= 10 && !isSubscribed;
   const [form, setForm] = useState({
     rentPrice: "",
@@ -59,6 +62,27 @@ export default function AddPropertyCard({
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
+  };
+
+  const handleFileButtonClick = async () => {
+    if (!isSubscribed) {
+      const confirmed = await confirm({
+        title: "Premium Özellik ✨",
+        message:
+          "Belgeden otomatik okuma özelliği sadece abonelerimiz içindir. Zaman kazanmak ve işinizi kolaylaştırmak için hemen abone olun!",
+        severity: "info",
+        confirmText: "Paketleri İncele",
+        cancelText: "Belki Daha Sonra",
+      });
+
+      if (confirmed) {
+        navigate(
+          "/subscription?returnUrl=" + encodeURIComponent(location.pathname)
+        );
+      }
+      return;
+    }
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = async () => {
@@ -415,9 +439,17 @@ export default function AddPropertyCard({
               md={4}
               sx={{ display: "flex", gap: 1, justifyContent: "center" }}
             >
+              <input
+                type="file"
+                hidden
+                ref={fileInputRef}
+                accept="image/*,application/pdf"
+                disabled={extractLoading}
+                onChange={(e) => handleExtract(e.target.files?.[0])}
+              />
               <Button
                 variant="contained"
-                component="label"
+                onClick={handleFileButtonClick}
                 size="medium"
                 startIcon={!extractLoading ? <AutoAwesomeIcon /> : null}
                 sx={{
@@ -446,50 +478,6 @@ export default function AddPropertyCard({
                 ) : (
                   "Belgeden Oku"
                 )}
-
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*,application/pdf"
-                  disabled={extractLoading}
-                  onChange={async (e) => {
-                    if (!isSubscribed) {
-                      e.target.value = "";
-                      const confirmed = await confirm({
-                        title: "Premium Özellik ✨",
-                        message:
-                          "Belgeden otomatik okuma özelliği sadece abonelerimiz içindir. Zaman kazanmak ve işinizi kolaylaştırmak için hemen abone olun!",
-                        severity: "info",
-                        confirmText: "Paketleri İncele",
-                        cancelText: "Belki Daha Sonra",
-                      });
-
-                      if (confirmed) {
-                        navigate(
-                          "/subscription?returnUrl=" +
-                            encodeURIComponent(location.pathname)
-                        );
-                      }
-                      return;
-                    }
-                    handleExtract(e.target.files?.[0]);
-                  }}
-                  onClick={(e) => {
-                    if (!isSubscribed) {
-                      e.preventDefault();
-                      confirm({
-                        title: "Premium Özellik ✨",
-                        message:
-                          "Belgeden otomatik okuma özelliği sadece abonelerimiz içindir. Zaman kazanmak ve işinizi kolaylaştırmak için hemen abone olun!",
-                        severity: "info",
-                        confirmText: "Paketleri İncele",
-                        cancelText: "Belki Daha Sonra",
-                      }).then((confirmed) => {
-                        if (confirmed) navigate("/subscription");
-                      });
-                    }
-                  }}
-                />
               </Button>
 
               <Button
