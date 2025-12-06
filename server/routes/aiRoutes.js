@@ -16,19 +16,17 @@ router.post(
   upload.single("file"),
   async (req, res) => {
     const activeSubscription = await Subscription.findOne({
-      userId: req.user._id,
+      userId: req.user.id,
       status: "ACTIVE",
       endDate: { $gt: new Date() },
     });
 
     if (!activeSubscription) {
       if (req.file && req.file.path) fs.unlinkSync(req.file.path); // Yüklenen dosyayı sil
-      return res
-        .status(403)
-        .json({
-          status: "error",
-          message: "Bu özellik sadece aboneler içindir.",
-        });
+      return res.status(403).json({
+        status: "error",
+        message: "Bu özellik sadece aboneler içindir.",
+      });
     }
 
     let filePath = null;
