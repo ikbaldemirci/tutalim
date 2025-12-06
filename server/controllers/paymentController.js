@@ -13,7 +13,7 @@ const iyzipay = new Iyzipay({
 const PLANS = require("../config/plans");
 
 exports.initializeSubscription = catchAsync(async (req, res, next) => {
-  const { planType } = req.body;
+  const { planType, returnUrl } = req.body;
   const user = req.user;
   const selectedPlan = PLANS[planType];
   if (!selectedPlan) {
@@ -84,6 +84,7 @@ exports.initializeSubscription = catchAsync(async (req, res, next) => {
       status: "PENDING",
       iyzicoSubscriptionReferenceCode: result.token,
       endDate: new Date(),
+      returnUrl: returnUrl || null,
     });
 
     res.status(200).json({
@@ -146,7 +147,12 @@ exports.handleCallback = catchAsync(async (req, res, next) => {
         await subscription.save();
       }
 
-      res.redirect(`${clientUrl}/payment/success`);
+      let redirectUrl = `${clientUrl}/payment/success`;
+      if (subscription.returnUrl) {
+        redirectUrl += `?next=${encodeURIComponent(subscription.returnUrl)}`;
+      }
+
+      res.redirect(redirectUrl);
     }
   );
 });

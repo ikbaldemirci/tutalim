@@ -465,7 +465,10 @@ export default function AddPropertyCard({
                       });
 
                       if (confirmed) {
-                        navigate("/subscription");
+                        navigate(
+                          "/subscription?returnUrl=" +
+                            encodeURIComponent(location.pathname)
+                        );
                       }
                       return;
                     }
