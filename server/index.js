@@ -26,6 +26,7 @@ const allowedOrigins = [
   "https://www.tutalim.com",
   "https://sandbox-api.iyzipay.com",
   "https://iyzipay.com",
+  "https://sandbox-cpp.iyzipay.com",
 ];
 app.use(
   cors({
