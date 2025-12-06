@@ -21,9 +21,7 @@ exports.initializeSubscription = catchAsync(async (req, res, next) => {
   }
 
   const conversationId = `${user.id}_${Date.now()}`;
-  const callbackUrl = `${
-    process.env.API_URL || "http://localhost:5000"
-  }/api/payment/callback`;
+  const callbackUrl = `${process.env.API_URL}/api/payment/callback`;
 
   const request = {
     locale: Iyzipay.LOCALE.TR,
@@ -157,16 +155,20 @@ exports.handleCallback = catchAsync(async (req, res, next) => {
   );
 });
 
-const subscription = await Subscription.findOne({
-  userId: user.id,
-  status: "ACTIVE",
-  endDate: { $gt: new Date() },
-}).sort({ endDate: -1 });
+exports.getSubscriptionStatus = catchAsync(async (req, res, next) => {
+  const user = req.user;
 
-res.json({
-  status: "success",
-  isSubscribed: !!subscription,
-  subscription: subscription || null,
+  const subscription = await Subscription.findOne({
+    userId: user.id,
+    status: "ACTIVE",
+    endDate: { $gt: new Date() },
+  }).sort({ endDate: -1 });
+
+  res.json({
+    status: "success",
+    isSubscribed: !!subscription,
+    subscription: subscription || null,
+  });
 });
 
 exports.getPlans = catchAsync(async (req, res, next) => {
