@@ -129,10 +129,22 @@ exports.handleCallback = catchAsync(async (req, res, next) => {
         subscription.status = "ACTIVE";
 
         const plan = PLANS[subscription.planType];
-        const now = new Date();
-        const endDate = new Date(
-          now.setMonth(now.getMonth() + (plan ? plan.months : 1))
-        );
+
+        const existingSub = await Subscription.findOne({
+          userId: subscription.userId,
+          status: "ACTIVE",
+          endDate: { $gt: new Date() },
+          _id: { $ne: subscription._id },
+        }).sort({ endDate: -1 });
+
+        let effectiveStartDate = new Date();
+
+        if (existingSub && existingSub.endDate > effectiveStartDate) {
+          effectiveStartDate = new Date(existingSub.endDate);
+        }
+
+        const endDate = new Date(effectiveStartDate);
+        endDate.setMonth(endDate.getMonth() + (plan ? plan.months : 1));
 
         subscription.endDate = endDate;
         subscription.startDate = new Date();
